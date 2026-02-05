@@ -1,0 +1,136 @@
+using BooksPortal.Application.Common.Exceptions;
+using BooksPortal.Application.Common.Interfaces;
+using BooksPortal.Application.Features.Users.DTOs;
+using BooksPortal.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+namespace BooksPortal.Infrastructure.Services;
+
+public class UserService : IUserService
+{
+    private readonly UserManager<Staff> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
+
+    public UserService(
+        UserManager<Staff> userManager,
+        RoleManager<IdentityRole<int>> roleManager)
+    {
+        _userManager = userManager;
+        _roleManager = roleManager;
+    }
+
+    public async Task<List<UserResponse>> GetAllUsersAsync()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        var result = new List<UserResponse>();
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            result.Add(MapToResponse(user, roles));
+        }
+
+        return result;
+    }
+
+    public async Task<UserResponse> GetUserByIdAsync(int id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString())
+            ?? throw new NotFoundException("Staff", id);
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return MapToResponse(user, roles);
+    }
+
+    public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
+    {
+        var user = new Staff
+        {
+            UserName = request.UserName,
+            Email = request.Email,
+            FullName = request.FullName,
+            NationalId = request.NationalId,
+            Designation = request.Designation,
+            IsActive = true
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new BusinessRuleException(errors);
+        }
+
+        if (request.Roles.Count > 0)
+        {
+            await _userManager.AddToRolesAsync(user, request.Roles);
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return MapToResponse(user, roles);
+    }
+
+    public async Task<UserResponse> UpdateUserAsync(int id, UpdateUserRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString())
+            ?? throw new NotFoundException("Staff", id);
+
+        user.Email = request.Email;
+        user.FullName = request.FullName;
+        user.NationalId = request.NationalId;
+        user.Designation = request.Designation;
+        user.IsActive = request.IsActive;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new BusinessRuleException(errors);
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return MapToResponse(user, roles);
+    }
+
+    public async Task ToggleUserActiveAsync(int id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString())
+            ?? throw new NotFoundException("Staff", id);
+
+        user.IsActive = !user.IsActive;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new BusinessRuleException(errors);
+        }
+    }
+
+    public async Task AssignRolesAsync(int id, List<string> roles)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString())
+            ?? throw new NotFoundException("Staff", id);
+
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        await _userManager.AddToRolesAsync(user, roles);
+    }
+
+    private static UserResponse MapToResponse(Staff user, IList<string> roles)
+    {
+        return new UserResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            FullName = user.FullName,
+            NationalId = user.NationalId,
+            Designation = user.Designation,
+            IsActive = user.IsActive,
+            Roles = roles.ToList(),
+            CreatedAt = user.CreatedAt
+        };
+    }
+}

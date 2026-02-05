@@ -14,6 +14,7 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     private readonly ICurrentUserService _currentUserService;
 
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
