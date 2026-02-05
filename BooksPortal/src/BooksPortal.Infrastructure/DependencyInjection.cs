@@ -34,12 +34,15 @@ public static class DependencyInjection
                 options.User.RequireUniqueEmail = false;
             })
             .AddRoles<IdentityRole<int>>()
+            .AddSignInManager()
             .AddEntityFrameworkStores<BooksPortalDbContext>()
             .AddDefaultTokenProviders();
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }
