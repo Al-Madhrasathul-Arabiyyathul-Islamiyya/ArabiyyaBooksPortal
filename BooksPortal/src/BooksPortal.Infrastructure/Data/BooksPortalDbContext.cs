@@ -15,6 +15,15 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
 
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
+    public DbSet<Keystage> Keystages => Set<Keystage>();
+    public DbSet<Subject> Subjects => Set<Subject>();
+    public DbSet<ClassSection> ClassSections => Set<ClassSection>();
+    public DbSet<Student> Students => Set<Student>();
+    public DbSet<Parent> Parents => Set<Parent>();
+    public DbSet<StudentParent> StudentParents => Set<StudentParent>();
+    public DbSet<Teacher> Teachers => Set<Teacher>();
+    public DbSet<TeacherAssignment> TeacherAssignments => Set<TeacherAssignment>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
