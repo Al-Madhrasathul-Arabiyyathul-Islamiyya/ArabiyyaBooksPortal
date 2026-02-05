@@ -24,6 +24,9 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<StudentParent> StudentParents => Set<StudentParent>();
     public DbSet<Teacher> Teachers => Set<Teacher>();
     public DbSet<TeacherAssignment> TeacherAssignments => Set<TeacherAssignment>();
+    public DbSet<Book> Books => Set<Book>();
+    public DbSet<StockEntry> StockEntries => Set<StockEntry>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
