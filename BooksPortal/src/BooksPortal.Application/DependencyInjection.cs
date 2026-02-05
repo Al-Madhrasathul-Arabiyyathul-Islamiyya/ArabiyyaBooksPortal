@@ -1,4 +1,6 @@
 using BooksPortal.Application.Common.Mappings;
+using BooksPortal.Application.Features.MasterData.Interfaces;
+using BooksPortal.Application.Features.MasterData.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,15 @@ public static class DependencyInjection
         MapsterConfig.Configure();
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+        services.AddScoped<IAcademicYearService, AcademicYearService>();
+        services.AddScoped<IKeystageService, KeystageService>();
+        services.AddScoped<ISubjectService, SubjectService>();
+        services.AddScoped<IClassSectionService, ClassSectionService>();
+        services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IParentService, ParentService>();
+        services.AddScoped<ITeacherService, TeacherService>();
+        services.AddScoped<ILookupService, LookupService>();
 
         return services;
     }
