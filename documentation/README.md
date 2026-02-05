@@ -15,6 +15,7 @@ Books Portal is a comprehensive web-based textbook management system for schools
 | [03-api-specification.md](./03-api-specification.md) | REST API endpoints, request/response formats |
 | [04-implementation-plan.md](./04-implementation-plan.md) | Phased development plan, tasks, deliverables |
 | [05-frontend-structure.md](./05-frontend-structure.md) | Nuxt project structure, components, composables |
+| [06-schema-addendum-unicode-timezone](./06-schema-addendum-unicode-timezone.md) | Schema addendums for unicode and timezone |
 
 ---
 
