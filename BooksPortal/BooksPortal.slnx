@@ -5,4 +5,8 @@
     <Project Path="src/BooksPortal.Domain/BooksPortal.Domain.csproj" />
     <Project Path="src/BooksPortal.Infrastructure/BooksPortal.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BooksPortal.IntegrationTests/BooksPortal.IntegrationTests.csproj" />
+    <Project Path="tests/BooksPortal.UnitTests/BooksPortal.UnitTests.csproj" />
+  </Folder>
 </Solution>
