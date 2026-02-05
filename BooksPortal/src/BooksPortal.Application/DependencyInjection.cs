@@ -1,4 +1,6 @@
 using BooksPortal.Application.Common.Mappings;
+using BooksPortal.Application.Features.Books.Interfaces;
+using BooksPortal.Application.Features.Books.Services;
 using BooksPortal.Application.Features.MasterData.Interfaces;
 using BooksPortal.Application.Features.MasterData.Services;
 using FluentValidation;
@@ -22,6 +24,8 @@ public static class DependencyInjection
         services.AddScoped<IParentService, ParentService>();
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<ILookupService, LookupService>();
+
+        services.AddScoped<IBookService, BookService>();
 
         return services;
     }
