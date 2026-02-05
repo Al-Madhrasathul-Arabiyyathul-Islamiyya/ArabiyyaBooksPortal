@@ -69,62 +69,34 @@ School book distribution management system built with .NET 10 Clean Architecture
 > Reference data entities - Academic Years, Keystages, Subjects, Classes, Students, Parents, Teachers
 
 ### 3.1 Academic Year
-- [ ] Entity: `AcademicYear.cs`
-- [ ] Configuration: `AcademicYearConfiguration.cs`
-- [ ] DTOs: `AcademicYearDto`, `CreateAcademicYearDto`
-- [ ] Service: `IAcademicYearService`, `AcademicYearService`
-- [ ] Controller: `AcademicYearsController`
-- [ ] Validator: `CreateAcademicYearValidator`
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.2 Keystage
-- [ ] Entity: `Keystage.cs`
-- [ ] Configuration: `KeystageConfiguration.cs`
-- [ ] DTOs, Service, Controller, Validator
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.3 Subject
-- [ ] Entity: `Subject.cs`
-- [ ] Configuration: `SubjectConfiguration.cs`
-- [ ] DTOs, Service, Controller, Validator
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.4 ClassSection
-- [ ] Entity: `ClassSection.cs` (with computed DisplayName)
-- [ ] Configuration: `ClassSectionConfiguration.cs`
-- [ ] DTOs, Service, Controller, Validator
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.5 Student
-- [ ] Entity: `Student.cs`
-- [ ] Configuration: `StudentConfiguration.cs`
-- [ ] DTOs, Service, Controller, Validator
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.6 Parent
-- [ ] Entity: `Parent.cs`
-- [ ] Configuration: `ParentConfiguration.cs`
-- [ ] DTOs, Service, Controller, Validator
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.7 StudentParent Junction
-- [ ] Entity: `StudentParent.cs`
-- [ ] Configuration: `StudentParentConfiguration.cs`
+- [x] Entity, Configuration
 
 ### 3.8 Teacher
-- [ ] Entity: `Teacher.cs`
-- [ ] Configuration: `TeacherConfiguration.cs`
-- [ ] DTOs, Service, Controller, Validator
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller, Validator
 
 ### 3.9 TeacherAssignment
-- [ ] Entity: `TeacherAssignment.cs`
-- [ ] Configuration: `TeacherAssignmentConfiguration.cs`
-- [ ] DTOs, Service, Controller
-- [ ] Unit tests
+- [x] Entity, Configuration, DTOs, Service, Controller
 
 ### 3.10 Lookup Endpoints
-- [ ] Create `LookupsController` for dropdown data
+- [x] `LookupsController` for dropdown data
 
 ---
 
