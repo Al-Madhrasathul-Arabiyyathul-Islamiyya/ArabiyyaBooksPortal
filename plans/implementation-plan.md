@@ -45,17 +45,17 @@ School book distribution management system built with .NET 10 Clean Architecture
 > JWT auth, user management, roles
 
 ### Backend
-- [ ] Configure ASP.NET Core Identity in Program.cs
-- [ ] Configure JWT Bearer authentication
-- [ ] Create `IAuthService` interface
-- [ ] Create `AuthService` implementation (Login, Refresh, Logout)
-- [ ] Create `IUserService` interface
-- [ ] Create `UserService` implementation
-- [ ] Create `AuthController` (login, refresh, logout, me, change-password)
-- [ ] Create `UsersController` (CRUD)
-- [ ] Create DTOs: LoginRequest, TokenResponse, UserDto, CreateUserDto
-- [ ] Create validators for auth DTOs
-- [ ] Seed default SuperAdmin user
+- [x] Configure ASP.NET Core Identity in Program.cs
+- [x] Configure JWT Bearer authentication
+- [x] Create `IAuthService` interface
+- [x] Create `AuthService` implementation (Login, Refresh, Logout)
+- [x] Create `IUserService` interface
+- [x] Create `UserService` implementation
+- [x] Create `AuthController` (login, refresh, logout, me, change-password)
+- [x] Create `UsersController` (CRUD)
+- [x] Create DTOs: LoginRequest, TokenResponse, UserDto, CreateUserDto
+- [x] Create validators for auth DTOs
+- [x] Seed default SuperAdmin user
 
 ### Frontend (Phase 2 - Later)
 - [ ] Setup Nuxt 4 project with PrimeVue
