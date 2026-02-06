@@ -1,10 +1,14 @@
 using BooksPortal.Application.Common.Mappings;
+using BooksPortal.Application.Features.AuditLogs.Interfaces;
+using BooksPortal.Application.Features.AuditLogs.Services;
 using BooksPortal.Application.Features.Books.Interfaces;
 using BooksPortal.Application.Features.Books.Services;
 using BooksPortal.Application.Features.Distribution.Interfaces;
 using BooksPortal.Application.Features.Distribution.Services;
 using BooksPortal.Application.Features.Returns.Interfaces;
 using BooksPortal.Application.Features.Returns.Services;
+using BooksPortal.Application.Features.Reports.Interfaces;
+using BooksPortal.Application.Features.Reports.Services;
 using BooksPortal.Application.Features.TeacherIssues.Interfaces;
 using BooksPortal.Application.Features.TeacherIssues.Services;
 using BooksPortal.Application.Features.MasterData.Interfaces;
@@ -35,6 +39,8 @@ public static class DependencyInjection
         services.AddScoped<IDistributionService, DistributionService>();
         services.AddScoped<IReturnService, ReturnService>();
         services.AddScoped<ITeacherIssueService, TeacherIssueService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<IReportService, ReportService>();
 
         return services;
     }
