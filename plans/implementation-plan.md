@@ -214,26 +214,26 @@ School book distribution management system built with .NET 10 Clean Architecture
 
 ---
 
-## Module 8: Reports & Dashboard
-> Stock reports, distribution reports, audit logs
+## Module 8: Reports & Audit
+> Stock reports, distribution reports, audit logs, Excel export
 
 ### Services
-- [ ] `IReportService` interface
-- [ ] `ReportService` implementation
-  - [ ] Stock summary
-  - [ ] Distribution summary
-  - [ ] Movement log
-  - [ ] Class distribution
-  - [ ] Teacher outstanding
+- [x] `IReportService` interface
+- [x] `ReportService` implementation
+  - [x] Stock summary (with subject/grade filter)
+  - [x] Distribution summary (by academic year, date range)
+  - [x] Teacher outstanding (with teacher filter)
+  - [x] Student history (distributions + returns)
+  - [x] Excel export via ClosedXML (stock, distribution, teacher outstanding)
 
 ### Controllers
-- [ ] `ReportsController`
-- [ ] Excel export using ClosedXML
+- [x] `ReportsController` (JSON + Excel export endpoints)
+- [x] `AuditLogsController` [Admin] (paginated, filterable)
 
 ### Audit Log
-- [ ] Entity: `AuditLog.cs`
-- [ ] EF Core interceptor for audit logging
-- [ ] `AuditLogsController`
+- [x] Entity: `AuditLog.cs` (created in Module 1)
+- [x] Auto-write in DbContext.SaveChangesAsync (Module 1)
+- [x] `IAuditLogService` / `AuditLogService` query interface
 
 ---
 
@@ -278,6 +278,6 @@ School book distribution management system built with .NET 10 Clean Architecture
 ---
 
 ## Current Focus
-> Module 8: Reports & Audit → Module 9: Print
+> Module 9: Print
 
-Modules 1-7 complete and merged to dev (v0.1.0 through v0.7.0).
+Modules 1-8 complete and merged to dev (v0.1.0 through v0.8.0).
