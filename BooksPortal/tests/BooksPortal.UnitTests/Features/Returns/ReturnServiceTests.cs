@@ -15,6 +15,8 @@ public class ReturnServiceTests
     private readonly IRepository<Book> _bookRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
+    private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
     private readonly ReturnService _sut;
 
     public ReturnServiceTests()
@@ -23,7 +25,9 @@ public class ReturnServiceTests
         _bookRepo = Substitute.For<IRepository<Book>>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _refService = Substitute.For<IReferenceNumberService>();
-        _sut = new ReturnService(_slipRepo, _bookRepo, _unitOfWork, _refService);
+        _pdfService = Substitute.For<IPdfService>();
+        _storageService = Substitute.For<ISlipStorageService>();
+        _sut = new ReturnService(_slipRepo, _bookRepo, _unitOfWork, _refService, _pdfService, _storageService);
     }
 
     private static Book CreateBook(int id = 1, int totalStock = 100, int distributed = 30,

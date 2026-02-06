@@ -11,6 +11,7 @@ public class ReturnSlip : BaseEntity
     public int ReceivedById { get; set; }
     public DateTime ReceivedAt { get; set; }
     public string? Notes { get; set; }
+    public string? PdfFilePath { get; set; }
 
     public AcademicYear AcademicYear { get; set; } = null!;
     public Student Student { get; set; } = null!;

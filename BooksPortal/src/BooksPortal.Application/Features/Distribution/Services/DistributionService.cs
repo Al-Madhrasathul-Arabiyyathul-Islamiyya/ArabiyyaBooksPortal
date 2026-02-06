@@ -15,17 +15,23 @@ public class DistributionService : IDistributionService
     private readonly IRepository<Book> _bookRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
+    private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
 
     public DistributionService(
         IRepository<DistributionSlip> slipRepo,
         IRepository<Book> bookRepo,
         IUnitOfWork unitOfWork,
-        IReferenceNumberService refService)
+        IReferenceNumberService refService,
+        IPdfService pdfService,
+        ISlipStorageService storageService)
     {
         _slipRepo = slipRepo;
         _bookRepo = bookRepo;
         _unitOfWork = unitOfWork;
         _refService = refService;
+        _pdfService = pdfService;
+        _storageService = storageService;
     }
 
     public async Task<PaginatedList<DistributionSlipResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? studentId = null)
@@ -58,6 +64,7 @@ public class DistributionService : IDistributionService
             IssuedById = d.IssuedById,
             IssuedAt = d.IssuedAt,
             Notes = d.Notes,
+            PdfFilePath = d.PdfFilePath,
             Items = d.Items.Select(i => new DistributionSlipItemResponse
             {
                 Id = i.Id,
@@ -143,9 +150,15 @@ public class DistributionService : IDistributionService
 
             _slipRepo.Add(slip);
             await _unitOfWork.SaveChangesAsync();
+
+            var response = await GetByIdAsync(slip.Id);
+            var pdfBytes = await _pdfService.GenerateDistributionSlipAsync(response);
+            slip.PdfFilePath = await _storageService.SaveAsync("Distribution", response.AcademicYearName, slip.ReferenceNo, pdfBytes);
+            await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
-            return await GetByIdAsync(slip.Id);
+            response.PdfFilePath = slip.PdfFilePath;
+            return response;
         }
         catch
         {
@@ -202,6 +215,7 @@ public class DistributionService : IDistributionService
             IssuedById = slip.IssuedById,
             IssuedAt = slip.IssuedAt,
             Notes = slip.Notes,
+            PdfFilePath = slip.PdfFilePath,
             Items = slip.Items.Select(i => new DistributionSlipItemResponse
             {
                 Id = i.Id,

@@ -13,6 +13,7 @@ public class DistributionSlip : BaseEntity
     public int IssuedById { get; set; }
     public DateTime IssuedAt { get; set; }
     public string? Notes { get; set; }
+    public string? PdfFilePath { get; set; }
 
     public AcademicYear AcademicYear { get; set; } = null!;
     public Student Student { get; set; } = null!;

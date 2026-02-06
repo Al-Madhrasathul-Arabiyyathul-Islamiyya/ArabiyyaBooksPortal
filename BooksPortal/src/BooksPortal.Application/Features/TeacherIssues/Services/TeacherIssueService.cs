@@ -16,19 +16,25 @@ public class TeacherIssueService : ITeacherIssueService
     private readonly IRepository<Book> _bookRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
+    private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
 
     public TeacherIssueService(
         IRepository<TeacherIssue> issueRepo,
         IRepository<TeacherReturnSlip> returnSlipRepo,
         IRepository<Book> bookRepo,
         IUnitOfWork unitOfWork,
-        IReferenceNumberService refService)
+        IReferenceNumberService refService,
+        IPdfService pdfService,
+        ISlipStorageService storageService)
     {
         _issueRepo = issueRepo;
         _returnSlipRepo = returnSlipRepo;
         _bookRepo = bookRepo;
         _unitOfWork = unitOfWork;
         _refService = refService;
+        _pdfService = pdfService;
+        _storageService = storageService;
     }
 
     public async Task<PaginatedList<TeacherIssueResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? teacherId = null)
@@ -58,6 +64,7 @@ public class TeacherIssueService : ITeacherIssueService
             ExpectedReturnDate = t.ExpectedReturnDate,
             Status = t.Status,
             Notes = t.Notes,
+            PdfFilePath = t.PdfFilePath,
             Items = t.Items.Select(i => new TeacherIssueItemResponse
             {
                 Id = i.Id,
@@ -132,9 +139,15 @@ public class TeacherIssueService : ITeacherIssueService
 
             _issueRepo.Add(issue);
             await _unitOfWork.SaveChangesAsync();
+
+            var response = await GetByIdAsync(issue.Id);
+            var pdfBytes = await _pdfService.GenerateTeacherIssueSlipAsync(response);
+            issue.PdfFilePath = await _storageService.SaveAsync("TeacherIssue", response.AcademicYearName, issue.ReferenceNo, pdfBytes);
+            await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
-            return await GetByIdAsync(issue.Id);
+            response.PdfFilePath = issue.PdfFilePath;
+            return response;
         }
         catch
         {
@@ -146,7 +159,9 @@ public class TeacherIssueService : ITeacherIssueService
     public async Task<TeacherIssueResponse> ProcessReturnAsync(int id, ProcessTeacherReturnRequest request, int userId)
     {
         var issue = await _issueRepo.Query()
-            .Include(t => t.Items)
+            .Include(t => t.AcademicYear)
+            .Include(t => t.Teacher)
+            .Include(t => t.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException(nameof(TeacherIssue), id);
 
@@ -196,6 +211,37 @@ public class TeacherIssueService : ITeacherIssueService
             issue.Status = DetermineStatus(issue);
             _issueRepo.Update(issue);
             await _unitOfWork.SaveChangesAsync();
+
+            // Generate and store teacher return PDF
+            var returnResponse = new TeacherReturnSlipResponse
+            {
+                Id = returnSlip.Id,
+                ReferenceNo = returnSlip.ReferenceNo,
+                TeacherIssueId = issue.Id,
+                TeacherName = issue.Teacher.FullName,
+                AcademicYearId = issue.AcademicYearId,
+                AcademicYearName = issue.AcademicYear.Name,
+                ReceivedById = userId,
+                ReceivedAt = returnSlip.ReceivedAt,
+                Notes = returnSlip.Notes,
+                Items = returnSlip.Items.Select(i =>
+                {
+                    var book = issue.Items.First(ii => ii.BookId == i.BookId).Book;
+                    return new TeacherReturnSlipItemResponse
+                    {
+                        Id = i.Id,
+                        BookId = i.BookId,
+                        BookTitle = book.Title,
+                        BookCode = book.Code,
+                        Quantity = i.Quantity
+                    };
+                }).ToList()
+            };
+
+            var returnPdfBytes = await _pdfService.GenerateTeacherReturnSlipAsync(returnResponse);
+            returnSlip.PdfFilePath = await _storageService.SaveAsync("TeacherReturn", issue.AcademicYear.Name, returnSlip.ReferenceNo, returnPdfBytes);
+            await _unitOfWork.SaveChangesAsync();
+
             await _unitOfWork.CommitTransactionAsync();
 
             return await GetByIdAsync(issue.Id);
@@ -270,6 +316,7 @@ public class TeacherIssueService : ITeacherIssueService
             ExpectedReturnDate = issue.ExpectedReturnDate,
             Status = issue.Status,
             Notes = issue.Notes,
+            PdfFilePath = issue.PdfFilePath,
             Items = issue.Items.Select(i => new TeacherIssueItemResponse
             {
                 Id = i.Id,

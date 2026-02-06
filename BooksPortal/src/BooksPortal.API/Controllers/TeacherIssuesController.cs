@@ -11,11 +11,13 @@ public class TeacherIssuesController : ApiControllerBase
 {
     private readonly ITeacherIssueService _service;
     private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
 
-    public TeacherIssuesController(ITeacherIssueService service, IPdfService pdfService)
+    public TeacherIssuesController(ITeacherIssueService service, IPdfService pdfService, ISlipStorageService storageService)
     {
         _service = service;
         _pdfService = pdfService;
+        _storageService = storageService;
     }
 
     [HttpGet]
@@ -45,6 +47,11 @@ public class TeacherIssuesController : ApiControllerBase
     public async Task<IActionResult> Print(int id)
     {
         var issue = await _service.GetByIdAsync(id);
+
+        var stored = await _storageService.LoadAsync(issue.PdfFilePath);
+        if (stored != null)
+            return File(stored, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}.pdf");
+
         var pdf = await _pdfService.GenerateTeacherIssueSlipAsync(issue);
         return File(pdf, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}.pdf");
     }

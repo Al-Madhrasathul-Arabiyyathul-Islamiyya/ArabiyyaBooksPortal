@@ -11,11 +11,13 @@ public class DistributionsController : ApiControllerBase
 {
     private readonly IDistributionService _service;
     private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
 
-    public DistributionsController(IDistributionService service, IPdfService pdfService)
+    public DistributionsController(IDistributionService service, IPdfService pdfService, ISlipStorageService storageService)
     {
         _service = service;
         _pdfService = pdfService;
+        _storageService = storageService;
     }
 
     [HttpGet]
@@ -45,6 +47,11 @@ public class DistributionsController : ApiControllerBase
     public async Task<IActionResult> Print(int id)
     {
         var slip = await _service.GetByIdAsync(id);
+
+        var stored = await _storageService.LoadAsync(slip.PdfFilePath);
+        if (stored != null)
+            return File(stored, "application/pdf", $"Distribution-{slip.ReferenceNo}.pdf");
+
         var pdf = await _pdfService.GenerateDistributionSlipAsync(slip);
         return File(pdf, "application/pdf", $"Distribution-{slip.ReferenceNo}.pdf");
     }

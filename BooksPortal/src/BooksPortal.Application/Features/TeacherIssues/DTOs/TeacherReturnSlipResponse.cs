@@ -11,6 +11,7 @@ public class TeacherReturnSlipResponse
     public int ReceivedById { get; set; }
     public DateTime ReceivedAt { get; set; }
     public string? Notes { get; set; }
+    public string? PdfFilePath { get; set; }
     public List<TeacherReturnSlipItemResponse> Items { get; set; } = new();
 }
 

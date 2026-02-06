@@ -13,6 +13,7 @@ public class TeacherIssue : BaseEntity
     public DateTime? ExpectedReturnDate { get; set; }
     public TeacherIssueStatus Status { get; set; }
     public string? Notes { get; set; }
+    public string? PdfFilePath { get; set; }
 
     public AcademicYear AcademicYear { get; set; } = null!;
     public Teacher Teacher { get; set; } = null!;

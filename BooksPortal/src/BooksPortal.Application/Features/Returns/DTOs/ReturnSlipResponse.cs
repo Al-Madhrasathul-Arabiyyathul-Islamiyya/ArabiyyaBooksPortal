@@ -14,5 +14,6 @@ public class ReturnSlipResponse
     public int ReceivedById { get; set; }
     public DateTime ReceivedAt { get; set; }
     public string? Notes { get; set; }
+    public string? PdfFilePath { get; set; }
     public List<ReturnSlipItemResponse> Items { get; set; } = new();
 }

@@ -11,11 +11,13 @@ public class ReturnsController : ApiControllerBase
 {
     private readonly IReturnService _service;
     private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
 
-    public ReturnsController(IReturnService service, IPdfService pdfService)
+    public ReturnsController(IReturnService service, IPdfService pdfService, ISlipStorageService storageService)
     {
         _service = service;
         _pdfService = pdfService;
+        _storageService = storageService;
     }
 
     [HttpGet]
@@ -45,6 +47,11 @@ public class ReturnsController : ApiControllerBase
     public async Task<IActionResult> Print(int id)
     {
         var slip = await _service.GetByIdAsync(id);
+
+        var stored = await _storageService.LoadAsync(slip.PdfFilePath);
+        if (stored != null)
+            return File(stored, "application/pdf", $"Return-{slip.ReferenceNo}.pdf");
+
         var pdf = await _pdfService.GenerateReturnSlipAsync(slip);
         return File(pdf, "application/pdf", $"Return-{slip.ReferenceNo}.pdf");
     }

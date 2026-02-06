@@ -15,5 +15,6 @@ public class TeacherIssueResponse
     public DateTime? ExpectedReturnDate { get; set; }
     public TeacherIssueStatus Status { get; set; }
     public string? Notes { get; set; }
+    public string? PdfFilePath { get; set; }
     public List<TeacherIssueItemResponse> Items { get; set; } = new();
 }

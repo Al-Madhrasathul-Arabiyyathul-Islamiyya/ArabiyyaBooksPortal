@@ -15,17 +15,23 @@ public class ReturnService : IReturnService
     private readonly IRepository<Book> _bookRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
+    private readonly IPdfService _pdfService;
+    private readonly ISlipStorageService _storageService;
 
     public ReturnService(
         IRepository<ReturnSlip> slipRepo,
         IRepository<Book> bookRepo,
         IUnitOfWork unitOfWork,
-        IReferenceNumberService refService)
+        IReferenceNumberService refService,
+        IPdfService pdfService,
+        ISlipStorageService storageService)
     {
         _slipRepo = slipRepo;
         _bookRepo = bookRepo;
         _unitOfWork = unitOfWork;
         _refService = refService;
+        _pdfService = pdfService;
+        _storageService = storageService;
     }
 
     public async Task<PaginatedList<ReturnSlipResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? studentId = null)
@@ -55,6 +61,7 @@ public class ReturnService : IReturnService
             ReceivedById = r.ReceivedById,
             ReceivedAt = r.ReceivedAt,
             Notes = r.Notes,
+            PdfFilePath = r.PdfFilePath,
             Items = r.Items.Select(i => new ReturnSlipItemResponse
             {
                 Id = i.Id,
@@ -131,9 +138,15 @@ public class ReturnService : IReturnService
 
             _slipRepo.Add(slip);
             await _unitOfWork.SaveChangesAsync();
+
+            var response = await GetByIdAsync(slip.Id);
+            var pdfBytes = await _pdfService.GenerateReturnSlipAsync(response);
+            slip.PdfFilePath = await _storageService.SaveAsync("Return", response.AcademicYearName, slip.ReferenceNo, pdfBytes);
+            await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
-            return await GetByIdAsync(slip.Id);
+            response.PdfFilePath = slip.PdfFilePath;
+            return response;
         }
         catch
         {
@@ -234,6 +247,7 @@ public class ReturnService : IReturnService
             ReceivedById = slip.ReceivedById,
             ReceivedAt = slip.ReceivedAt,
             Notes = slip.Notes,
+            PdfFilePath = slip.PdfFilePath,
             Items = slip.Items.Select(i => new ReturnSlipItemResponse
             {
                 Id = i.Id,
