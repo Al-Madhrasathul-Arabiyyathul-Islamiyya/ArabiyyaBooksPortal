@@ -30,6 +30,8 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<DistributionSlip> DistributionSlips => Set<DistributionSlip>();
     public DbSet<DistributionSlipItem> DistributionSlipItems => Set<DistributionSlipItem>();
     public DbSet<ReferenceCounter> ReferenceCounters => Set<ReferenceCounter>();
+    public DbSet<ReturnSlip> ReturnSlips => Set<ReturnSlip>();
+    public DbSet<ReturnSlipItem> ReturnSlipItems => Set<ReturnSlipItem>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
