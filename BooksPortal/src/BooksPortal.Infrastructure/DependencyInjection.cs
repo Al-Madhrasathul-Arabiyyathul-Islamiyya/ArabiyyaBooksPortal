@@ -38,6 +38,7 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<BooksPortalDbContext>()
             .AddDefaultTokenProviders();
 
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<BooksPortalDbContext>());
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
