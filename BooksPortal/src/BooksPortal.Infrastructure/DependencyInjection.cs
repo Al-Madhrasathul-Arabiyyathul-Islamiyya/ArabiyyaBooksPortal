@@ -43,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IReferenceNumberService, ReferenceNumberService>();
 
         return services;
     }

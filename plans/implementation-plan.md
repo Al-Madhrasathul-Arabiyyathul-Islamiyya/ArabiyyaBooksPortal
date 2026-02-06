@@ -104,23 +104,23 @@ School book distribution management system built with .NET 10 Clean Architecture
 > Book catalog, stock entries, stock movements
 
 ### Entities
-- [ ] Entity: `Book.cs` (with stock fields)
-- [ ] Entity: `StockEntry.cs`
-- [ ] Entity: `StockMovement.cs`
-- [ ] Configurations for all entities
+- [x] Entity: `Book.cs` (with stock fields)
+- [x] Entity: `StockEntry.cs`
+- [x] Entity: `StockMovement.cs`
+- [x] Configurations for all entities
 
 ### Services
-- [ ] `IBookService` interface
-- [ ] `BookService` implementation
-  - [ ] CRUD operations
-  - [ ] `AddStockAsync` method
-  - [ ] `AdjustStockAsync` method
-  - [ ] `GetStockSummaryAsync` method
+- [x] `IBookService` interface
+- [x] `BookService` implementation
+  - [x] CRUD operations
+  - [x] `AddStockAsync` method
+  - [x] `AdjustStockAsync` method
+  - [x] `SearchAsync` method
 
 ### Controllers & DTOs
-- [ ] `BooksController`
-- [ ] DTOs: BookDto, CreateBookDto, StockEntryDto, etc.
-- [ ] Validators
+- [x] `BooksController`
+- [x] DTOs: BookResponse, CreateBookRequest, AddStockRequest, AdjustStockRequest, StockEntryResponse, StockMovementResponse
+- [x] Validators
 
 ### Tests
 - [ ] Unit tests for stock calculations
@@ -132,21 +132,28 @@ School book distribution management system built with .NET 10 Clean Architecture
 > Create distribution slips, stock deduction
 
 ### Entities
-- [ ] Entity: `DistributionSlip.cs`
-- [ ] Entity: `DistributionSlipItem.cs`
-- [ ] Configurations
+- [x] Entity: `DistributionSlip.cs`
+- [x] Entity: `DistributionSlipItem.cs`
+- [x] Entity: `ReferenceCounter.cs` (shared by Modules 5, 6, 7)
+- [x] Configurations
 
 ### Services
-- [ ] `IDistributionService` interface
-- [ ] `DistributionService` implementation
-  - [ ] Create slip with stock validation
-  - [ ] Reference number generation (DST{YEAR}{SEQ})
-  - [ ] Cancel slip with stock reversal
+- [x] `IReferenceNumberService` interface + implementation
+- [x] `IDistributionService` interface
+- [x] `DistributionService` implementation
+  - [x] Create slip with stock validation
+  - [x] Reference number generation (DST{YEAR}{SEQ})
+  - [x] Cancel slip with stock reversal
 
 ### Controllers & DTOs
-- [ ] `DistributionsController`
-- [ ] DTOs: DistributionSlipDto, CreateDistributionDto, etc.
-- [ ] Validators
+- [x] `DistributionsController`
+- [x] DTOs: DistributionSlipResponse, CreateDistributionSlipRequest, etc.
+- [x] Validators
+
+### Wiring
+- [~] DbSets in BooksPortalDbContext
+- [~] DI registrations
+- [~] Migration
 
 ### Tests
 - [ ] Unit tests
@@ -270,6 +277,6 @@ School book distribution management system built with .NET 10 Clean Architecture
 ---
 
 ## Current Focus
-> Module 1: Core Infrastructure
+> Module 5: Distribution (wiring remaining) → Module 6: Returns → Module 7: Teacher Issues
 
-Starting with foundation code that all other modules depend on.
+Modules 1-4 complete and merged to dev. Module 5 files created, needs DI/DbContext/migration.
