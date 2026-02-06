@@ -9,6 +9,8 @@ public class ReturnSlipResponse
     public int StudentId { get; set; }
     public string StudentName { get; set; } = string.Empty;
     public string StudentIndexNo { get; set; } = string.Empty;
+    public string StudentClassName { get; set; } = string.Empty;
+    public string? StudentNationalId { get; set; }
     public int ReturnedById { get; set; }
     public string ReturnedByName { get; set; } = string.Empty;
     public int ReceivedById { get; set; }

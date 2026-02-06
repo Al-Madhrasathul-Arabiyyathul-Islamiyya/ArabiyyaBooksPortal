@@ -12,6 +12,8 @@ public class DistributionSlipResponse
     public int StudentId { get; set; }
     public string StudentName { get; set; } = string.Empty;
     public string StudentIndexNo { get; set; } = string.Empty;
+    public string StudentClassName { get; set; } = string.Empty;
+    public string? StudentNationalId { get; set; }
     public int ParentId { get; set; }
     public string ParentName { get; set; } = string.Empty;
     public int IssuedById { get; set; }

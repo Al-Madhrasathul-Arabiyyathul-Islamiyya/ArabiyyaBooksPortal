@@ -77,49 +77,63 @@ public class SlipTemplateSettingService : ISlipTemplateSettingService
         var sort = 0;
 
         // Common labels shared across slip types
-        AddLabel(labels, "Common", "SchoolName", "މާލެ އިންޓަނޭޝަނަލް ސްކੂލް", ref sort);
-        AddLabel(labels, "Common", "SchoolSubtitle", "ފޮތް ބެހެއްٽެރި ޕੋرਟَل", ref sort);
-        AddLabel(labels, "Common", "SignatureIssuedBy", "ދੂکری ފަރާތް", ref sort);
-        AddLabel(labels, "Common", "SignatureReceivedBy", "ލިބ였 ފަرާتް", ref sort);
+        AddLabel(labels, "Common", "SchoolName", "އަލް މަދްރަސަތުލް ޢަރަބިއްޔަތުލް އިސްލާމިއްޔާ", ref sort);
+        AddLabel(labels, "Common", "SchoolSubtitle", "މާލެ", ref sort);
         AddLabel(labels, "Common", "LabelName", "ނަން:", ref sort);
-        AddLabel(labels, "Common", "LabelIdNo", "އައي.ডي ނަންބަر:", ref sort);
-        AddLabel(labels, "Common", "LabelPhone", "ފੋނ:", ref sort);
-        AddLabel(labels, "Common", "LabelSignature", "ސައي:", ref sort);
-        AddLabel(labels, "Common", "LabelDate", "ތާرީخ:", ref sort);
-        AddLabel(labels, "Common", "LabelTime", "ގަޑi:", ref sort);
+        AddLabel(labels, "Common", "LabelIdCard", "އައިޑީ ކާޑު:", ref sort);
+        AddLabel(labels, "Common", "LabelPhone", "ފޯން:", ref sort);
+        AddLabel(labels, "Common", "LabelSignature", "ސޮއި:", ref sort);
+        AddLabel(labels, "Common", "LabelDate", "ތާރީހު:", ref sort);
+        AddLabel(labels, "Common", "LabelTime", "ގަޑި:", ref sort);
         AddLabel(labels, "Common", "LabelRefNo", "Ref No:", ref sort);
+        AddLabel(labels, "Common", "LabelClass", "ކުލާސް:", ref sort);
+        AddLabel(labels, "Common", "LabelIndex", "އިންޑެކްސް:", ref sort);
+        AddLabel(labels, "Common", "LabelId", "އައިޑީ:", ref sort);
+        AddLabel(labels, "Common", "LabelPosition", "މަގާމު:", ref sort);
 
         // Distribution
         sort = 0;
-        AddLabel(labels, "Distribution", "Title", "ދަރިވަرުންނަށް ފੋތް ބੈ ސްލިޕ", ref sort);
-        AddLabel(labels, "Distribution", "ColTerm", "ٹَرމ", ref sort);
-        AddLabel(labels, "Distribution", "ColPublisher", "ޕަބްلިޝަر", ref sort);
-        AddLabel(labels, "Distribution", "ColAcademicYear", "އެکَޑَمިک އަހَر", ref sort);
-        AddLabel(labels, "Distribution", "ColSubjectCode", "ساބްجެکٹ کوڈ", ref sort);
-        AddLabel(labels, "Distribution", "ColBookTitle", "ފੋتް ނަން", ref sort);
+        AddLabel(labels, "Distribution", "Title", "ފޮތް ދޫކުރާ ސުލިޕް", ref sort);
+        AddLabel(labels, "Distribution", "StudentInfoTitle", "ދަރިވަރުގެ މައުލޫމާތު", ref sort);
+        AddLabel(labels, "Distribution", "ColBookTitle", "ނަން", ref sort);
+        AddLabel(labels, "Distribution", "ColSubjectCode", "މާއްދާ ކޯޑް", ref sort);
+        AddLabel(labels, "Distribution", "ColAcademicYear", "އަހަރު", ref sort);
+        AddLabel(labels, "Distribution", "ColPublisher", "ޕަބްލިޝަރ", ref sort);
+        AddLabel(labels, "Distribution", "ColTerm", "ޓާރމް", ref sort);
+        AddLabel(labels, "Distribution", "SignatureReceiver", "ހަވާލުވި ފަރާތް", ref sort);
+        AddLabel(labels, "Distribution", "SignatureStaff", "ހަވާލުކުރި މުވައްޒަފު", ref sort);
 
         // Return
         sort = 0;
-        AddLabel(labels, "Return", "Title", "ދَرiވَرuންގެ ފੋتް އަނބuރާ ސްلiپ", ref sort);
-        AddLabel(labels, "Return", "ColCondition", "ހާلَތu", ref sort);
-        AddLabel(labels, "Return", "ColBookTitle", "ފੋتް ނަން", ref sort);
-        AddLabel(labels, "Return", "ColSubjectCode", "ساބްجެکٹ کوڈ", ref sort);
-        AddLabel(labels, "Return", "ColQuantity", "އަދَދu", ref sort);
+        AddLabel(labels, "Return", "Title", "ދަރިވަރުންގެ ފޮތް ހަވާލުކުރާ ސުލިޕް", ref sort);
+        AddLabel(labels, "Return", "StudentInfoTitle", "ދަރިވަރުގެ މައުލޫމާތު", ref sort);
+        AddLabel(labels, "Return", "ColBookTitle", "ނަން", ref sort);
+        AddLabel(labels, "Return", "ColSubjectCode", "މާއްދާ ކޯޑް", ref sort);
+        AddLabel(labels, "Return", "ColAcademicYear", "އަހަރު", ref sort);
+        AddLabel(labels, "Return", "ColPublisher", "ޕަބްލިޝަރ", ref sort);
+        AddLabel(labels, "Return", "ColTerm", "ޓާރމް", ref sort);
+        AddLabel(labels, "Return", "SignatureParent", "ހަވާލުކުރި ފަރާތް", ref sort);
+        AddLabel(labels, "Return", "SignatureStaff", "ހަވާލުވި މުވައްޒަފު", ref sort);
 
         // TeacherIssue
         sort = 0;
-        AddLabel(labels, "TeacherIssue", "Title", "ٹީچَرަށް ފੋتް ދiނ ސްلiپ", ref sort);
-        AddLabel(labels, "TeacherIssue", "ColBookTitle", "ފੋتް ނަން", ref sort);
-        AddLabel(labels, "TeacherIssue", "ColSubjectCode", "ساބްجެکٹ کوڈ", ref sort);
-        AddLabel(labels, "TeacherIssue", "ColQuantity", "އަދَدu", ref sort);
-        AddLabel(labels, "TeacherIssue", "ColAcademicYear", "އެکَޑَمiک އَހَر", ref sort);
+        AddLabel(labels, "TeacherIssue", "Title", "މުދައްރިސުންނަށް ފޮތްދޫކުރާ ސުލިޕް", ref sort);
+        AddLabel(labels, "TeacherIssue", "ColBookTitle", "ނަން", ref sort);
+        AddLabel(labels, "TeacherIssue", "ColSubjectCode", "މާއްދާ ކޯޑް", ref sort);
+        AddLabel(labels, "TeacherIssue", "ColAcademicYear", "އަހަރު", ref sort);
+        AddLabel(labels, "TeacherIssue", "ColPublisher", "ޕަބްލިޝަރ", ref sort);
+        AddLabel(labels, "TeacherIssue", "SignatureTeacher", "ޓީޗަރު", ref sort);
+        AddLabel(labels, "TeacherIssue", "SignatureStaff", "ހަވާލުކުރި މުވައްޒަފު", ref sort);
 
         // TeacherReturn
         sort = 0;
-        AddLabel(labels, "TeacherReturn", "Title", "ٹީچَرގެ ފੋتް އަނبuރާ ސްلiޕ", ref sort);
-        AddLabel(labels, "TeacherReturn", "ColBookTitle", "ފੋتް ނަން", ref sort);
-        AddLabel(labels, "TeacherReturn", "ColSubjectCode", "ساބްجެکٹ ކوޑ", ref sort);
-        AddLabel(labels, "TeacherReturn", "ColQuantity", "އަދَދu", ref sort);
+        AddLabel(labels, "TeacherReturn", "Title", "ޓީޗަރުން ފޮތް ހަވާލުކުރާ ސުލިޕް", ref sort);
+        AddLabel(labels, "TeacherReturn", "ColBookTitle", "ނަން", ref sort);
+        AddLabel(labels, "TeacherReturn", "ColSubjectCode", "މާއްދާ ކޯޑް", ref sort);
+        AddLabel(labels, "TeacherReturn", "ColAcademicYear", "އަހަރު", ref sort);
+        AddLabel(labels, "TeacherReturn", "ColPublisher", "ޕަބްލިޝަރ", ref sort);
+        AddLabel(labels, "TeacherReturn", "SignatureTeacher", "ޓީޗަރު", ref sort);
+        AddLabel(labels, "TeacherReturn", "SignatureStaff", "ހަވާލުވި މުވައްޒަފު", ref sort);
 
         return labels;
     }

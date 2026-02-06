@@ -47,6 +47,8 @@ public class PdfServiceTests
             Term = Term.Term1,
             StudentName = "Ahmed Hassan",
             StudentIndexNo = "STU001",
+            StudentClassName = "Grade 5 - A",
+            StudentNationalId = "A123456",
             ParentName = "Mohamed Hassan",
             IssuedAt = new DateTime(2025, 9, 15),
             Notes = "First term distribution",
@@ -74,6 +76,7 @@ public class PdfServiceTests
             Term = Term.Term2,
             StudentName = "Sara Ali",
             StudentIndexNo = "STU002",
+            StudentClassName = "Grade 3 - B",
             ParentName = "Ali Mohamed",
             IssuedAt = DateTime.UtcNow,
             Items = [new() { BookCode = "ARA-G2", BookTitle = "Arabic Grade 2", Quantity = 1 }]
@@ -94,6 +97,8 @@ public class PdfServiceTests
             AcademicYearName = "2025/2026",
             StudentName = "Ahmed Hassan",
             StudentIndexNo = "STU001",
+            StudentClassName = "Grade 5 - A",
+            StudentNationalId = "A123456",
             ReturnedByName = "Mohamed Hassan",
             ReceivedAt = new DateTime(2025, 12, 20),
             Notes = "End of term return",
@@ -120,6 +125,7 @@ public class PdfServiceTests
             AcademicYearName = "2025/2026",
             StudentName = "Omar Khalil",
             StudentIndexNo = "STU003",
+            StudentClassName = "Grade 4 - C",
             ReturnedByName = "Khalil Ibrahim",
             ReceivedAt = DateTime.UtcNow,
             Items =
