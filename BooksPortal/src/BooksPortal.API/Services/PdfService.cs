@@ -1,6 +1,7 @@
 using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.Distribution.DTOs;
 using BooksPortal.Application.Features.Returns.DTOs;
+using BooksPortal.Application.Features.Settings.Interfaces;
 using BooksPortal.Application.Features.TeacherIssues.DTOs;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -10,348 +11,545 @@ namespace BooksPortal.API.Services;
 
 public class PdfService : IPdfService
 {
-    private const string SchoolName = "Arabiyya International School";
-    private const string SchoolAddress = "Book Distribution Department";
+    private readonly ISlipTemplateSettingService _labelService;
 
-    public byte[] GenerateDistributionSlip(DistributionSlipResponse slip)
+    private const string ThaanaFont = "Faruma";
+
+    public PdfService(ISlipTemplateSettingService labelService)
     {
+        _labelService = labelService;
+    }
+
+    public async Task<byte[]> GenerateDistributionSlipAsync(DistributionSlipResponse slip)
+    {
+        var common = await _labelService.GetLabelsByCategoryAsync("Common");
+        var labels = await _labelService.GetLabelsByCategoryAsync("Distribution");
+
         var document = Document.Create(container =>
         {
-            // Two copies: School Copy + Parent Copy
-            foreach (var copyLabel in new[] { "School Copy", "Parent Copy" })
+            container.Page(page =>
             {
-                container.Page(page =>
+                page.Size(PageSizes.A4.Landscape());
+                page.MarginVertical(12);
+                page.MarginHorizontal(15);
+                page.DefaultTextStyle(x => x.FontSize(8));
+
+                page.Content().Row(mainRow =>
                 {
-                    page.Size(PageSizes.A5);
-                    page.Margin(20);
-                    page.DefaultTextStyle(x => x.FontSize(9));
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeDistributionCopy(c, slip, common, labels));
 
-                    page.Header().Element(header => ComposeHeader(header, "BOOK DISTRIBUTION SLIP", copyLabel));
+                    mainRow.ConstantItem(16).Element(ComposeSeparator);
 
-                    page.Content().Column(col =>
-                    {
-                        col.Spacing(8);
-
-                        // Slip details
-                        col.Item().Row(row =>
-                        {
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().Text($"Reference: {slip.ReferenceNo}").Bold();
-                                c.Item().Text($"Date: {slip.IssuedAt:dd/MM/yyyy}");
-                                c.Item().Text($"Academic Year: {slip.AcademicYearName}");
-                                c.Item().Text($"Term: {slip.Term}");
-                            });
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().Text($"Student: {slip.StudentName}").Bold();
-                                c.Item().Text($"Index No: {slip.StudentIndexNo}");
-                                c.Item().Text($"Parent: {slip.ParentName}");
-                            });
-                        });
-
-                        // Items table
-                        col.Item().Element(e => ComposeDistributionTable(e, slip.Items));
-
-                        // Notes
-                        if (!string.IsNullOrWhiteSpace(slip.Notes))
-                            col.Item().Text($"Notes: {slip.Notes}").FontSize(8).Italic();
-
-                        // Signatures
-                        col.Item().PaddingTop(15).Element(ComposeSignatures);
-                    });
-
-                    page.Footer().Element(ComposeFooter);
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeDistributionCopy(c, slip, common, labels));
                 });
-            }
+            });
         });
 
         return document.GeneratePdf();
     }
 
-    public byte[] GenerateReturnSlip(ReturnSlipResponse slip)
+    public async Task<byte[]> GenerateReturnSlipAsync(ReturnSlipResponse slip)
     {
+        var common = await _labelService.GetLabelsByCategoryAsync("Common");
+        var labels = await _labelService.GetLabelsByCategoryAsync("Return");
+
         var document = Document.Create(container =>
         {
-            foreach (var copyLabel in new[] { "School Copy", "Parent Copy" })
+            container.Page(page =>
             {
-                container.Page(page =>
+                page.Size(PageSizes.A4.Landscape());
+                page.MarginVertical(12);
+                page.MarginHorizontal(15);
+                page.DefaultTextStyle(x => x.FontSize(8));
+
+                page.Content().Row(mainRow =>
                 {
-                    page.Size(PageSizes.A5);
-                    page.Margin(20);
-                    page.DefaultTextStyle(x => x.FontSize(9));
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeReturnCopy(c, slip, common, labels));
 
-                    page.Header().Element(header => ComposeHeader(header, "BOOK RETURN SLIP", copyLabel));
+                    mainRow.ConstantItem(16).Element(ComposeSeparator);
 
-                    page.Content().Column(col =>
-                    {
-                        col.Spacing(8);
-
-                        col.Item().Row(row =>
-                        {
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().Text($"Reference: {slip.ReferenceNo}").Bold();
-                                c.Item().Text($"Date: {slip.ReceivedAt:dd/MM/yyyy}");
-                                c.Item().Text($"Academic Year: {slip.AcademicYearName}");
-                            });
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().Text($"Student: {slip.StudentName}").Bold();
-                                c.Item().Text($"Index No: {slip.StudentIndexNo}");
-                                c.Item().Text($"Returned By: {slip.ReturnedByName}");
-                            });
-                        });
-
-                        col.Item().Element(e => ComposeReturnTable(e, slip.Items));
-
-                        if (!string.IsNullOrWhiteSpace(slip.Notes))
-                            col.Item().Text($"Notes: {slip.Notes}").FontSize(8).Italic();
-
-                        col.Item().PaddingTop(15).Element(ComposeSignatures);
-                    });
-
-                    page.Footer().Element(ComposeFooter);
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeReturnCopy(c, slip, common, labels));
                 });
-            }
+            });
         });
 
         return document.GeneratePdf();
     }
 
-    public byte[] GenerateTeacherIssueSlip(TeacherIssueResponse issue)
+    public async Task<byte[]> GenerateTeacherIssueSlipAsync(TeacherIssueResponse issue)
     {
+        var common = await _labelService.GetLabelsByCategoryAsync("Common");
+        var labels = await _labelService.GetLabelsByCategoryAsync("TeacherIssue");
+
         var document = Document.Create(container =>
         {
-            foreach (var copyLabel in new[] { "School Copy", "Teacher Copy" })
+            container.Page(page =>
             {
-                container.Page(page =>
+                page.Size(PageSizes.A4.Landscape());
+                page.MarginVertical(12);
+                page.MarginHorizontal(15);
+                page.DefaultTextStyle(x => x.FontSize(8));
+
+                page.Content().Row(mainRow =>
                 {
-                    page.Size(PageSizes.A5);
-                    page.Margin(20);
-                    page.DefaultTextStyle(x => x.FontSize(9));
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeTeacherIssueCopy(c, issue, common, labels));
 
-                    page.Header().Element(header => ComposeHeader(header, "TEACHER BOOK ISSUE SLIP", copyLabel));
+                    mainRow.ConstantItem(16).Element(ComposeSeparator);
 
-                    page.Content().Column(col =>
-                    {
-                        col.Spacing(8);
-
-                        col.Item().Row(row =>
-                        {
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().Text($"Reference: {issue.ReferenceNo}").Bold();
-                                c.Item().Text($"Date: {issue.IssuedAt:dd/MM/yyyy}");
-                                c.Item().Text($"Academic Year: {issue.AcademicYearName}");
-                            });
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().Text($"Teacher: {issue.TeacherName}").Bold();
-                                c.Item().Text($"Status: {issue.Status}");
-                                if (issue.ExpectedReturnDate.HasValue)
-                                    c.Item().Text($"Expected Return: {issue.ExpectedReturnDate:dd/MM/yyyy}");
-                            });
-                        });
-
-                        col.Item().Element(e => ComposeTeacherIssueTable(e, issue.Items));
-
-                        if (!string.IsNullOrWhiteSpace(issue.Notes))
-                            col.Item().Text($"Notes: {issue.Notes}").FontSize(8).Italic();
-
-                        col.Item().PaddingTop(15).Row(row =>
-                        {
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().PaddingTop(25).LineHorizontal(0.5f);
-                                c.Item().Text("Issued By").FontSize(8).AlignCenter();
-                            });
-                            row.ConstantItem(30);
-                            row.RelativeItem().Column(c =>
-                            {
-                                c.Item().PaddingTop(25).LineHorizontal(0.5f);
-                                c.Item().Text("Teacher Signature").FontSize(8).AlignCenter();
-                            });
-                        });
-                    });
-
-                    page.Footer().Element(ComposeFooter);
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeTeacherIssueCopy(c, issue, common, labels));
                 });
-            }
+            });
         });
 
         return document.GeneratePdf();
     }
 
-    private static void ComposeHeader(IContainer container, string title, string copyLabel)
+    public async Task<byte[]> GenerateTeacherReturnSlipAsync(TeacherReturnSlipResponse slip)
+    {
+        var common = await _labelService.GetLabelsByCategoryAsync("Common");
+        var labels = await _labelService.GetLabelsByCategoryAsync("TeacherReturn");
+
+        var document = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4.Landscape());
+                page.MarginVertical(12);
+                page.MarginHorizontal(15);
+                page.DefaultTextStyle(x => x.FontSize(8));
+
+                page.Content().Row(mainRow =>
+                {
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeTeacherReturnCopy(c, slip, common, labels));
+
+                    mainRow.ConstantItem(16).Element(ComposeSeparator);
+
+                    mainRow.RelativeItem().Element(c =>
+                        ComposeTeacherReturnCopy(c, slip, common, labels));
+                });
+            });
+        });
+
+        return document.GeneratePdf();
+    }
+
+    // ── Per-slip-type copy composition ──────────────────────────────
+
+    private static void ComposeDistributionCopy(
+        IContainer container,
+        DistributionSlipResponse slip,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels)
+    {
+        container.Border(0.5f).BorderColor(Colors.Grey.Medium).Padding(8).Column(col =>
+        {
+            col.Spacing(6);
+
+            col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+
+            col.Item().Element(c => ComposeRefAndDate(c, slip.ReferenceNo, slip.IssuedAt, common));
+
+            // Info row: Name, IndexNo, AcademicYear, Term
+            col.Item().ContentFromRightToLeft().Row(row =>
+            {
+                row.RelativeItem().Text(text =>
+                {
+                    text.Span(L(common, "LabelName")).FontFamily(ThaanaFont).FontSize(8);
+                    text.Span($" {slip.StudentName}").FontSize(8);
+                });
+                row.RelativeItem().Text(text =>
+                {
+                    text.Span(L(common, "LabelIdNo")).FontFamily(ThaanaFont).FontSize(8);
+                    text.Span($" {slip.StudentIndexNo}").FontSize(8);
+                });
+            });
+
+            // Distribution table
+            col.Item().Element(c => ComposeDistributionTable(c, slip, labels));
+
+            col.Item().Element(c => ComposeSignatures(c, common,
+                L(common, "SignatureIssuedBy"), L(common, "SignatureReceivedBy")));
+        });
+    }
+
+    private static void ComposeReturnCopy(
+        IContainer container,
+        ReturnSlipResponse slip,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels)
+    {
+        container.Border(0.5f).BorderColor(Colors.Grey.Medium).Padding(8).Column(col =>
+        {
+            col.Spacing(6);
+
+            col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+
+            col.Item().Element(c => ComposeRefAndDate(c, slip.ReferenceNo, slip.ReceivedAt, common));
+
+            col.Item().ContentFromRightToLeft().Row(row =>
+            {
+                row.RelativeItem().Text(text =>
+                {
+                    text.Span(L(common, "LabelName")).FontFamily(ThaanaFont).FontSize(8);
+                    text.Span($" {slip.StudentName}").FontSize(8);
+                });
+                row.RelativeItem().Text(text =>
+                {
+                    text.Span(L(common, "LabelIdNo")).FontFamily(ThaanaFont).FontSize(8);
+                    text.Span($" {slip.StudentIndexNo}").FontSize(8);
+                });
+            });
+
+            col.Item().Element(c => ComposeReturnTable(c, slip, labels));
+
+            col.Item().Element(c => ComposeSignatures(c, common,
+                L(common, "SignatureIssuedBy"), L(common, "SignatureReceivedBy")));
+        });
+    }
+
+    private static void ComposeTeacherIssueCopy(
+        IContainer container,
+        TeacherIssueResponse issue,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels)
+    {
+        container.Border(0.5f).BorderColor(Colors.Grey.Medium).Padding(8).Column(col =>
+        {
+            col.Spacing(6);
+
+            col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+
+            col.Item().Element(c => ComposeRefAndDate(c, issue.ReferenceNo, issue.IssuedAt, common));
+
+            col.Item().ContentFromRightToLeft().Row(row =>
+            {
+                row.RelativeItem().Text(text =>
+                {
+                    text.Span(L(common, "LabelName")).FontFamily(ThaanaFont).FontSize(8);
+                    text.Span($" {issue.TeacherName}").FontSize(8);
+                });
+            });
+
+            col.Item().Element(c => ComposeTeacherIssueTable(c, issue, labels));
+
+            col.Item().Element(c => ComposeSignatures(c, common,
+                L(common, "SignatureIssuedBy"), L(common, "SignatureReceivedBy")));
+        });
+    }
+
+    private static void ComposeTeacherReturnCopy(
+        IContainer container,
+        TeacherReturnSlipResponse slip,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels)
+    {
+        container.Border(0.5f).BorderColor(Colors.Grey.Medium).Padding(8).Column(col =>
+        {
+            col.Spacing(6);
+
+            col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+
+            col.Item().Element(c => ComposeRefAndDate(c, slip.ReferenceNo, slip.ReceivedAt, common));
+
+            col.Item().ContentFromRightToLeft().Row(row =>
+            {
+                row.RelativeItem().Text(text =>
+                {
+                    text.Span(L(common, "LabelName")).FontFamily(ThaanaFont).FontSize(8);
+                    text.Span($" {slip.TeacherName}").FontSize(8);
+                });
+            });
+
+            col.Item().Element(c => ComposeTeacherReturnTable(c, slip, labels));
+
+            col.Item().Element(c => ComposeSignatures(c, common,
+                L(common, "SignatureIssuedBy"), L(common, "SignatureReceivedBy")));
+        });
+    }
+
+    // ── Shared layout components ────────────────────────────────────
+
+    private static void ComposeHeader(IContainer container, Dictionary<string, string> common, string title)
     {
         container.Column(col =>
         {
-            col.Item().Row(row =>
+            // School name and subtitle (RTL, centered)
+            col.Item().ContentFromRightToLeft().AlignCenter().Text(text =>
             {
-                row.RelativeItem().Column(c =>
-                {
-                    c.Item().Text(SchoolName).FontSize(12).Bold();
-                    c.Item().Text(SchoolAddress).FontSize(8);
-                });
-                row.ConstantItem(80).AlignRight().Text(copyLabel).FontSize(8).Bold().Italic();
+                text.Span(L(common, "SchoolName")).FontFamily(ThaanaFont).FontSize(13).Bold();
             });
-            col.Item().PaddingVertical(5).LineHorizontal(1);
-            col.Item().AlignCenter().Text(title).FontSize(11).Bold();
-            col.Item().PaddingBottom(5);
+            col.Item().ContentFromRightToLeft().AlignCenter().Text(text =>
+            {
+                text.Span(L(common, "SchoolSubtitle")).FontFamily(ThaanaFont).FontSize(9);
+            });
+
+            col.Item().PaddingVertical(4).LineHorizontal(1);
+
+            // Slip title
+            col.Item().ContentFromRightToLeft().AlignCenter().Text(text =>
+            {
+                text.Span(title).FontFamily(ThaanaFont).FontSize(11).Bold();
+            });
         });
     }
 
-    private static void ComposeDistributionTable(IContainer container, List<DistributionSlipItemResponse> items)
-    {
-        container.Table(table =>
-        {
-            table.ColumnsDefinition(columns =>
-            {
-                columns.ConstantColumn(25);  // #
-                columns.ConstantColumn(60);  // Code
-                columns.RelativeColumn();    // Title
-                columns.ConstantColumn(40);  // Qty
-            });
-
-            table.Header(header =>
-            {
-                header.Cell().Element(HeaderCell).Text("#");
-                header.Cell().Element(HeaderCell).Text("Code");
-                header.Cell().Element(HeaderCell).Text("Book Title");
-                header.Cell().Element(HeaderCell).AlignCenter().Text("Qty");
-            });
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                var item = items[i];
-                table.Cell().Element(DataCell).Text($"{i + 1}");
-                table.Cell().Element(DataCell).Text(item.BookCode);
-                table.Cell().Element(DataCell).Text(item.BookTitle);
-                table.Cell().Element(DataCell).AlignCenter().Text($"{item.Quantity}");
-            }
-
-            // Total row
-            table.Cell().ColumnSpan(3).Element(TotalCell).AlignRight().Text("Total Books:");
-            table.Cell().Element(TotalCell).AlignCenter().Text($"{items.Sum(i => i.Quantity)}");
-        });
-    }
-
-    private static void ComposeReturnTable(IContainer container, List<ReturnSlipItemResponse> items)
-    {
-        container.Table(table =>
-        {
-            table.ColumnsDefinition(columns =>
-            {
-                columns.ConstantColumn(25);  // #
-                columns.ConstantColumn(55);  // Code
-                columns.RelativeColumn();    // Title
-                columns.ConstantColumn(35);  // Qty
-                columns.ConstantColumn(55);  // Condition
-            });
-
-            table.Header(header =>
-            {
-                header.Cell().Element(HeaderCell).Text("#");
-                header.Cell().Element(HeaderCell).Text("Code");
-                header.Cell().Element(HeaderCell).Text("Book Title");
-                header.Cell().Element(HeaderCell).AlignCenter().Text("Qty");
-                header.Cell().Element(HeaderCell).Text("Condition");
-            });
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                var item = items[i];
-                table.Cell().Element(DataCell).Text($"{i + 1}");
-                table.Cell().Element(DataCell).Text(item.BookCode);
-                table.Cell().Element(DataCell).Text(item.BookTitle);
-                table.Cell().Element(DataCell).AlignCenter().Text($"{item.Quantity}");
-                table.Cell().Element(DataCell).Text(item.Condition.ToString());
-            }
-
-            table.Cell().ColumnSpan(4).Element(TotalCell).AlignRight().Text("Total Books:");
-            table.Cell().Element(TotalCell).AlignCenter().Text($"{items.Sum(i => i.Quantity)}");
-        });
-    }
-
-    private static void ComposeTeacherIssueTable(IContainer container, List<TeacherIssueItemResponse> items)
-    {
-        container.Table(table =>
-        {
-            table.ColumnsDefinition(columns =>
-            {
-                columns.ConstantColumn(25);  // #
-                columns.ConstantColumn(55);  // Code
-                columns.RelativeColumn();    // Title
-                columns.ConstantColumn(35);  // Qty
-            });
-
-            table.Header(header =>
-            {
-                header.Cell().Element(HeaderCell).Text("#");
-                header.Cell().Element(HeaderCell).Text("Code");
-                header.Cell().Element(HeaderCell).Text("Book Title");
-                header.Cell().Element(HeaderCell).AlignCenter().Text("Qty");
-            });
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                var item = items[i];
-                table.Cell().Element(DataCell).Text($"{i + 1}");
-                table.Cell().Element(DataCell).Text(item.BookCode);
-                table.Cell().Element(DataCell).Text(item.BookTitle);
-                table.Cell().Element(DataCell).AlignCenter().Text($"{item.Quantity}");
-            }
-
-            table.Cell().ColumnSpan(3).Element(TotalCell).AlignRight().Text("Total Books:");
-            table.Cell().Element(TotalCell).AlignCenter().Text($"{items.Sum(i => i.Quantity)}");
-        });
-    }
-
-    private static void ComposeSignatures(IContainer container)
+    private static void ComposeRefAndDate(IContainer container, string refNo, DateTime dateTime, Dictionary<string, string> common)
     {
         container.Row(row =>
         {
-            row.RelativeItem().Column(c =>
+            // Ref No (English, left side)
+            row.RelativeItem().Text(text =>
             {
-                c.Item().PaddingTop(25).LineHorizontal(0.5f);
-                c.Item().Text("Issued By").FontSize(8).AlignCenter();
+                text.Span($"{L(common, "LabelRefNo", "Ref No:")} ").FontSize(9);
+                text.Span(refNo).FontSize(9).Bold();
             });
-            row.ConstantItem(30);
-            row.RelativeItem().Column(c =>
+
+            // Date (right side, RTL)
+            row.RelativeItem().ContentFromRightToLeft().AlignRight().Text(text =>
             {
-                c.Item().PaddingTop(25).LineHorizontal(0.5f);
-                c.Item().Text("Received By (Parent/Guardian)").FontSize(8).AlignCenter();
+                text.Span(L(common, "LabelDate")).FontFamily(ThaanaFont).FontSize(8);
+                text.Span($" {dateTime:dd/MM/yyyy}  ").FontSize(8);
+                text.Span(L(common, "LabelTime")).FontFamily(ThaanaFont).FontSize(8);
+                text.Span($" {dateTime:HH:mm}").FontSize(8);
             });
         });
     }
 
-    private static void ComposeFooter(IContainer container)
+    private static void ComposeSeparator(IContainer container)
     {
-        container.AlignCenter().Text(text =>
+        container.AlignCenter().PaddingVertical(15).Column(col =>
         {
-            text.Span("Generated on ").FontSize(7);
-            text.Span(DateTime.Now.ToString("dd/MM/yyyy HH:mm")).FontSize(7);
+            col.Item().Width(1).ExtendVertical().Background(Colors.Grey.Lighten1);
         });
     }
 
-    private static IContainer HeaderCell(IContainer container) =>
-        container.Background(Colors.Grey.Lighten3)
-            .Border(0.5f)
-            .BorderColor(Colors.Grey.Darken1)
-            .Padding(3)
-            .DefaultTextStyle(x => x.FontSize(8).Bold());
+    // ── Tables ──────────────────────────────────────────────────────
 
-    private static IContainer DataCell(IContainer container) =>
-        container.Border(0.5f)
-            .BorderColor(Colors.Grey.Medium)
-            .Padding(3)
-            .DefaultTextStyle(x => x.FontSize(8));
+    private static void ComposeDistributionTable(IContainer container, DistributionSlipResponse slip, Dictionary<string, string> labels)
+    {
+        container.Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn(3);   // Book Title (widest)
+                columns.RelativeColumn(1.2f); // Subject Code
+                columns.RelativeColumn(1.2f); // Academic Year
+                columns.RelativeColumn(1.2f); // Publisher
+                columns.RelativeColumn(1);    // Term
+            });
 
-    private static IContainer TotalCell(IContainer container) =>
-        container.Background(Colors.Grey.Lighten4)
-            .Border(0.5f)
-            .BorderColor(Colors.Grey.Darken1)
-            .Padding(3)
-            .DefaultTextStyle(x => x.FontSize(8).Bold());
+            // Thaana headers (RTL order: rightmost column first in visual, but table is LTR, so we reverse)
+            table.Header(header =>
+            {
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColAcademicYear")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColPublisher")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColTerm")).FontFamily(ThaanaFont);
+            });
+
+            foreach (var item in slip.Items)
+            {
+                table.Cell().Element(DataCellLtr).Text(item.BookTitle);
+                table.Cell().Element(DataCellLtr).Text(item.BookCode);
+                table.Cell().Element(DataCellLtr).Text(slip.AcademicYearName);
+                table.Cell().Element(DataCellLtr).Text("-"); // Publisher not in DTO
+                table.Cell().Element(DataCellLtr).Text(slip.Term.ToString());
+            }
+
+            // Empty rows to fill the table area (match the design's grid)
+            for (var i = slip.Items.Count; i < 12; i++)
+            {
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+            }
+        });
+    }
+
+    private static void ComposeReturnTable(IContainer container, ReturnSlipResponse slip, Dictionary<string, string> labels)
+    {
+        container.Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn(3);   // Book Title
+                columns.RelativeColumn(1.2f); // Subject Code
+                columns.RelativeColumn(1);    // Quantity
+                columns.RelativeColumn(1.2f); // Condition
+            });
+
+            table.Header(header =>
+            {
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColQuantity")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColCondition")).FontFamily(ThaanaFont);
+            });
+
+            foreach (var item in slip.Items)
+            {
+                table.Cell().Element(DataCellLtr).Text(item.BookTitle);
+                table.Cell().Element(DataCellLtr).Text(item.BookCode);
+                table.Cell().Element(DataCellLtr).AlignCenter().Text($"{item.Quantity}");
+                table.Cell().Element(DataCellLtr).Text(item.Condition.ToString());
+            }
+
+            for (var i = slip.Items.Count; i < 12; i++)
+            {
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+            }
+        });
+    }
+
+    private static void ComposeTeacherIssueTable(IContainer container, TeacherIssueResponse issue, Dictionary<string, string> labels)
+    {
+        container.Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn(3);   // Book Title
+                columns.RelativeColumn(1.2f); // Subject Code
+                columns.RelativeColumn(1.2f); // Academic Year
+                columns.RelativeColumn(1);    // Quantity
+            });
+
+            table.Header(header =>
+            {
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColAcademicYear")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColQuantity")).FontFamily(ThaanaFont);
+            });
+
+            foreach (var item in issue.Items)
+            {
+                table.Cell().Element(DataCellLtr).Text(item.BookTitle);
+                table.Cell().Element(DataCellLtr).Text(item.BookCode);
+                table.Cell().Element(DataCellLtr).Text(issue.AcademicYearName);
+                table.Cell().Element(DataCellLtr).AlignCenter().Text($"{item.Quantity}");
+            }
+
+            for (var i = issue.Items.Count; i < 12; i++)
+            {
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+            }
+        });
+    }
+
+    private static void ComposeTeacherReturnTable(IContainer container, TeacherReturnSlipResponse slip, Dictionary<string, string> labels)
+    {
+        container.Table(table =>
+        {
+            table.ColumnsDefinition(columns =>
+            {
+                columns.RelativeColumn(3);   // Book Title
+                columns.RelativeColumn(1.2f); // Subject Code
+                columns.RelativeColumn(1);    // Quantity
+            });
+
+            table.Header(header =>
+            {
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCellRtl).Text(L(labels, "ColQuantity")).FontFamily(ThaanaFont);
+            });
+
+            foreach (var item in slip.Items)
+            {
+                table.Cell().Element(DataCellLtr).Text(item.BookTitle);
+                table.Cell().Element(DataCellLtr).Text(item.BookCode);
+                table.Cell().Element(DataCellLtr).AlignCenter().Text($"{item.Quantity}");
+            }
+
+            for (var i = slip.Items.Count; i < 12; i++)
+            {
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+                table.Cell().Element(EmptyCell);
+            }
+        });
+    }
+
+    // ── Signatures ──────────────────────────────────────────────────
+
+    private static void ComposeSignatures(IContainer container, Dictionary<string, string> common, string leftTitle, string rightTitle)
+    {
+        container.PaddingTop(8).Row(row =>
+        {
+            row.RelativeItem().Element(c =>
+                ComposeOneSignatureBlock(c, common, leftTitle));
+            row.ConstantItem(20);
+            row.RelativeItem().Element(c =>
+                ComposeOneSignatureBlock(c, common, rightTitle));
+        });
+    }
+
+    private static void ComposeOneSignatureBlock(IContainer container, Dictionary<string, string> common, string title)
+    {
+        container.ContentFromRightToLeft().Column(col =>
+        {
+            col.Item().Text(title).FontFamily(ThaanaFont).FontSize(8).Bold();
+            col.Item().PaddingTop(2).Element(c => SignatureField(c, L(common, "LabelName")));
+            col.Item().Element(c => SignatureField(c, L(common, "LabelIdNo")));
+            col.Item().Element(c => SignatureField(c, L(common, "LabelPhone")));
+            col.Item().Element(c => SignatureField(c, L(common, "LabelSignature")));
+            col.Item().Row(dateTimeRow =>
+            {
+                dateTimeRow.RelativeItem().Element(c => SignatureField(c, L(common, "LabelDate")));
+                dateTimeRow.ConstantItem(10);
+                dateTimeRow.RelativeItem().Element(c => SignatureField(c, L(common, "LabelTime")));
+            });
+        });
+    }
+
+    private static void SignatureField(IContainer container, string label)
+    {
+        container.PaddingTop(3).Row(row =>
+        {
+            row.AutoItem().Text(label).FontFamily(ThaanaFont).FontSize(7);
+            row.RelativeItem().PaddingBottom(1).AlignBottom()
+                .LineHorizontal(0.3f).LineColor(Colors.Grey.Medium);
+        });
+    }
+
+    // ── Cell styles ─────────────────────────────────────────────────
+
+    private static IContainer HeaderCellRtl(IContainer container) =>
+        container.ContentFromRightToLeft()
+            .Background(Colors.Grey.Lighten3)
+            .Border(0.5f).BorderColor(Colors.Grey.Darken1)
+            .PaddingVertical(3).PaddingHorizontal(4)
+            .DefaultTextStyle(x => x.FontSize(7).Bold());
+
+    private static IContainer DataCellLtr(IContainer container) =>
+        container.ContentFromLeftToRight()
+            .Border(0.5f).BorderColor(Colors.Grey.Medium)
+            .PaddingVertical(2).PaddingHorizontal(4)
+            .DefaultTextStyle(x => x.FontSize(7));
+
+    private static IContainer EmptyCell(IContainer container) =>
+        container.Border(0.5f).BorderColor(Colors.Grey.Lighten2)
+            .PaddingVertical(2).PaddingHorizontal(4)
+            .MinHeight(14);
+
+    // ── Helpers ─────────────────────────────────────────────────────
+
+    private static string L(Dictionary<string, string> labels, string key, string fallback = "")
+        => labels.TryGetValue(key, out var value) ? value : fallback;
 }

@@ -15,6 +15,14 @@ using System.Text.Json.Serialization;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
+// Register Faruma font for Thaana text support
+var farumaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "designs", "Faruma.ttf");
+if (File.Exists(farumaPath))
+{
+    using var fontStream = File.OpenRead(farumaPath);
+    QuestPDF.Drawing.FontManager.RegisterFont(fontStream);
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Serilog
@@ -26,7 +34,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IPdfService, PdfService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;

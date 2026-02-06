@@ -1,0 +1,24 @@
+namespace BooksPortal.Application.Features.TeacherIssues.DTOs;
+
+public class TeacherReturnSlipResponse
+{
+    public int Id { get; set; }
+    public string ReferenceNo { get; set; } = string.Empty;
+    public int TeacherIssueId { get; set; }
+    public string TeacherName { get; set; } = string.Empty;
+    public int AcademicYearId { get; set; }
+    public string AcademicYearName { get; set; } = string.Empty;
+    public int ReceivedById { get; set; }
+    public DateTime ReceivedAt { get; set; }
+    public string? Notes { get; set; }
+    public List<TeacherReturnSlipItemResponse> Items { get; set; } = new();
+}
+
+public class TeacherReturnSlipItemResponse
+{
+    public int Id { get; set; }
+    public int BookId { get; set; }
+    public string BookTitle { get; set; } = string.Empty;
+    public string BookCode { get; set; } = string.Empty;
+    public int Quantity { get; set; }
+}

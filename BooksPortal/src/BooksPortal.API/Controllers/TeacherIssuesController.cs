@@ -45,7 +45,7 @@ public class TeacherIssuesController : ApiControllerBase
     public async Task<IActionResult> Print(int id)
     {
         var issue = await _service.GetByIdAsync(id);
-        var pdf = _pdfService.GenerateTeacherIssueSlip(issue);
+        var pdf = await _pdfService.GenerateTeacherIssueSlipAsync(issue);
         return File(pdf, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}.pdf");
     }
 }

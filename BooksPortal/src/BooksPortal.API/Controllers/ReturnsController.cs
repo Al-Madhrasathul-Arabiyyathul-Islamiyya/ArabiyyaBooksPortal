@@ -45,7 +45,7 @@ public class ReturnsController : ApiControllerBase
     public async Task<IActionResult> Print(int id)
     {
         var slip = await _service.GetByIdAsync(id);
-        var pdf = _pdfService.GenerateReturnSlip(slip);
+        var pdf = await _pdfService.GenerateReturnSlipAsync(slip);
         return File(pdf, "application/pdf", $"Return-{slip.ReferenceNo}.pdf");
     }
 }

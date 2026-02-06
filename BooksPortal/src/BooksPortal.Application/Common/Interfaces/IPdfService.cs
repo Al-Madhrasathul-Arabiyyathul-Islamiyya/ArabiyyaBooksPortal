@@ -6,7 +6,8 @@ namespace BooksPortal.Application.Common.Interfaces;
 
 public interface IPdfService
 {
-    byte[] GenerateDistributionSlip(DistributionSlipResponse slip);
-    byte[] GenerateReturnSlip(ReturnSlipResponse slip);
-    byte[] GenerateTeacherIssueSlip(TeacherIssueResponse issue);
+    Task<byte[]> GenerateDistributionSlipAsync(DistributionSlipResponse slip);
+    Task<byte[]> GenerateReturnSlipAsync(ReturnSlipResponse slip);
+    Task<byte[]> GenerateTeacherIssueSlipAsync(TeacherIssueResponse issue);
+    Task<byte[]> GenerateTeacherReturnSlipAsync(TeacherReturnSlipResponse slip);
 }

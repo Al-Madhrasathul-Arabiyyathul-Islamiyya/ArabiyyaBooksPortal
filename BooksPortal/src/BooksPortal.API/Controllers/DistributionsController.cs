@@ -45,7 +45,7 @@ public class DistributionsController : ApiControllerBase
     public async Task<IActionResult> Print(int id)
     {
         var slip = await _service.GetByIdAsync(id);
-        var pdf = _pdfService.GenerateDistributionSlip(slip);
+        var pdf = await _pdfService.GenerateDistributionSlipAsync(slip);
         return File(pdf, "application/pdf", $"Distribution-{slip.ReferenceNo}.pdf");
     }
 }
