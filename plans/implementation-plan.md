@@ -151,12 +151,12 @@ School book distribution management system built with .NET 10 Clean Architecture
 - [x] Validators
 
 ### Wiring
-- [~] DbSets in BooksPortalDbContext
-- [~] DI registrations
-- [~] Migration
+- [x] DbSets in BooksPortalDbContext
+- [x] DI registrations
+- [x] Migration
 
 ### Tests
-- [ ] Unit tests
+- [x] Unit tests (6 tests)
 - [ ] Integration tests
 
 ---
@@ -165,24 +165,24 @@ School book distribution management system built with .NET 10 Clean Architecture
 > Return slips, stock restoration, condition tracking
 
 ### Entities
-- [ ] Entity: `ReturnSlip.cs`
-- [ ] Entity: `ReturnSlipItem.cs`
-- [ ] Configurations
+- [x] Entity: `ReturnSlip.cs`
+- [x] Entity: `ReturnSlipItem.cs`
+- [x] Configurations
 
 ### Services
-- [ ] `IReturnService` interface
-- [ ] `ReturnService` implementation
-  - [ ] Create return with condition assessment
-  - [ ] Reference number generation (RTN{YEAR}{SEQ})
-  - [ ] Update damage/lost counters
+- [x] `IReturnService` interface
+- [x] `ReturnService` implementation
+  - [x] Create return with condition assessment
+  - [x] Reference number generation (RTN{YEAR}{SEQ})
+  - [x] Update damage/lost counters
 
 ### Controllers & DTOs
-- [ ] `ReturnsController`
-- [ ] DTOs
-- [ ] Validators
+- [x] `ReturnsController`
+- [x] DTOs
+- [x] Validators
 
 ### Tests
-- [ ] Unit tests
+- [x] Unit tests (15 tests: apply/reverse for all conditions, round-trip, create)
 - [ ] Integration tests
 
 ---
@@ -277,6 +277,6 @@ School book distribution management system built with .NET 10 Clean Architecture
 ---
 
 ## Current Focus
-> Module 5: Distribution (wiring remaining) → Module 6: Returns → Module 7: Teacher Issues
+> Module 7: Teacher Issues → Module 8: Reports → Module 9: Print
 
-Modules 1-4 complete and merged to dev. Module 5 files created, needs DI/DbContext/migration.
+Modules 1-6 complete and merged to dev (v0.1.0 through v0.6.0).
