@@ -10,6 +10,6 @@ public class ReferenceCounterConfiguration : IEntityTypeConfiguration<ReferenceC
     {
         builder.ToTable("ReferenceCounters");
         builder.HasKey(r => r.Key);
-        builder.Property(r => r.Key).HasMaxLength(20);
+        builder.Property(r => r.Key).HasMaxLength(50);
     }
 }

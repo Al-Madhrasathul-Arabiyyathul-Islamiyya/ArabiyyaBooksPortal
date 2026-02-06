@@ -10,7 +10,7 @@ public class TeacherIssueConfiguration : IEntityTypeConfiguration<TeacherIssue>
     {
         builder.ToTable("TeacherIssues");
         builder.HasKey(t => t.Id);
-        builder.Property(t => t.ReferenceNo).HasMaxLength(20).IsRequired();
+        builder.Property(t => t.ReferenceNo).HasMaxLength(50).IsRequired();
         builder.HasIndex(t => t.ReferenceNo).IsUnique();
         builder.Property(t => t.Notes).HasMaxLength(500);
         builder.HasOne(t => t.AcademicYear).WithMany().HasForeignKey(t => t.AcademicYearId).OnDelete(DeleteBehavior.Restrict);

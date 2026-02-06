@@ -12,17 +12,20 @@ namespace BooksPortal.Application.Features.TeacherIssues.Services;
 public class TeacherIssueService : ITeacherIssueService
 {
     private readonly IRepository<TeacherIssue> _issueRepo;
+    private readonly IRepository<TeacherReturnSlip> _returnSlipRepo;
     private readonly IRepository<Book> _bookRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
 
     public TeacherIssueService(
         IRepository<TeacherIssue> issueRepo,
+        IRepository<TeacherReturnSlip> returnSlipRepo,
         IRepository<Book> bookRepo,
         IUnitOfWork unitOfWork,
         IReferenceNumberService refService)
     {
         _issueRepo = issueRepo;
+        _returnSlipRepo = returnSlipRepo;
         _bookRepo = bookRepo;
         _unitOfWork = unitOfWork;
         _refService = refService;
@@ -99,7 +102,7 @@ public class TeacherIssueService : ITeacherIssueService
         await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var referenceNo = await _refService.GenerateAsync("TIS");
+            var referenceNo = await _refService.GenerateAsync(SlipType.TeacherIssue, request.AcademicYearId);
 
             var issue = new TeacherIssue
             {
@@ -150,6 +153,17 @@ public class TeacherIssueService : ITeacherIssueService
         await _unitOfWork.BeginTransactionAsync();
         try
         {
+            var returnSlipRefNo = await _refService.GenerateAsync(SlipType.TeacherReturn, issue.AcademicYearId);
+
+            var returnSlip = new TeacherReturnSlip
+            {
+                ReferenceNo = returnSlipRefNo,
+                TeacherIssueId = issue.Id,
+                ReceivedById = userId,
+                ReceivedAt = DateTime.UtcNow,
+                Notes = request.Notes
+            };
+
             foreach (var returnItem in request.Items)
             {
                 var issueItem = issue.Items.FirstOrDefault(i => i.Id == returnItem.TeacherIssueItemId)
@@ -168,7 +182,16 @@ public class TeacherIssueService : ITeacherIssueService
 
                 book.WithTeachers -= returnItem.Quantity;
                 _bookRepo.Update(book);
+
+                returnSlip.Items.Add(new TeacherReturnSlipItem
+                {
+                    TeacherIssueItemId = issueItem.Id,
+                    BookId = issueItem.BookId,
+                    Quantity = returnItem.Quantity
+                });
             }
+
+            _returnSlipRepo.Add(returnSlip);
 
             issue.Status = DetermineStatus(issue);
             _issueRepo.Update(issue);

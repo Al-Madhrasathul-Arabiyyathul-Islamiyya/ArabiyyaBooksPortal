@@ -99,7 +99,7 @@ public class ReturnService : IReturnService
         await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var referenceNo = await _refService.GenerateAsync("RTN");
+            var referenceNo = await _refService.GenerateAsync(SlipType.Return, request.AcademicYearId);
 
             var slip = new ReturnSlip
             {

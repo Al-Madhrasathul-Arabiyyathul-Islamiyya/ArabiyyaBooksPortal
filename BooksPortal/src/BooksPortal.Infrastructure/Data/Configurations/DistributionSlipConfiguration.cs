@@ -10,7 +10,7 @@ public class DistributionSlipConfiguration : IEntityTypeConfiguration<Distributi
     {
         builder.ToTable("DistributionSlips");
         builder.HasKey(d => d.Id);
-        builder.Property(d => d.ReferenceNo).HasMaxLength(20).IsRequired();
+        builder.Property(d => d.ReferenceNo).HasMaxLength(50).IsRequired();
         builder.HasIndex(d => d.ReferenceNo).IsUnique();
         builder.Property(d => d.Notes).HasMaxLength(500);
         builder.HasOne(d => d.AcademicYear).WithMany().HasForeignKey(d => d.AcademicYearId).OnDelete(DeleteBehavior.Restrict);

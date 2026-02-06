@@ -104,7 +104,7 @@ public class DistributionServiceTests
         var book2 = CreateBook(2, totalStock: 50);
         _bookRepo.GetByIdAsync(1).Returns(book1);
         _bookRepo.GetByIdAsync(2).Returns(book2);
-        _refService.GenerateAsync("DST").Returns("DST2026000001");
+        _refService.GenerateAsync(SlipType.Distribution, 1).Returns("DST2026000001");
         var request = CreateRequest((1, 5), (2, 3));
 
         // CreateAsync calls GetByIdAsync in the loop which will throw on the
@@ -121,13 +121,13 @@ public class DistributionServiceTests
     {
         var book = CreateBook(1, totalStock: 100);
         _bookRepo.GetByIdAsync(1).Returns(book);
-        _refService.GenerateAsync("DST").Returns("DST2026000001");
+        _refService.GenerateAsync(SlipType.Distribution, 1).Returns("DST2026000001");
         var request = CreateRequest((1, 5));
 
         try { await _sut.CreateAsync(request, userId: 1); } catch { }
 
         await _unitOfWork.Received(1).BeginTransactionAsync();
-        await _refService.Received(1).GenerateAsync("DST");
+        await _refService.Received(1).GenerateAsync(SlipType.Distribution, 1);
         _slipRepo.Received(1).Add(Arg.Is<DistributionSlip>(s =>
             s.ReferenceNo == "DST2026000001" &&
             s.AcademicYearId == 1 &&

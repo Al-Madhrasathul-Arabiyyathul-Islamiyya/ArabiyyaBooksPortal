@@ -113,7 +113,7 @@ public class DistributionService : IDistributionService
         await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var referenceNo = await _refService.GenerateAsync("DST");
+            var referenceNo = await _refService.GenerateAsync(SlipType.Distribution, request.AcademicYearId);
 
             var slip = new DistributionSlip
             {

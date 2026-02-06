@@ -13,6 +13,8 @@ using BooksPortal.Application.Features.TeacherIssues.Interfaces;
 using BooksPortal.Application.Features.TeacherIssues.Services;
 using BooksPortal.Application.Features.MasterData.Interfaces;
 using BooksPortal.Application.Features.MasterData.Services;
+using BooksPortal.Application.Features.Settings.Interfaces;
+using BooksPortal.Application.Features.Settings.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<ITeacherIssueService, TeacherIssueService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IReportService, ReportService>();
+
+        services.AddScoped<IReferenceNumberFormatService, ReferenceNumberFormatService>();
 
         return services;
     }

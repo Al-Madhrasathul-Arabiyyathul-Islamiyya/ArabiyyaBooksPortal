@@ -143,7 +143,7 @@ public class ReturnServiceTests
     public async Task Create_BookNotFound_ThrowsNotFoundException()
     {
         _bookRepo.GetByIdAsync(999).Returns((Book?)null);
-        _refService.GenerateAsync("RTN").Returns("RTN2026000001");
+        _refService.GenerateAsync(SlipType.Return, 1).Returns("RTN2026000001");
         var request = new CreateReturnSlipRequest
         {
             AcademicYearId = 1, StudentId = 1, ReturnedById = 1,
@@ -164,7 +164,7 @@ public class ReturnServiceTests
         var book2 = CreateBook(2, distributed: 15, lost: 1);
         _bookRepo.GetByIdAsync(1).Returns(book1);
         _bookRepo.GetByIdAsync(2).Returns(book2);
-        _refService.GenerateAsync("RTN").Returns("RTN2026000001");
+        _refService.GenerateAsync(SlipType.Return, 1).Returns("RTN2026000001");
 
         var request = new CreateReturnSlipRequest
         {

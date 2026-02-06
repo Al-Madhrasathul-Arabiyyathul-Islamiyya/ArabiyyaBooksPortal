@@ -12,6 +12,7 @@ namespace BooksPortal.UnitTests.Features.TeacherIssues;
 public class TeacherIssueServiceTests
 {
     private readonly IRepository<TeacherIssue> _issueRepo;
+    private readonly IRepository<TeacherReturnSlip> _returnSlipRepo;
     private readonly IRepository<Book> _bookRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
@@ -20,10 +21,11 @@ public class TeacherIssueServiceTests
     public TeacherIssueServiceTests()
     {
         _issueRepo = Substitute.For<IRepository<TeacherIssue>>();
+        _returnSlipRepo = Substitute.For<IRepository<TeacherReturnSlip>>();
         _bookRepo = Substitute.For<IRepository<Book>>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _refService = Substitute.For<IReferenceNumberService>();
-        _sut = new TeacherIssueService(_issueRepo, _bookRepo, _unitOfWork, _refService);
+        _sut = new TeacherIssueService(_issueRepo, _returnSlipRepo, _bookRepo, _unitOfWork, _refService);
     }
 
     private static Book CreateBook(int id = 1, int totalStock = 100, int distributed = 0,
@@ -164,7 +166,7 @@ public class TeacherIssueServiceTests
     {
         var book = CreateBook(1, totalStock: 100, withTeachers: 5);
         _bookRepo.GetByIdAsync(1).Returns(book);
-        _refService.GenerateAsync("TIS").Returns("TIS2026000001");
+        _refService.GenerateAsync(SlipType.TeacherIssue, 1).Returns("TIS2026000001");
         var request = new CreateTeacherIssueRequest
         {
             AcademicYearId = 1, TeacherId = 1,

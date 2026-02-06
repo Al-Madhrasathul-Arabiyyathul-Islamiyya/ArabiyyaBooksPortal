@@ -10,7 +10,7 @@ public class ReturnSlipConfiguration : IEntityTypeConfiguration<ReturnSlip>
     {
         builder.ToTable("ReturnSlips");
         builder.HasKey(r => r.Id);
-        builder.Property(r => r.ReferenceNo).HasMaxLength(20).IsRequired();
+        builder.Property(r => r.ReferenceNo).HasMaxLength(50).IsRequired();
         builder.HasIndex(r => r.ReferenceNo).IsUnique();
         builder.Property(r => r.Notes).HasMaxLength(500);
         builder.HasOne(r => r.AcademicYear).WithMany().HasForeignKey(r => r.AcademicYearId).OnDelete(DeleteBehavior.Restrict);
