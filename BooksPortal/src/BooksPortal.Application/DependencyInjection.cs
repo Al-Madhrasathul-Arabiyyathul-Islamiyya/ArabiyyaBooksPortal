@@ -5,6 +5,8 @@ using BooksPortal.Application.Features.Distribution.Interfaces;
 using BooksPortal.Application.Features.Distribution.Services;
 using BooksPortal.Application.Features.Returns.Interfaces;
 using BooksPortal.Application.Features.Returns.Services;
+using BooksPortal.Application.Features.TeacherIssues.Interfaces;
+using BooksPortal.Application.Features.TeacherIssues.Services;
 using BooksPortal.Application.Features.MasterData.Interfaces;
 using BooksPortal.Application.Features.MasterData.Services;
 using FluentValidation;
@@ -32,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IBookService, BookService>();
         services.AddScoped<IDistributionService, DistributionService>();
         services.AddScoped<IReturnService, ReturnService>();
+        services.AddScoped<ITeacherIssueService, TeacherIssueService>();
 
         return services;
     }
