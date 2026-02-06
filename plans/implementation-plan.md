@@ -237,23 +237,141 @@ School book distribution management system built with .NET 10 Clean Architecture
 
 ---
 
-## Module 9: Print Module
-> PDF generation for slips
+## Module 9: Print & Enhancements
+> PDF generation, configurable reference numbers, DB-stored labels, PDF storage, active academic year
 
-### QuestPDF Templates
-- [x] Distribution slip template (A5, dual copy)
-- [x] Return slip template
-- [x] Teacher issue slip template
-- [x] Print endpoints in controllers
+Branch: `feature/module-9-print`
 
-### Infrastructure
+### 9.0 Documentation & Housekeeping
+- [x] Add `documentation/07-reference-number-system.md`
+- [x] Add `documentation/08-slip-templates-and-storage.md`
+- [~] Update `plans/implementation-plan.md` to reflect enhancements
+- [ ] Update `documentation/03-api-specification.md` with new endpoints
+
+### 9.1 Basic PdfService (initial scaffold)
 - [x] `IPdfService` interface (Application layer)
-- [x] `PdfService` implementation (API layer)
+- [x] `PdfService` implementation (API layer, basic English templates)
 - [x] QuestPDF Community license config in Program.cs
 - [x] DI registration
-
-### Tests
+- [x] Print endpoints in controllers (Distribution, Return, TeacherIssue)
 - [x] Unit tests (6 tests: PDF generation for all slip types)
+
+### 9.2 Active Academic Year Endpoint (Feature E)
+- [~] Add `GetActiveAsync()` to `IAcademicYearService` interface
+- [ ] Implement in `AcademicYearService` (`.FirstOrDefaultAsync(y => y.IsActive)`)
+- [ ] Add `GET /api/academicyears/active` to `AcademicYearsController`
+
+### 9.3 Customizable Reference Numbers (Feature A)
+> See `documentation/07-reference-number-system.md` for full specification
+
+#### New Entities
+- [ ] `SlipType` enum (Distribution=1, Return=2, TeacherIssue=3, TeacherReturn=4)
+- [ ] `ReferenceNumberFormat` entity (SlipType, AcademicYearId, FormatTemplate, PaddingWidth)
+- [ ] `ReferenceNumberFormatConfiguration` (unique constraint on SlipType+AcademicYearId)
+- [ ] `TeacherReturnSlip` entity (ReferenceNo, TeacherIssueId, ReceivedById, ReceivedAt, Notes, PdfFilePath)
+- [ ] `TeacherReturnSlipItem` entity (TeacherReturnSlipId, TeacherIssueItemId, BookId, Quantity)
+- [ ] `TeacherReturnSlipConfiguration` + `TeacherReturnSlipItemConfiguration`
+
+#### Service Changes
+- [ ] Rewrite `IReferenceNumberService` — new signature: `GenerateAsync(SlipType, int academicYearId)`
+- [ ] Rewrite `ReferenceNumberService` — query format, fallback to default, template parsing
+- [ ] Update `DistributionService.CreateAsync` to use new signature
+- [ ] Update `ReturnService.CreateAsync` to use new signature
+- [ ] Update `TeacherIssueService.CreateAsync` to use new signature
+- [ ] Update `TeacherIssueService.ProcessReturnAsync` — create `TeacherReturnSlip` with ref number
+
+#### Admin API
+- [ ] `IReferenceNumberFormatService` + `ReferenceNumberFormatService`
+- [ ] DTOs: `ReferenceNumberFormatResponse`, `CreateReferenceNumberFormatRequest`
+- [ ] Validator: `CreateReferenceNumberFormatRequestValidator`
+- [ ] `ReferenceNumberFormatsController` [Admin] — CRUD + DELETE [SuperAdmin]
+
+#### Infrastructure
+- [ ] Add DbSets (ReferenceNumberFormat, TeacherReturnSlip, TeacherReturnSlipItem)
+- [ ] Migration: `AddReferenceNumberFormatAndTeacherReturnSlip`
+
+#### Tests
+- [ ] Unit tests: template parsing (internal static method)
+- [ ] Unit tests: default fallback, token substitution, padding width variations
+
+### 9.4 Slip Template Settings — DB-Stored Labels (Feature B)
+> See `documentation/08-slip-templates-and-storage.md` for full specification
+
+#### Entity
+- [ ] `SlipTemplateSetting` entity (Category, Key, Value, SortOrder)
+- [ ] `SlipTemplateSettingConfiguration` (unique constraint on Category+Key)
+
+#### Admin API
+- [ ] `ISlipTemplateSettingService` + `SlipTemplateSettingService`
+- [ ] DTOs: `SlipTemplateSettingResponse`, `UpdateSlipTemplateSettingRequest`
+- [ ] `SlipTemplateSettingsController` [Admin] — GET (list/filter), GET (by id), PUT (update), POST /reset [SuperAdmin]
+
+#### Seeding
+- [ ] Seed default Thaana labels in `SeedData.cs` (Common + per slip type)
+
+#### Infrastructure
+- [ ] Add DbSet for SlipTemplateSetting
+- [ ] Migration: `AddSlipTemplateSetting`
+
+### 9.5 PDF Template Redesign — Thaana (Feature C)
+> Depends on 9.3 + 9.4. Designs in `./designs/` folder.
+
+#### Font & Assets
+- [ ] Copy `designs/faruma.ttf` to `API/Resources/Fonts/`
+- [ ] Register Faruma font with QuestPDF `FontManager` in Program.cs
+- [ ] Embed `designs/logo.svg` as resource
+
+#### PdfService Rewrite
+- [ ] Rewrite `PdfService` — A4 landscape, dual-copy layout
+- [ ] Load labels from `SlipTemplateSetting` via injected service (cached with `IMemoryCache`)
+- [ ] RTL support: `.ContentFromRightToLeft()` for Thaana sections
+- [ ] Distribution slip template (5-col: Term, Publisher, AcademicYear, SubjectCode, BookTitle)
+- [ ] Student Return slip template (5-col, different title)
+- [ ] Teacher Issue slip template (4-col, no Term)
+- [ ] Teacher Return slip template (4-col)
+- [ ] Header: logo (top-right), school name centered in Thaana
+- [ ] Signature blocks: Name, ID No, Phone, Signature, Date, Time — Thaana labels
+
+#### IPdfService Update
+- [ ] Add `GenerateTeacherReturnSlip(...)` method to interface
+
+#### Tests
+- [ ] Update existing PDF tests for new template structure
+- [ ] New tests for PDF generation with Thaana labels
+
+### 9.6 PDF Storage on Disk (Feature D)
+> Depends on 9.5. See `documentation/08-slip-templates-and-storage.md`.
+
+#### Entity Changes
+- [ ] Add `PdfFilePath` (string?) to `DistributionSlip`
+- [ ] Add `PdfFilePath` (string?) to `ReturnSlip`
+- [ ] Add `PdfFilePath` (string?) to `TeacherIssue`
+- [ ] (`TeacherReturnSlip.PdfFilePath` already defined in 9.3)
+
+#### Configuration
+- [ ] Add `SlipStorage:BasePath` to `appsettings.json`
+
+#### Service Changes
+- [ ] `DistributionService.CreateAsync` — generate PDF + save to disk + store path
+- [ ] `ReturnService.CreateAsync` — same
+- [ ] `TeacherIssueService.CreateAsync` — same
+- [ ] `TeacherIssueService.ProcessReturnAsync` — same (teacher return slip)
+
+#### Print Endpoint Changes
+- [ ] `GET /distributions/{id}/print` — serve stored file (fallback: regenerate)
+- [ ] `GET /returns/{id}/print` — same
+- [ ] `GET /teacher-issues/{id}/print` — same
+- [ ] `GET /teacher-issues/{id}/return/{returnSlipId}/print` — teacher return slip
+
+#### Infrastructure
+- [ ] Migration: `AddPdfFilePath` (nullable string to 3 existing tables)
+- [ ] Directory structure: `{BasePath}/{SlipType}/{AcademicYear}/{ReferenceNo}.pdf`
+
+### 9.7 Final Verification
+- [ ] All existing unit tests still pass
+- [ ] All new unit tests pass
+- [ ] Build: 0 errors, 0 warnings
+- [ ] Merge to dev, tag v0.9.0
 
 ---
 
@@ -286,8 +404,18 @@ School book distribution management system built with .NET 10 Clean Architecture
 
 ---
 
-## Current Focus
-> Backend complete. Ready for REST client testing.
+## Deferred Items
+- **Slip revision** (edit within 24h of creation) → implement post-frontend
+- **Frontend pages** for reference number format management
+- **Frontend pages** for slip template settings management
 
-Modules 1-9 complete and merged to dev (v0.1.0 through v0.9.0).
+---
+
+## Current Focus
+> Module 9 enhancements in progress on `feature/module-9-print`
+
+Modules 1–8 complete and merged to dev (v0.1.0 – v0.8.0).
 Hotfix applied: master data deletion restricted to SuperAdmin.
+64 unit tests + 1 integration test passing.
+
+**Implementation order:** 9.0 → 9.1 → 9.2 → 9.3 → 9.4 → 9.5 → 9.6 → 9.7
