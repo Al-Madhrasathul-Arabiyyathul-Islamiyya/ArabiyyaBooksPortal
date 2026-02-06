@@ -1,5 +1,6 @@
 using BooksPortal.Application.Features.MasterData.DTOs;
 using BooksPortal.Application.Features.MasterData.Interfaces;
+using BooksPortal.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,7 @@ public class KeystagesController : ApiControllerBase
         => OkResponse(await _service.UpdateAsync(id, request));
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Delete(int id)
     {
         await _service.DeleteAsync(id);

@@ -30,6 +30,7 @@ public class BooksController : ApiControllerBase
         => OkResponse(await _service.UpdateAsync(id, request));
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Delete(int id)
     {
         await _service.DeleteAsync(id);
