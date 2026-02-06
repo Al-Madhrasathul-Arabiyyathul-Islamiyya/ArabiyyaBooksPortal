@@ -27,6 +27,9 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<Book> Books => Set<Book>();
     public DbSet<StockEntry> StockEntries => Set<StockEntry>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<DistributionSlip> DistributionSlips => Set<DistributionSlip>();
+    public DbSet<DistributionSlipItem> DistributionSlipItems => Set<DistributionSlipItem>();
+    public DbSet<ReferenceCounter> ReferenceCounters => Set<ReferenceCounter>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
