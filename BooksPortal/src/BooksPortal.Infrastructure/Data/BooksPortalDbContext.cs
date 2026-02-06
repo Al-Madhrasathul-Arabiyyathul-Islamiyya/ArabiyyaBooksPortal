@@ -32,6 +32,8 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<ReferenceCounter> ReferenceCounters => Set<ReferenceCounter>();
     public DbSet<ReturnSlip> ReturnSlips => Set<ReturnSlip>();
     public DbSet<ReturnSlipItem> ReturnSlipItems => Set<ReturnSlipItem>();
+    public DbSet<TeacherIssue> TeacherIssues => Set<TeacherIssue>();
+    public DbSet<TeacherIssueItem> TeacherIssueItems => Set<TeacherIssueItem>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,

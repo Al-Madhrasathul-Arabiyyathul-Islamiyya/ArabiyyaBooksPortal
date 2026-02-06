@@ -191,24 +191,25 @@ School book distribution management system built with .NET 10 Clean Architecture
 > Teacher book loans, partial returns
 
 ### Entities
-- [ ] Entity: `TeacherIssue.cs`
-- [ ] Entity: `TeacherIssueItem.cs`
-- [ ] Configurations
+- [x] Entity: `TeacherIssue.cs`
+- [x] Entity: `TeacherIssueItem.cs` (with OutstandingQuantity computed property)
+- [x] Configurations
 
 ### Services
-- [ ] `ITeacherIssueService` interface
-- [ ] `TeacherIssueService` implementation
-  - [ ] Issue books to teachers
-  - [ ] Process partial returns
-  - [ ] Status tracking
+- [x] `ITeacherIssueService` interface
+- [x] `TeacherIssueService` implementation
+  - [x] Issue books to teachers (WithTeachers increment)
+  - [x] Process partial returns (WithTeachers decrement, status update)
+  - [x] Status tracking (Active → Partial → Returned)
+  - [x] Cancel (reverses only outstanding quantities)
 
 ### Controllers & DTOs
-- [ ] `TeacherIssuesController`
-- [ ] DTOs
-- [ ] Validators
+- [x] `TeacherIssuesController` (CRUD + POST /{id}/return)
+- [x] DTOs (TeacherIssueResponse, CreateTeacherIssueRequest, ProcessTeacherReturnRequest)
+- [x] Validators
 
 ### Tests
-- [ ] Unit tests
+- [x] Unit tests (13 tests: DetermineStatus, OutstandingQuantity, stock effects, validation)
 - [ ] Integration tests
 
 ---
@@ -277,6 +278,6 @@ School book distribution management system built with .NET 10 Clean Architecture
 ---
 
 ## Current Focus
-> Module 7: Teacher Issues → Module 8: Reports → Module 9: Print
+> Module 8: Reports & Audit → Module 9: Print
 
-Modules 1-6 complete and merged to dev (v0.1.0 through v0.6.0).
+Modules 1-7 complete and merged to dev (v0.1.0 through v0.7.0).
