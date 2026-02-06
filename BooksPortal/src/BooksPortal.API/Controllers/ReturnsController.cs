@@ -1,3 +1,4 @@
+using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.Returns.DTOs;
 using BooksPortal.Application.Features.Returns.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -9,8 +10,13 @@ namespace BooksPortal.API.Controllers;
 public class ReturnsController : ApiControllerBase
 {
     private readonly IReturnService _service;
+    private readonly IPdfService _pdfService;
 
-    public ReturnsController(IReturnService service) => _service = service;
+    public ReturnsController(IReturnService service, IPdfService pdfService)
+    {
+        _service = service;
+        _pdfService = pdfService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetPaged(int pageNumber = 1, int pageSize = 20, int? academicYearId = null, int? studentId = null)
@@ -33,5 +39,13 @@ public class ReturnsController : ApiControllerBase
     {
         await _service.CancelAsync(id);
         return OkResponse("Return slip cancelled.");
+    }
+
+    [HttpGet("{id}/print")]
+    public async Task<IActionResult> Print(int id)
+    {
+        var slip = await _service.GetByIdAsync(id);
+        var pdf = _pdfService.GenerateReturnSlip(slip);
+        return File(pdf, "application/pdf", $"Return-{slip.ReferenceNo}.pdf");
     }
 }

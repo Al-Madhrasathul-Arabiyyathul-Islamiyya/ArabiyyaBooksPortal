@@ -1,3 +1,4 @@
+using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.Distribution.DTOs;
 using BooksPortal.Application.Features.Distribution.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -9,8 +10,13 @@ namespace BooksPortal.API.Controllers;
 public class DistributionsController : ApiControllerBase
 {
     private readonly IDistributionService _service;
+    private readonly IPdfService _pdfService;
 
-    public DistributionsController(IDistributionService service) => _service = service;
+    public DistributionsController(IDistributionService service, IPdfService pdfService)
+    {
+        _service = service;
+        _pdfService = pdfService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetPaged(int pageNumber = 1, int pageSize = 20, int? academicYearId = null, int? studentId = null)
@@ -33,5 +39,13 @@ public class DistributionsController : ApiControllerBase
     {
         await _service.CancelAsync(id);
         return OkResponse("Distribution slip cancelled.");
+    }
+
+    [HttpGet("{id}/print")]
+    public async Task<IActionResult> Print(int id)
+    {
+        var slip = await _service.GetByIdAsync(id);
+        var pdf = _pdfService.GenerateDistributionSlip(slip);
+        return File(pdf, "application/pdf", $"Distribution-{slip.ReferenceNo}.pdf");
     }
 }

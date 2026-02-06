@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\src\BooksPortal.Domain\BooksPortal.Domain.csproj" />
     <ProjectReference Include="..\..\src\BooksPortal.Application\BooksPortal.Application.csproj" />
     <ProjectReference Include="..\..\src\BooksPortal.Infrastructure\BooksPortal.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\BooksPortal.API\BooksPortal.API.csproj" />
   </ItemGroup>
 
 </Project>

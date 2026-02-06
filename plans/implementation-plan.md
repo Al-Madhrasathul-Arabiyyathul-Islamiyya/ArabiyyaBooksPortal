@@ -241,10 +241,19 @@ School book distribution management system built with .NET 10 Clean Architecture
 > PDF generation for slips
 
 ### QuestPDF Templates
-- [ ] Distribution slip template (A5, dual copy)
-- [ ] Return slip template
-- [ ] Teacher issue slip template
-- [ ] Print endpoints in controllers
+- [x] Distribution slip template (A5, dual copy)
+- [x] Return slip template
+- [x] Teacher issue slip template
+- [x] Print endpoints in controllers
+
+### Infrastructure
+- [x] `IPdfService` interface (Application layer)
+- [x] `PdfService` implementation (API layer)
+- [x] QuestPDF Community license config in Program.cs
+- [x] DI registration
+
+### Tests
+- [x] Unit tests (6 tests: PDF generation for all slip types)
 
 ---
 
@@ -278,6 +287,7 @@ School book distribution management system built with .NET 10 Clean Architecture
 ---
 
 ## Current Focus
-> Module 9: Print
+> Backend complete. Ready for REST client testing.
 
-Modules 1-8 complete and merged to dev (v0.1.0 through v0.8.0).
+Modules 1-9 complete and merged to dev (v0.1.0 through v0.9.0).
+Hotfix applied: master data deletion restricted to SuperAdmin.

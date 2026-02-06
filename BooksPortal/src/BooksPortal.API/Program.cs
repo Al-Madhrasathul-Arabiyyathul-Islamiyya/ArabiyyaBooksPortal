@@ -1,14 +1,19 @@
 using BooksPortal.API.Filters;
 using BooksPortal.API.Middleware;
+using BooksPortal.API.Services;
 using BooksPortal.Application;
+using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Common.Models;
 using BooksPortal.Infrastructure;
 using BooksPortal.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using QuestPDF.Infrastructure;
 using Serilog;
 using System.Text;
 using System.Text.Json.Serialization;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +26,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IPdfService, PdfService>();
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;

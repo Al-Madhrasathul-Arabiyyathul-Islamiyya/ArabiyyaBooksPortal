@@ -1,3 +1,4 @@
+using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.TeacherIssues.DTOs;
 using BooksPortal.Application.Features.TeacherIssues.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -9,8 +10,13 @@ namespace BooksPortal.API.Controllers;
 public class TeacherIssuesController : ApiControllerBase
 {
     private readonly ITeacherIssueService _service;
+    private readonly IPdfService _pdfService;
 
-    public TeacherIssuesController(ITeacherIssueService service) => _service = service;
+    public TeacherIssuesController(ITeacherIssueService service, IPdfService pdfService)
+    {
+        _service = service;
+        _pdfService = pdfService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetPaged(int pageNumber = 1, int pageSize = 20, int? academicYearId = null, int? teacherId = null)
@@ -33,5 +39,13 @@ public class TeacherIssuesController : ApiControllerBase
     {
         await _service.CancelAsync(id);
         return OkResponse("Teacher issue cancelled.");
+    }
+
+    [HttpGet("{id}/print")]
+    public async Task<IActionResult> Print(int id)
+    {
+        var issue = await _service.GetByIdAsync(id);
+        var pdf = _pdfService.GenerateTeacherIssueSlip(issue);
+        return File(pdf, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}.pdf");
     }
 }
