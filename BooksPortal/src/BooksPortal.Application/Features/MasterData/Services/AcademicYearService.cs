@@ -25,6 +25,12 @@ public class AcademicYearService : IAcademicYearService
         return items.Adapt<List<AcademicYearResponse>>();
     }
 
+    public async Task<AcademicYearResponse?> GetActiveAsync()
+    {
+        var entity = await _repository.Query().FirstOrDefaultAsync(a => a.IsActive);
+        return entity?.Adapt<AcademicYearResponse>();
+    }
+
     public async Task<AcademicYearResponse> GetByIdAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id)

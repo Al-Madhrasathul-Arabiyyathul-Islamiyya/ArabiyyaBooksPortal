@@ -17,6 +17,13 @@ public class AcademicYearsController : ApiControllerBase
     public async Task<IActionResult> GetAll()
         => OkResponse(await _service.GetAllAsync());
 
+    [HttpGet("active")]
+    public async Task<IActionResult> GetActive()
+    {
+        var result = await _service.GetActiveAsync();
+        return result is not null ? OkResponse(result) : NotFound();
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
         => OkResponse(await _service.GetByIdAsync(id));
