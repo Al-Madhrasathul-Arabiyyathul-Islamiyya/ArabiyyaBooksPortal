@@ -1,6 +1,8 @@
+using BooksPortal.Application.Features.Settings.Services;
 using BooksPortal.Domain.Enums;
 using BooksPortal.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BooksPortal.Infrastructure.Data;
@@ -42,5 +44,19 @@ public static class SeedData
                 await userManager.AddToRoleAsync(adminUser, UserRole.SuperAdmin);
             }
         }
+
+        await SeedSlipTemplateSettingsAsync(serviceProvider);
+    }
+
+    private static async Task SeedSlipTemplateSettingsAsync(IServiceProvider serviceProvider)
+    {
+        var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
+
+        if (await db.SlipTemplateSettings.AnyAsync())
+            return;
+
+        var defaults = SlipTemplateSettingService.GetDefaultLabels();
+        db.SlipTemplateSettings.AddRange(defaults);
+        await db.SaveChangesAsync();
     }
 }

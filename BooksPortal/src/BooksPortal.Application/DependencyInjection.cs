@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.AddScoped<IReportService, ReportService>();
 
         services.AddScoped<IReferenceNumberFormatService, ReferenceNumberFormatService>();
+        services.AddScoped<ISlipTemplateSettingService, SlipTemplateSettingService>();
 
         return services;
     }
