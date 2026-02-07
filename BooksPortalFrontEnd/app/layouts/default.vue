@@ -25,7 +25,7 @@
           text
           severity="secondary"
           class="w-full"
-          @click="sidebarCollapsed = !sidebarCollapsed"
+          @click="appStore.toggleSidebar()"
         />
       </div>
     </aside>
@@ -37,7 +37,7 @@
     >
       <!-- Header -->
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
-        <div />
+        <AppBreadcrumb />
         <div class="flex items-center gap-3">
           <Button
             :icon="colorMode.value === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
@@ -70,8 +70,9 @@ import { ROLES } from '~/utils/constants'
 
 const colorMode = useColorMode()
 const { user, isAdmin, logout } = useAuth()
+const appStore = useAppStore()
 
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
 const userMenuRef = ref()
 
 function toggleColorMode() {
