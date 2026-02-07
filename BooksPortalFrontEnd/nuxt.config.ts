@@ -1,9 +1,12 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import Aura from '@primeuix/themes/aura'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  ssr: false,
 
   modules: [
+    '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
@@ -12,38 +15,66 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@primevue/nuxt-module',
     '@pinia/nuxt',
-    'nuxt-csurf',
+    '@pinia/colada-nuxt',
+    '@regle/nuxt',
     'dayjs-nuxt',
     'nuxt-charts',
-    '@regle/nuxt',
-    '@pinia/colada-nuxt'
+    'nuxt-csurf',
   ],
-  colorMode: {
-    preference: 'system', 
-    fallback: 'light',
-    componentName: 'ColorScheme',
-    storage: 'localStorage',
-    storageKey: 'nuxt-color-mode'
-  },
-  primevue: {},
-  csurf: { // optional
-    https: false, // default true if in production
-    cookieKey: '', // "__Host-csrf" if https is true otherwise just "csrf"
-    cookie: { // CookieSerializeOptions from unjs/cookie-es
-      path: '/',
-      httpOnly: true,
-      sameSite: 'strict'
+
+  runtimeConfig: {
+    public: {
+      apiBase: 'https://localhost:5001/api',
     },
-    methodsToProtect: ['POST', 'PUT', 'PATCH'], // the request methods we want CSRF protection for
-    encryptSecret: '/** a 32 bits secret */', // for stateless server (like serverless runtime), random bytes by default
-    encryptAlgorithm: 'AES-CBC', // by default 'aes-256-cbc' (node), 'AES-CBC' (serverless)
-    addCsrfTokenToEventCtx: true, // default false, to run useCsrfFetch on server set it to true
-    headerName: 'csrf-token' // the header where the csrf token is stored
   },
+
+  primevue: {
+    options: {
+      theme: {
+        preset: Aura,
+        options: {
+          darkModeSelector: '.dark',
+          cssLayer: {
+            name: 'primevue',
+            order: 'tailwind-base, primevue, tailwind-utilities',
+          },
+        },
+      },
+      ripple: true,
+    },
+    autoImport: true,
+  },
+
+  colorMode: {
+    preference: 'system',
+    fallback: 'light',
+    classSuffix: '',
+    storage: 'localStorage',
+    storageKey: 'nuxt-color-mode',
+  },
+
+  tailwindcss: {
+    cssPath: ['~/assets/css/main.css', { injectPosition: 'first' }],
+  },
+
   dayjs: {
     locales: ['en'],
     plugins: ['relativeTime', 'utc', 'timezone'],
     defaultLocale: 'en',
     defaultTimezone: 'Indian/Maldives',
-  }
+  },
+
+  csurf: {
+    https: false,
+    cookieKey: '',
+    cookie: {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'strict',
+    },
+    methodsToProtect: ['POST', 'PUT', 'PATCH'],
+    encryptAlgorithm: 'AES-CBC',
+    addCsrfTokenToEventCtx: true,
+    headerName: 'csrf-token',
+  },
 })
