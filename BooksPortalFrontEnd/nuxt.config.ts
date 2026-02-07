@@ -1,11 +1,16 @@
 import Aura from '@primeuix/themes/aura'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  sourcemap: {
+    server: false,
+    client: false,
+  },
+
   modules: [
-    '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
@@ -26,6 +31,17 @@ export default defineNuxtConfig({
     },
   },
 
+  css: ['./app/assets/css/main.css'],
+
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+    build: {
+      sourcemap: false, // Disable source maps in production
+    },
+  },
+
   primevue: {
     options: {
       theme: {
@@ -34,7 +50,7 @@ export default defineNuxtConfig({
           darkModeSelector: '.dark',
           cssLayer: {
             name: 'primevue',
-            order: 'tailwind-base, primevue, tailwind-utilities',
+            order: 'theme, base, primevue',
           },
         },
       },
@@ -51,8 +67,16 @@ export default defineNuxtConfig({
     storageKey: 'nuxt-color-mode',
   },
 
-  tailwindcss: {
-    cssPath: ['~/assets/css/main.css', { injectPosition: 'first' }],
+  fonts: {
+    families: [
+      { name: 'Sofia Sans', provider: 'google' },
+      { name: 'Playfair Display', provider: 'google' },
+      { name: 'Geist Mono', provider: 'google' },
+    ],
+    defaults: {
+      weights: [300, 400, 500, 600, 700],
+      styles: ['normal', 'italic'],
+    },
   },
 
   dayjs: {
