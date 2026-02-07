@@ -1,8 +1,10 @@
 export function usePrint() {
   const api = useApi()
-  const toast = useToast()
+  const toast = useAppToast()
 
   async function printPdf(url: string, filename: string, openInNewTab = true) {
+    if (!import.meta.client) return
+
     try {
       const token = api.getAccessToken()
       const config = useRuntimeConfig()

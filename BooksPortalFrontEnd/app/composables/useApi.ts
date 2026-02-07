@@ -1,5 +1,9 @@
 import type { ApiResponse } from '~/types/api'
-import { STORAGE_KEYS, API } from '~/utils/constants'
+import { API } from '~/utils/constants'
+
+const TOKEN_COOKIE = 'bp_access_token'
+const REFRESH_COOKIE = 'bp_refresh_token'
+const EXPIRY_COOKIE = 'bp_token_expiry'
 
 interface ApiOptions extends Record<string, unknown> {
   headers?: Record<string, string>
@@ -9,43 +13,42 @@ export function useApi() {
   const config = useRuntimeConfig()
   const baseURL = config.public.apiBase as string
 
+  const accessToken = useCookie(TOKEN_COOKIE, { maxAge: 60 * 60 * 24 * 7 })
+  const refreshToken = useCookie(REFRESH_COOKIE, { maxAge: 60 * 60 * 24 * 30 })
+  const tokenExpiry = useCookie(EXPIRY_COOKIE, { maxAge: 60 * 60 * 24 * 7 })
+
   function getAccessToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.accessToken)
+    return accessToken.value ?? null
   }
 
-  function getRefreshToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.refreshToken)
-  }
-
-  function setTokens(accessToken: string, refreshToken: string, expiresAt: string) {
-    localStorage.setItem(STORAGE_KEYS.accessToken, accessToken)
-    localStorage.setItem(STORAGE_KEYS.refreshToken, refreshToken)
-    localStorage.setItem(STORAGE_KEYS.tokenExpiry, expiresAt)
+  function setTokens(access: string, refresh: string, expiresAt: string) {
+    accessToken.value = access
+    refreshToken.value = refresh
+    tokenExpiry.value = expiresAt
   }
 
   function clearTokens() {
-    localStorage.removeItem(STORAGE_KEYS.accessToken)
-    localStorage.removeItem(STORAGE_KEYS.refreshToken)
-    localStorage.removeItem(STORAGE_KEYS.tokenExpiry)
+    accessToken.value = null
+    refreshToken.value = null
+    tokenExpiry.value = null
   }
 
   function isTokenExpired(): boolean {
-    const expiry = localStorage.getItem(STORAGE_KEYS.tokenExpiry)
-    if (!expiry) return true
-    return new Date(expiry) <= new Date()
+    if (!tokenExpiry.value) return true
+    return new Date(tokenExpiry.value) <= new Date()
   }
 
   async function refreshAccessToken(): Promise<boolean> {
-    const accessToken = getAccessToken()
-    const refreshToken = getRefreshToken()
-    if (!accessToken || !refreshToken) return false
+    const access = accessToken.value
+    const refresh = refreshToken.value
+    if (!access || !refresh) return false
 
     try {
       const response = await $fetch<ApiResponse<{ accessToken: string; refreshToken: string; expiresAt: string }>>(
         `${baseURL}${API.auth.refresh}`,
         {
           method: 'POST',
-          body: { accessToken, refreshToken },
+          body: { accessToken: access, refreshToken: refresh },
         },
       )
 
@@ -66,7 +69,7 @@ export function useApi() {
     options: ApiOptions & { method?: string; body?: unknown; query?: Record<string, unknown> } = {},
   ): Promise<ApiResponse<T>> {
     // Try refreshing if token is expired
-    if (isTokenExpired() && getRefreshToken()) {
+    if (isTokenExpired() && refreshToken.value) {
       const refreshed = await refreshAccessToken()
       if (!refreshed) {
         clearTokens()
@@ -75,7 +78,7 @@ export function useApi() {
       }
     }
 
-    const token = getAccessToken()
+    const token = accessToken.value
     const headers: Record<string, string> = {
       ...options.headers,
     }
@@ -93,11 +96,10 @@ export function useApi() {
       const fetchError = error as { status?: number; data?: ApiResponse<unknown> }
 
       // On 401, try refresh once
-      if (fetchError.status === 401 && getRefreshToken()) {
+      if (fetchError.status === 401 && refreshToken.value) {
         const refreshed = await refreshAccessToken()
         if (refreshed) {
-          const newToken = getAccessToken()
-          headers.Authorization = `Bearer ${newToken}`
+          headers.Authorization = `Bearer ${accessToken.value}`
           return await $fetch<ApiResponse<T>>(`${baseURL}${url}`, {
             ...options,
             headers,
@@ -128,7 +130,7 @@ export function useApi() {
   }
 
   async function downloadBlob(url: string, filename: string) {
-    const token = getAccessToken()
+    const token = accessToken.value
     const headers: Record<string, string> = {}
     if (token) {
       headers.Authorization = `Bearer ${token}`

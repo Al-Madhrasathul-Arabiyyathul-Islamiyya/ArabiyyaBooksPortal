@@ -1,7 +1,5 @@
-import { useConfirm as usePrimeConfirm } from 'primevue/useconfirm'
-
-export function useConfirm() {
-  const confirm = usePrimeConfirm()
+export function useAppConfirm() {
+  const confirm = useConfirm()
 
   function confirmDelete(
     message: string,

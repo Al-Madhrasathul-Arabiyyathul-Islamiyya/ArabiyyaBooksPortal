@@ -1,7 +1,5 @@
-import { useToast as usePrimeToast } from 'primevue/usetoast'
-
-export function useToast() {
-  const toast = usePrimeToast()
+export function useAppToast() {
+  const toast = useToast()
 
   function showSuccess(message: string, summary = 'Success') {
     toast.add({

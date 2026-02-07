@@ -3,7 +3,6 @@ import Aura from '@primeuix/themes/aura'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  ssr: false,
 
   modules: [
     '@nuxtjs/tailwindcss',
@@ -19,12 +18,11 @@ export default defineNuxtConfig({
     '@regle/nuxt',
     'dayjs-nuxt',
     'nuxt-charts',
-    'nuxt-csurf',
   ],
 
   runtimeConfig: {
     public: {
-      apiBase: 'https://localhost:5001/api',
+      apiBase: 'http://localhost:5071/api',
     },
   },
 
@@ -49,7 +47,7 @@ export default defineNuxtConfig({
     preference: 'system',
     fallback: 'light',
     classSuffix: '',
-    storage: 'localStorage',
+    storage: 'cookie',
     storageKey: 'nuxt-color-mode',
   },
 
@@ -62,19 +60,5 @@ export default defineNuxtConfig({
     plugins: ['relativeTime', 'utc', 'timezone'],
     defaultLocale: 'en',
     defaultTimezone: 'Indian/Maldives',
-  },
-
-  csurf: {
-    https: false,
-    cookieKey: '',
-    cookie: {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'strict',
-    },
-    methodsToProtect: ['POST', 'PUT', 'PATCH'],
-    encryptAlgorithm: 'AES-CBC',
-    addCsrfTokenToEventCtx: true,
-    headerName: 'csrf-token',
   },
 })

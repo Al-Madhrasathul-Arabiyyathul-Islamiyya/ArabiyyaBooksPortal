@@ -118,9 +118,3 @@ export const ROLES = {
   staff: 'Staff',
 } as const
 
-// Local storage keys
-export const STORAGE_KEYS = {
-  accessToken: 'bp_access_token',
-  refreshToken: 'bp_refresh_token',
-  tokenExpiry: 'bp_token_expiry',
-} as const

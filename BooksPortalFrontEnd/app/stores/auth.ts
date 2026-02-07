@@ -1,7 +1,6 @@
 import type { UserProfile } from '~/types/entities'
 import type { LoginRequest } from '~/types/forms'
 import { API } from '~/utils/constants'
-import { STORAGE_KEYS } from '~/utils/constants'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<UserProfile | null>(null)
@@ -60,8 +59,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function initialize() {
-    const token = localStorage.getItem(STORAGE_KEYS.accessToken)
-    if (token) {
+    const api = useApi()
+    if (api.getAccessToken()) {
       await fetchProfile()
     }
   }

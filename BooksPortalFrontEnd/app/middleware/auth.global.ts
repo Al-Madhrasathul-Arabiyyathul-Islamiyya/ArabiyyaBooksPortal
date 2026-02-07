@@ -1,10 +1,8 @@
-import { STORAGE_KEYS } from '~/utils/constants'
-
 export default defineNuxtRouteMiddleware((to) => {
   if (to.path === '/login') return
 
-  const token = localStorage.getItem(STORAGE_KEYS.accessToken)
-  if (!token) {
+  const token = useCookie('bp_access_token')
+  if (!token.value) {
     return navigateTo('/login')
   }
 })
