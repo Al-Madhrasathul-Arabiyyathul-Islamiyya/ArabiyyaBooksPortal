@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Distribution Slip</title>
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Faruma.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Faruma', sans-serif;
+            background-color: #f0f0f0;
+            direction: rtl;
+            color: #1d1d1b;
+        }
+
+        .page-container {
+            width: 297mm;
+            height: 210mm;
+            margin: auto;
+            background: white;
+            display: flex;
+            position: relative;
+            padding: 10mm 5mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .center-divider {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            border-left: 1px dashed #000;
+            z-index: 10;
+        }
+
+        .scissor {
+            position: absolute;
+            left: 50%;
+            top: 5mm;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 2px;
+            font-size: 20pt;
+            z-index: 11;
+        }
+
+        .slip {
+            width: 50%;
+            padding: 0 10mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            margin-bottom: 5px;
+        }
+
+        .logo {
+            width: 45px;
+            height: auto;
+            margin-left: 15px;
+        }
+
+        .header-text {
+            text-align: right;
+            width: 100%;
+        }
+
+        .header-text h1 {
+            font-size: 12pt;
+            margin: 0;
+            line-height: 1.2;
+            font-weight: normal;
+        }
+
+        .header-text p {
+            font-size: 11pt;
+            margin: 2px 0;
+        }
+
+        .slip-title {
+            font-size: 13pt;
+            font-weight: bold;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .ref-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .ref-no {
+            font-family: Arial, sans-serif;
+            direction: ltr;
+            font-size: 11pt;
+        }
+
+        .student-title {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1.5fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 10pt;
+        }
+
+        .dots {
+            border-bottom: 1px dotted #000;
+            flex-grow: 1;
+            margin-right: 4px;
+            height: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-end;
+            white-space: nowrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 4px 2px;
+            text-align: center;
+            font-size: 9.5pt;
+            height: 25px;
+            overflow: hidden;
+        }
+
+        th { font-weight: bold; }
+
+        .eng-text {
+            font-family: Arial, sans-serif;
+            direction: ltr;
+            display: block;
+        }
+
+        .footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 5mm;
+        }
+
+        .sig-block {
+            width: 48%;
+        }
+
+        .sig-title {
+            text-align: right;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 11pt;
+        }
+
+        .sig-line {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 8px;
+            font-size: 10pt;
+        }
+
+        /* Logic for splitting the Date and Time fields */
+        .sig-line.split {
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .split-item {
+            display: flex;
+            flex: 1;
+            align-items: flex-end;
+        }
+
+        @media print {
+            body { background: none; }
+            .page-container { box-shadow: none; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    <div class="scissor">✂</div>
+    <div class="center-divider"></div>
+
+    <!-- SLIP 1 -->
+    <div class="slip">
+        <div class="header">
+            <img src="logo.svg" alt="Logo" class="logo">
+            <div class="header-text">
+                <h1>އަލް މަދްރަސަތުލް ޢަރަބިއްޔަތުލް އިސްލާމިއްޔާ</h1>
+                <p>މާލެ</p>
+                <div class="slip-title">ފޮތް ދޫކުރާ ސުލިޕް</div>
+            </div>
+        </div>
+
+        <div class="ref-row">
+            <div class="student-title">ދަރިވަރުގެ މައުލޫމާތު</div>
+            <div class="ref-no">Ref No: ....................................</div>
+        </div>
+
+        <div class="student-details">
+            <div class="detail-item">ނަން: <div class="dots"></div></div>
+            <div class="detail-item">ކުލާސް: <div class="dots"></div></div>
+            <div class="detail-item">އިންޑެކްސް: <div class="dots"></div></div>
+            <div class="detail-item">އައިޑީ: <div class="dots"></div></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 43%;">ނަން</th>
+                    <th style="width: 15%;">މާއްދާ ކޯޑް</th>
+                    <th style="width: 15%;">އަހަރު</th>
+                    <th style="width: 15%;">ޕަބްލިޝަރ</th>
+                    <th style="width: 12%;">ޓާރމް</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="eng-text">Exploring Mathematics 5A</span></td>
+                    <td><span class="eng-text">MAT</span></td>
+                    <td><span class="eng-text">2025</span></td>
+                    <td><span class="eng-text">NIE</span></td>
+                    <td><span class="eng-text">Term 1</span></td>
+                </tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <div class="sig-block">
+                <div class="sig-title">ހަވާލުވި ފަރާތް</div>
+                <div class="sig-line">ނަން: <div class="dots"></div></div>
+                <div class="sig-line">އައިޑީ ކާޑު: <div class="dots"></div></div>
+                <div class="sig-line">ފޯން: <div class="dots"></div></div>
+                <div class="sig-line">ސޮއި: <div class="dots"></div></div>
+                <!-- Split Row -->
+                <div class="sig-line split">
+                    <div class="split-item">ތާރީހު: <div class="dots"></div></div>
+                    <div class="split-item">ގަޑި: <div class="dots"></div></div>
+                </div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-title">ހަވާލުކުރި މުވައްޒަފު</div>
+                <div class="sig-line">ނަން: <div class="dots"></div></div>
+                <div class="sig-line">މަގާމު: <div class="dots"></div></div>
+                <div class="sig-line">ސޮއި: <div class="dots"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIP 2 -->
+    <div class="slip">
+        <div class="header">
+            <img src="logo.svg" alt="Logo" class="logo">
+            <div class="header-text">
+                <h1>އަލް މަދްރަސަތުލް ޢަރަބިއްޔަތުލް އިސްލާމިއްޔާ</h1>
+                <p>މާލެ</p>
+                <div class="slip-title">ފޮތް ދޫކުރާ ސުލިޕް</div>
+            </div>
+        </div>
+
+        <div class="ref-row">
+            <div class="student-title">ދަރިވަރުގެ މައުލޫމާތު</div>
+            <div class="ref-no">Ref No: ....................................</div>
+        </div>
+
+        <div class="student-details">
+            <div class="detail-item">ނަން: <div class="dots"></div></div>
+            <div class="detail-item">ކުލާސް: <div class="dots"></div></div>
+            <div class="detail-item">އިންޑެކްސް: <div class="dots"></div></div>
+            <div class="detail-item">އައިޑީ: <div class="dots"></div></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 43%;">ނަން</th>
+                    <th style="width: 15%;">މާއްދާ ކޯޑް</th>
+                    <th style="width: 15%;">އަހަރު</th>
+                    <th style="width: 15%;">ޕަބްލިޝަރ</th>
+                    <th style="width: 12%;">ޓާރމް</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="eng-text">Exploring Mathematics 5A</span></td>
+                    <td><span class="eng-text">MAT</span></td>
+                    <td><span class="eng-text">2025</span></td>
+                    <td><span class="eng-text">NIE</span></td>
+                    <td><span class="eng-text">Term 1</span></td>
+                </tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <div class="sig-block">
+                <div class="sig-title">ހަވާލުވި ފަރާތް</div>
+                <div class="sig-line">ނަން: <div class="dots"></div></div>
+                <div class="sig-line">އައިޑީ ކާޑު: <div class="dots"></div></div>
+                <div class="sig-line">ފޯން: <div class="dots"></div></div>
+                <div class="sig-line">ސޮއި: <div class="dots"></div></div>
+                <!-- Split Row -->
+                <div class="sig-line split">
+                    <div class="split-item">ތާރީހު: <div class="dots"></div></div>
+                    <div class="split-item">ގަޑި: <div class="dots"></div></div>
+                </div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-title">ހަވާލުކުރި މުވައްޒަފު</div>
+                <div class="sig-line">ނަން: <div class="dots"></div></div>
+                <div class="sig-line">މަގާމު: <div class="dots"></div></div>
+                <div class="sig-line">ސޮއި: <div class="dots"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

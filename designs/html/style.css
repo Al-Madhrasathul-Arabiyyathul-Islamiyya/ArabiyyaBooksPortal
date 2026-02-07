@@ -1,0 +1,214 @@
+@font-face {
+    font-family: 'Faruma';
+    src: url('Faruma.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@page {
+    size: A4 landscape;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Faruma', sans-serif;
+    background-color: #f0f0f0;
+    direction: rtl;
+    color: #1d1d1b;
+}
+
+.page-container {
+    width: 297mm;
+    height: 210mm;
+    margin: auto;
+    background: white;
+    display: flex;
+    position: relative;
+    padding: 10mm 5mm;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Center Scissor Line */
+.center-divider {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1px dashed #000;
+    z-index: 10;
+}
+
+.scissor {
+    position: absolute;
+    left: 50%;
+    top: 5mm;
+    transform: translateX(-50%);
+    background: white;
+    padding: 0 2px;
+    font-size: 20pt;
+    z-index: 11;
+}
+
+.slip {
+    width: 50%;
+    padding: 0 10mm;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Layout */
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+}
+
+.logo {
+    width: 45px;
+    height: auto;
+    margin-left: 15px;
+}
+
+.header-text {
+    text-align: right;
+    width: 100%;
+}
+
+.header-text h1 {
+    font-size: 12pt;
+    margin: 0;
+    line-height: 1.2;
+    font-weight: normal;
+}
+
+.header-text p {
+    font-size: 11pt;
+    margin: 2px 0;
+}
+
+.slip-title {
+    font-size: 13pt;
+    font-weight: bold;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Reference & Student Info Titles */
+.ref-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.ref-no {
+    font-family: Arial, sans-serif;
+    direction: ltr;
+    flex-grow: 1;
+    font-size: 11pt;
+}
+
+.meta-title {
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+/* Metadata Grid (ID, Index, etc) */
+.meta-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 10pt;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-end;
+    white-space: nowrap;
+}
+
+.dots {
+    border-bottom: 1px dotted #000;
+    flex-grow: 1;
+    margin-right: 4px;
+    height: 14px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 4px 2px;
+    text-align: center;
+    font-size: 9.5pt;
+    height: 25px;
+}
+
+th { font-weight: bold; }
+
+.eng-text {
+    font-family: Arial, sans-serif;
+    direction: ltr;
+    display: block;
+}
+
+/* Signatures */
+.footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5mm;
+}
+
+.sig-block {
+    width: 48%;
+}
+
+.sig-title {
+    text-align: right; /* Set to right as requested */
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 11pt;
+}
+
+.sig-line {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 8px;
+    font-size: 10pt;
+}
+
+/* Split Date and Time fields */
+.split-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.split-item {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+}
+
+@media print {
+    body { background: none; }
+    .page-container { box-shadow: none; margin: 0; }
+}
