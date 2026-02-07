@@ -16,11 +16,18 @@ public class PdfServiceTests
     private readonly PdfService _sut;
 
     // Set to a directory path to save generated PDFs for visual inspection, e.g. @"D:\temp\pdfs"
-    private static readonly string? SavePdfsTo = null;
+    private static readonly string? SavePdfsTo = @"D:\temp\pdfs";
 
     public PdfServiceTests()
     {
         QuestPDF.Settings.License = LicenseType.Community;
+
+        var fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Faruma.ttf");
+        if (File.Exists(fontPath))
+        {
+            using var fontStream = File.OpenRead(fontPath);
+            QuestPDF.Drawing.FontManager.RegisterFont(fontStream);
+        }
 
         var defaults = SlipTemplateSettingService.GetDefaultLabels();
         var labelService = Substitute.For<ISlipTemplateSettingService>();
@@ -56,14 +63,58 @@ public class PdfServiceTests
             [
                 new() { BookCode = "MAT-G1", BookTitle = "Mathematics Grade 1", Quantity = 1 },
                 new() { BookCode = "ENG-G1", BookTitle = "English Grade 1", Quantity = 1 },
-                new() { BookCode = "SCI-G1", BookTitle = "Science Grade 1", Quantity = 2 }
+                new() { BookCode = "SCI-G1", BookTitle = "Science Grade 1", Quantity = 2 },
+                new() { BookCode = "ARA-G1", BookTitle = "Arabic Grade 1", Quantity = 1 },
+                new() { BookCode = "ISL-G1", BookTitle = "Islamic Studies Grade 1", Quantity = 1 }
             ]
         };
 
         var result = await _sut.GenerateDistributionSlipAsync(slip);
 
         AssertValidPdf(result);
-        MaybeSave(result, "distribution-slip.pdf");
+        MaybeSave(result, $"distribution-{slip.ReferenceNo}.pdf");
+    }
+
+    [Fact]
+    public async Task GenerateDistributionSlip_With16Items_ProducesValidPdf()
+    {
+        var slip = new DistributionSlipResponse
+        {
+            Id = 2,
+            ReferenceNo = "DST2025000016",
+            AcademicYearName = "2025/2026",
+            Term = Term.Term1,
+            StudentName = "Ahmed Hassan",
+            StudentIndexNo = "STU001",
+            StudentClassName = "Grade 5 - A",
+            StudentNationalId = "A123456",
+            ParentName = "Mohamed Hassan",
+            IssuedAt = new DateTime(2025, 9, 15),
+            Items =
+            [
+                new() { BookCode = "MAT-G1", BookTitle = "Mathematics Grade 1", Quantity = 1 },
+                new() { BookCode = "ENG-G1", BookTitle = "English Grade 1", Quantity = 1 },
+                new() { BookCode = "SCI-G1", BookTitle = "Science Grade 1", Quantity = 1 },
+                new() { BookCode = "ARA-G1", BookTitle = "Arabic Grade 1", Quantity = 1 },
+                new() { BookCode = "ISL-G1", BookTitle = "Islamic Studies Grade 1", Quantity = 1 },
+                new() { BookCode = "DHI-G1", BookTitle = "Dhivehi Grade 1", Quantity = 1 },
+                new() { BookCode = "QUR-G1", BookTitle = "Quran Grade 1", Quantity = 1 },
+                new() { BookCode = "SOC-G1", BookTitle = "Social Studies Grade 1", Quantity = 1 },
+                new() { BookCode = "HPE-G1", BookTitle = "Health & PE Grade 1", Quantity = 1 },
+                new() { BookCode = "CRE-G1", BookTitle = "Creative Arts Grade 1", Quantity = 1 },
+                new() { BookCode = "ICT-G1", BookTitle = "ICT Grade 1", Quantity = 1 },
+                new() { BookCode = "ENV-G1", BookTitle = "Environmental Studies Grade 1", Quantity = 1 },
+                new() { BookCode = "LIB-G1", BookTitle = "Library Skills Grade 1", Quantity = 1 },
+                new() { BookCode = "MUS-G1", BookTitle = "Music Grade 1", Quantity = 1 },
+                new() { BookCode = "GEO-G1", BookTitle = "Geography Grade 1", Quantity = 1 },
+                new() { BookCode = "HIS-G1", BookTitle = "History Grade 1", Quantity = 1 }
+            ]
+        };
+
+        var result = await _sut.GenerateDistributionSlipAsync(slip);
+
+        AssertValidPdf(result);
+        MaybeSave(result, $"distribution-{slip.ReferenceNo}.pdf");
     }
 
     [Fact]
@@ -113,7 +164,7 @@ public class PdfServiceTests
         var result = await _sut.GenerateReturnSlipAsync(slip);
 
         AssertValidPdf(result);
-        MaybeSave(result, "return-slip.pdf");
+        MaybeSave(result, $"return-{slip.ReferenceNo}.pdf");
     }
 
     [Fact]
@@ -163,7 +214,7 @@ public class PdfServiceTests
         var result = await _sut.GenerateTeacherIssueSlipAsync(issue);
 
         AssertValidPdf(result);
-        MaybeSave(result, "teacher-issue-slip.pdf");
+        MaybeSave(result, $"teacher-issue-{issue.ReferenceNo}.pdf");
     }
 
     [Fact]
@@ -207,7 +258,7 @@ public class PdfServiceTests
         var result = await _sut.GenerateTeacherReturnSlipAsync(slip);
 
         AssertValidPdf(result);
-        MaybeSave(result, "teacher-return-slip.pdf");
+        MaybeSave(result, $"teacher-return-{slip.ReferenceNo}.pdf");
     }
 
     private static void AssertValidPdf(byte[] pdf)

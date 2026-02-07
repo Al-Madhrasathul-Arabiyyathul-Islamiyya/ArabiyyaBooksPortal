@@ -16,7 +16,7 @@ using System.Text.Json.Serialization;
 QuestPDF.Settings.License = LicenseType.Community;
 
 // Register Faruma font for Thaana text support
-var farumaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "designs", "Faruma.ttf");
+var farumaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Faruma.ttf");
 if (File.Exists(farumaPath))
 {
     using var fontStream = File.OpenRead(farumaPath);

@@ -17,15 +17,15 @@ public class PdfService : IPdfService
     private const int StudentTableRows = 9;
     private const int TeacherTableRows = 3;
 
-    private static readonly Lazy<byte[]?> LogoSvgBytes = new(() =>
-    {
-        var logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "designs", "logo.svg");
-        return File.Exists(logoPath) ? File.ReadAllBytes(logoPath) : null;
-    });
+    private readonly byte[]? _logoPng;
 
     public PdfService(ISlipTemplateSettingService labelService)
     {
         _labelService = labelService;
+
+        var logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "logo.png");
+        if (File.Exists(logoPath))
+            _logoPng = File.ReadAllBytes(logoPath);
     }
 
     public async Task<byte[]> GenerateDistributionSlipAsync(DistributionSlipResponse slip)
@@ -33,17 +33,18 @@ public class PdfService : IPdfService
         var common = await _labelService.GetLabelsByCategoryAsync("Common");
         var labels = await _labelService.GetLabelsByCategoryAsync("Distribution");
 
+        var logo = _logoPng;
         return GenerateDocument(page =>
         {
             page.Content().Row(mainRow =>
             {
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeDistributionCopy(col, slip, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeDistributionCopy(col, slip, common, labels, logo));
 
                 mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeDistributionCopy(col, slip, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeDistributionCopy(col, slip, common, labels, logo));
             });
         });
     }
@@ -53,17 +54,18 @@ public class PdfService : IPdfService
         var common = await _labelService.GetLabelsByCategoryAsync("Common");
         var labels = await _labelService.GetLabelsByCategoryAsync("Return");
 
+        var logo = _logoPng;
         return GenerateDocument(page =>
         {
             page.Content().Row(mainRow =>
             {
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeReturnCopy(col, slip, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeReturnCopy(col, slip, common, labels, logo));
 
                 mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeReturnCopy(col, slip, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeReturnCopy(col, slip, common, labels, logo));
             });
         });
     }
@@ -73,17 +75,18 @@ public class PdfService : IPdfService
         var common = await _labelService.GetLabelsByCategoryAsync("Common");
         var labels = await _labelService.GetLabelsByCategoryAsync("TeacherIssue");
 
+        var logo = _logoPng;
         return GenerateDocument(page =>
         {
             page.Content().Row(mainRow =>
             {
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeTeacherIssueCopy(col, issue, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeTeacherIssueCopy(col, issue, common, labels, logo));
 
                 mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeTeacherIssueCopy(col, issue, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeTeacherIssueCopy(col, issue, common, labels, logo));
             });
         });
     }
@@ -93,17 +96,18 @@ public class PdfService : IPdfService
         var common = await _labelService.GetLabelsByCategoryAsync("Common");
         var labels = await _labelService.GetLabelsByCategoryAsync("TeacherReturn");
 
+        var logo = _logoPng;
         return GenerateDocument(page =>
         {
             page.Content().Row(mainRow =>
             {
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeTeacherReturnCopy(col, slip, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeTeacherReturnCopy(col, slip, common, labels, logo));
 
                 mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().Padding(5).Column(col =>
-                    ComposeTeacherReturnCopy(col, slip, common, labels));
+                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                    ComposeTeacherReturnCopy(col, slip, common, labels, logo));
             });
         });
     }
@@ -132,9 +136,10 @@ public class PdfService : IPdfService
         ColumnDescriptor col,
         DistributionSlipResponse slip,
         Dictionary<string, string> common,
-        Dictionary<string, string> labels)
+        Dictionary<string, string> labels,
+        byte[]? logo)
     {
-        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title"), logo));
 
         col.Item().PaddingTop(8).Element(c => ComposeRefRow(c, slip.ReferenceNo,
             L(labels, "StudentInfoTitle")));
@@ -145,16 +150,18 @@ public class PdfService : IPdfService
         col.Item().Element(c => ComposeStudentTable(c, labels,
             slip.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, slip.AcademicYearName, "-", slip.Term.ToString())).ToList()));
 
-        col.Item().PaddingTop(8).Element(c => ComposeDistributionSignatures(c, common, labels));
+        col.Item().ExtendVertical().AlignBottom()
+            .PaddingTop(8).Element(c => ComposeDistributionSignatures(c, common, labels));
     }
 
     private static void ComposeReturnCopy(
         ColumnDescriptor col,
         ReturnSlipResponse slip,
         Dictionary<string, string> common,
-        Dictionary<string, string> labels)
+        Dictionary<string, string> labels,
+        byte[]? logo)
     {
-        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title"), logo));
 
         col.Item().PaddingTop(8).Element(c => ComposeRefRow(c, slip.ReferenceNo,
             L(labels, "StudentInfoTitle")));
@@ -165,51 +172,55 @@ public class PdfService : IPdfService
         col.Item().Element(c => ComposeStudentTable(c, labels,
             slip.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, slip.AcademicYearName, "-", "-")).ToList()));
 
-        col.Item().PaddingTop(8).Element(c => ComposeReturnSignatures(c, common, labels));
+        col.Item().ExtendVertical().AlignBottom()
+            .PaddingTop(8).Element(c => ComposeReturnSignatures(c, common, labels));
     }
 
     private static void ComposeTeacherIssueCopy(
         ColumnDescriptor col,
         TeacherIssueResponse issue,
         Dictionary<string, string> common,
-        Dictionary<string, string> labels)
+        Dictionary<string, string> labels,
+        byte[]? logo)
     {
-        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title"), logo));
 
         col.Item().PaddingTop(8).Element(c => ComposeRefRow(c, issue.ReferenceNo, null));
 
         col.Item().PaddingTop(4).Element(c => ComposeTeacherTable(c, labels,
             issue.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, issue.AcademicYearName, "-", null)).ToList()));
 
-        col.Item().PaddingTop(8).Element(c => ComposeTeacherIssueSignatures(c, common, labels));
+        col.Item().ExtendVertical().AlignBottom()
+            .PaddingTop(8).Element(c => ComposeTeacherIssueSignatures(c, common, labels));
     }
 
     private static void ComposeTeacherReturnCopy(
         ColumnDescriptor col,
         TeacherReturnSlipResponse slip,
         Dictionary<string, string> common,
-        Dictionary<string, string> labels)
+        Dictionary<string, string> labels,
+        byte[]? logo)
     {
-        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title")));
+        col.Item().Element(c => ComposeHeader(c, common, L(labels, "Title"), logo));
 
         col.Item().PaddingTop(8).Element(c => ComposeRefRow(c, slip.ReferenceNo, null));
 
         col.Item().PaddingTop(4).Element(c => ComposeTeacherTable(c, labels,
             slip.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, slip.AcademicYearName, "-", null)).ToList()));
 
-        col.Item().PaddingTop(8).Element(c => ComposeTeacherReturnSignatures(c, common, labels));
+        col.Item().ExtendVertical().AlignBottom()
+            .PaddingTop(8).Element(c => ComposeTeacherReturnSignatures(c, common, labels));
     }
 
     // ── Header ──────────────────────────────────────────────────────
 
-    private static void ComposeHeader(IContainer container, Dictionary<string, string> common, string title)
+    private static void ComposeHeader(IContainer container, Dictionary<string, string> common, string title, byte[]? logo = null)
     {
         container.ContentFromRightToLeft().Row(row =>
         {
-            var svgBytes = LogoSvgBytes.Value;
-            if (svgBytes != null)
+            if (logo != null)
             {
-                row.ConstantItem(40).Image(svgBytes);
+                row.ConstantItem(40).Image(logo);
                 row.ConstantItem(10);
             }
 
@@ -233,6 +244,9 @@ public class PdfService : IPdfService
     {
         container.Row(row =>
         {
+            row.AutoItem().ContentFromLeftToRight().AlignLeft().Text($"Ref No: {refNo}")
+                .FontSize(9);
+
             if (!string.IsNullOrEmpty(studentInfoTitle))
             {
                 row.RelativeItem().ContentFromRightToLeft().AlignRight().Text(studentInfoTitle)
@@ -242,9 +256,6 @@ public class PdfService : IPdfService
             {
                 row.RelativeItem();
             }
-
-            row.AutoItem().ContentFromLeftToRight().Text($"Ref No: {refNo}")
-                .FontSize(9);
         });
     }
 
@@ -291,31 +302,32 @@ public class PdfService : IPdfService
     {
         container.Table(table =>
         {
+            // RTL order: Term(12) | Publisher(15) | AcademicYear(15) | SubjectCode(15) | BookTitle(43)
             table.ColumnsDefinition(columns =>
             {
-                columns.RelativeColumn(43);
-                columns.RelativeColumn(15);
-                columns.RelativeColumn(15);
-                columns.RelativeColumn(15);
                 columns.RelativeColumn(12);
+                columns.RelativeColumn(15);
+                columns.RelativeColumn(15);
+                columns.RelativeColumn(15);
+                columns.RelativeColumn(43);
             });
 
             table.Header(header =>
             {
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColAcademicYear")).FontFamily(ThaanaFont);
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColPublisher")).FontFamily(ThaanaFont);
                 header.Cell().Element(HeaderCell).Text(L(labels, "ColTerm")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColPublisher")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColAcademicYear")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
             });
 
             foreach (var item in rows)
             {
-                table.Cell().Element(DataCell).Text(item.BookTitle);
-                table.Cell().Element(DataCell).Text(item.SubjectCode);
-                table.Cell().Element(DataCell).Text(item.AcademicYear);
-                table.Cell().Element(DataCell).Text(item.Publisher);
                 table.Cell().Element(DataCell).Text(item.Term ?? "");
+                table.Cell().Element(DataCell).Text(item.Publisher);
+                table.Cell().Element(DataCell).Text(item.AcademicYear);
+                table.Cell().Element(DataCell).Text(item.SubjectCode);
+                table.Cell().Element(DataCellRight).Text(item.BookTitle);
             }
 
             for (var i = rows.Count; i < StudentTableRows; i++)
@@ -330,28 +342,29 @@ public class PdfService : IPdfService
     {
         container.Table(table =>
         {
+            // RTL order: Publisher(15) | AcademicYear(15) | SubjectCode(20) | BookTitle(50)
             table.ColumnsDefinition(columns =>
             {
-                columns.RelativeColumn(50);
+                columns.RelativeColumn(15);
+                columns.RelativeColumn(15);
                 columns.RelativeColumn(20);
-                columns.RelativeColumn(15);
-                columns.RelativeColumn(15);
+                columns.RelativeColumn(50);
             });
 
             table.Header(header =>
             {
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
-                header.Cell().Element(HeaderCell).Text(L(labels, "ColAcademicYear")).FontFamily(ThaanaFont);
                 header.Cell().Element(HeaderCell).Text(L(labels, "ColPublisher")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColAcademicYear")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColSubjectCode")).FontFamily(ThaanaFont);
+                header.Cell().Element(HeaderCell).Text(L(labels, "ColBookTitle")).FontFamily(ThaanaFont);
             });
 
             foreach (var item in rows)
             {
-                table.Cell().Element(DataCell).Text(item.BookTitle);
-                table.Cell().Element(DataCell).Text(item.SubjectCode);
-                table.Cell().Element(DataCell).Text(item.AcademicYear);
                 table.Cell().Element(DataCell).Text(item.Publisher);
+                table.Cell().Element(DataCell).Text(item.AcademicYear);
+                table.Cell().Element(DataCell).Text(item.SubjectCode);
+                table.Cell().Element(DataCellRight).Text(item.BookTitle);
             }
 
             for (var i = rows.Count; i < TeacherTableRows; i++)
@@ -476,13 +489,20 @@ public class PdfService : IPdfService
         container.ContentFromLeftToRight()
             .Border(0.5f).BorderColor(Colors.Black)
             .PaddingVertical(2).PaddingHorizontal(2)
-            .AlignCenter()
+            .MinHeight(12).AlignCenter()
+            .DefaultTextStyle(x => x.FontSize(8.5f));
+
+    private static IContainer DataCellRight(IContainer container) =>
+        container.ContentFromLeftToRight()
+            .Border(0.5f).BorderColor(Colors.Black)
+            .PaddingVertical(2).PaddingHorizontal(2)
+            .MinHeight(12).AlignRight()
             .DefaultTextStyle(x => x.FontSize(8.5f));
 
     private static IContainer EmptyCell(IContainer container) =>
         container.Border(0.5f).BorderColor(Colors.Black)
             .PaddingVertical(2).PaddingHorizontal(2)
-            .MinHeight(18);
+            .MinHeight(12);
 
     // ── Helpers ─────────────────────────────────────────────────────
 
