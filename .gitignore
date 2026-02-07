@@ -2,3 +2,9 @@
 **/CLAUDE.md
 *llms.txt
 **/.mcp.json
+**/AGENTS.md
+.codex/
+
+# Dev server logs
+backend.log
+frontend.log
