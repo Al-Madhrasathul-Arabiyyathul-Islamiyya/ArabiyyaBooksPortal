@@ -8,6 +8,13 @@
 | Auth | JWT Bearer token in `Authorization: Bearer {token}` header |
 | Content-Type | `application/json` |
 
+### Routing Note
+
+- Default convention in this API is `[Route("api/[controller]")]`.
+- No kebab-case route transformer is configured.
+- Controller-name paths are canonical (for example: `/api/AcademicYears`, `/api/ClassSections`, `/api/TeacherIssues`).
+- ASP.NET Core routing is case-insensitive, but hyphenated aliases are not configured.
+
 ### Standard Response Wrapper
 
 All endpoints return:
@@ -108,29 +115,29 @@ Change current user's password.
   |-------|------|----------|
   | currentPassword | string | yes |
   | newPassword | string | yes |
-- **Response**: `string` message
+- **Response**: `bool` with message
 
 ---
 
 ## 2. Academic Years
 
-Base path: `/api/academic-years`
+Base path: `/api/AcademicYears`
 
 All endpoints require **Bearer auth**.
 
-### GET /api/academic-years
+### GET /api/AcademicYears
 
 List all academic years.
 
 - **Response**: `AcademicYearResponse[]`
 
-### GET /api/academic-years/{id}
+### GET /api/AcademicYears/{id}
 
 Get academic year by ID.
 
 - **Response**: `AcademicYearResponse`
 
-### POST /api/academic-years
+### POST /api/AcademicYears
 
 Create a new academic year.
 
@@ -143,7 +150,7 @@ Create a new academic year.
   | endDate | DateTime | yes |
 - **Response**: `AcademicYearResponse`
 
-### PUT /api/academic-years/{id}
+### PUT /api/AcademicYears/{id}
 
 Update an academic year.
 
@@ -156,19 +163,19 @@ Update an academic year.
   | endDate | DateTime | yes |
 - **Response**: `AcademicYearResponse`
 
-### POST /api/academic-years/{id}/activate
+### POST /api/AcademicYears/{id}/activate
 
 Set an academic year as active (deactivates others).
 
 - **Response**: `string` message
 
-### GET /api/academic-years/active
+### GET /api/AcademicYears/active
 
 Get the currently active academic year. Returns 404 if none is active.
 
 - **Response**: `AcademicYearResponse` (or 404)
 
-### DELETE /api/academic-years/{id}
+### DELETE /api/AcademicYears/{id}
 
 Delete an academic year (soft delete).
 
@@ -298,24 +305,24 @@ Delete a subject.
 
 ## 5. Class Sections
 
-Base path: `/api/class-sections`
+Base path: `/api/ClassSections`
 
 All endpoints require **Bearer auth**.
 
-### GET /api/class-sections
+### GET /api/ClassSections
 
 List class sections with optional filter.
 
 - **Query**: `?academicYearId={int}`
 - **Response**: `ClassSectionResponse[]`
 
-### GET /api/class-sections/{id}
+### GET /api/ClassSections/{id}
 
 Get class section by ID.
 
 - **Response**: `ClassSectionResponse`
 
-### POST /api/class-sections
+### POST /api/ClassSections
 
 Create a class section.
 
@@ -328,14 +335,14 @@ Create a class section.
   | section | string | yes |
 - **Response**: `ClassSectionResponse`
 
-### PUT /api/class-sections/{id}
+### PUT /api/ClassSections/{id}
 
 Update a class section.
 
 - **Request**: `CreateClassSectionRequest` (same as create)
 - **Response**: `ClassSectionResponse`
 
-### DELETE /api/class-sections/{id}
+### DELETE /api/ClassSections/{id}
 
 Delete a class section.
 
@@ -558,7 +565,7 @@ Add a subject/class assignment to a teacher.
   |-------|------|----------|
   | subjectId | int | yes |
   | classSectionId | int | yes |
-- **Response**: `TeacherResponse`
+- **Response**: `TeacherAssignmentResponse`
 
 ### DELETE /api/teachers/{id}/assignments/{assignmentId}
 
@@ -972,11 +979,11 @@ Download PDF for a return slip.
 
 ## 13. Teacher Issues
 
-Base path: `/api/teacher-issues`
+Base path: `/api/TeacherIssues`
 
 All endpoints require **Bearer auth**.
 
-### GET /api/teacher-issues
+### GET /api/TeacherIssues
 
 List teacher issues (paginated).
 
@@ -984,13 +991,13 @@ List teacher issues (paginated).
 - **Defaults**: pageNumber=1, pageSize=20
 - **Response**: `PaginatedList<TeacherIssueResponse>`
 
-### GET /api/teacher-issues/{id}
+### GET /api/TeacherIssues/{id}
 
 Get teacher issue by ID.
 
 - **Response**: `TeacherIssueResponse`
 
-### POST /api/teacher-issues
+### POST /api/TeacherIssues
 
 Create a teacher issue.
 
@@ -1010,7 +1017,7 @@ Create a teacher issue.
   | quantity | int |
 - **Response**: `TeacherIssueResponse`
 
-### POST /api/teacher-issues/{id}/return
+### POST /api/TeacherIssues/{id}/return
 
 Process a partial or full return of books from a teacher.
 
@@ -1027,13 +1034,13 @@ Process a partial or full return of books from a teacher.
   | quantity | int |
 - **Response**: `TeacherReturnSlipResponse`
 
-### DELETE /api/teacher-issues/{id}
+### DELETE /api/TeacherIssues/{id}
 
 Cancel a teacher issue (reverses stock).
 
 - **Response**: `string` message
 
-### GET /api/teacher-issues/{id}/print
+### GET /api/TeacherIssues/{id}/print
 
 Download PDF for a teacher issue.
 
@@ -1291,24 +1298,24 @@ Assign roles to a user.
 
 ## 16. Reference Number Formats
 
-Base path: `/api/reference-number-formats`
+Base path: `/api/ReferenceNumberFormats`
 
 All endpoints require **Bearer auth** + **SuperAdmin** or **Admin** role.
 
-### GET /api/reference-number-formats
+### GET /api/ReferenceNumberFormats
 
 List all formats.
 
 - **Query**: `?slipType={SlipType}&academicYearId={int}`
 - **Response**: `ReferenceNumberFormatResponse[]`
 
-### GET /api/reference-number-formats/{id}
+### GET /api/ReferenceNumberFormats/{id}
 
 Get format by ID.
 
 - **Response**: `ReferenceNumberFormatResponse`
 
-### POST /api/reference-number-formats
+### POST /api/ReferenceNumberFormats
 
 Create a format.
 
@@ -1321,14 +1328,14 @@ Create a format.
   | paddingWidth | int | yes (default 6) |
 - **Response**: `ReferenceNumberFormatResponse`
 
-### PUT /api/reference-number-formats/{id}
+### PUT /api/ReferenceNumberFormats/{id}
 
 Update a format.
 
 - **Request**: `CreateReferenceNumberFormatRequest` (same as create)
 - **Response**: `ReferenceNumberFormatResponse`
 
-### DELETE /api/reference-number-formats/{id}
+### DELETE /api/ReferenceNumberFormats/{id}
 
 Delete a format.
 
@@ -1350,24 +1357,24 @@ Delete a format.
 
 ## 17. Slip Template Settings
 
-Base path: `/api/slip-template-settings`
+Base path: `/api/SlipTemplateSettings`
 
 All endpoints require **Bearer auth** + **SuperAdmin** or **Admin** role.
 
-### GET /api/slip-template-settings
+### GET /api/SlipTemplateSettings
 
 List all settings.
 
 - **Query**: `?category={string}`
 - **Response**: `SlipTemplateSettingResponse[]`
 
-### GET /api/slip-template-settings/{id}
+### GET /api/SlipTemplateSettings/{id}
 
 Get setting by ID.
 
 - **Response**: `SlipTemplateSettingResponse`
 
-### PUT /api/slip-template-settings/{id}
+### PUT /api/SlipTemplateSettings/{id}
 
 Update a setting value.
 
@@ -1378,7 +1385,7 @@ Update a setting value.
   | sortOrder | int | yes |
 - **Response**: `SlipTemplateSettingResponse`
 
-### POST /api/slip-template-settings/reset
+### POST /api/SlipTemplateSettings/reset
 
 Reset all template settings to defaults.
 
@@ -1399,11 +1406,11 @@ Reset all template settings to defaults.
 
 ## 18. Audit Logs
 
-Base path: `/api/audit-logs`
+Base path: `/api/AuditLogs`
 
 All endpoints require **Bearer auth** + **SuperAdmin** or **Admin** role.
 
-### GET /api/audit-logs
+### GET /api/AuditLogs
 
 List audit logs (paginated).
 
