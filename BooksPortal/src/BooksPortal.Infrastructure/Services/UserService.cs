@@ -1,9 +1,12 @@
 using BooksPortal.Application.Common.Exceptions;
 using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.Users.DTOs;
+using BooksPortal.Domain.Enums;
+using BooksPortal.Infrastructure.Data;
 using BooksPortal.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace BooksPortal.Infrastructure.Services;
 
@@ -11,13 +14,17 @@ public class UserService : IUserService
 {
     private readonly UserManager<Staff> _userManager;
     private readonly RoleManager<IdentityRole<int>> _roleManager;
+    private readonly SuperAdminAccountSettings _superAdmin;
 
     public UserService(
         UserManager<Staff> userManager,
-        RoleManager<IdentityRole<int>> roleManager)
+        RoleManager<IdentityRole<int>> roleManager,
+        IConfiguration configuration)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _superAdmin = configuration.GetSection("SuperAdminSeed").Get<SuperAdminAccountSettings>()
+            ?? new SuperAdminAccountSettings();
     }
 
     public async Task<List<UserResponse>> GetAllUsersAsync()
@@ -76,6 +83,11 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString())
             ?? throw new NotFoundException("Staff", id);
 
+        if (await IsMainSuperAdminAsync(user) && !request.IsActive)
+        {
+            throw new BusinessRuleException("Main SuperAdmin account cannot be deactivated.");
+        }
+
         user.Email = request.Email;
         user.FullName = request.FullName;
         user.NationalId = request.NationalId;
@@ -98,6 +110,11 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString())
             ?? throw new NotFoundException("Staff", id);
 
+        if (await IsMainSuperAdminAsync(user))
+        {
+            throw new BusinessRuleException("Main SuperAdmin account cannot be deactivated.");
+        }
+
         user.IsActive = !user.IsActive;
 
         var result = await _userManager.UpdateAsync(user);
@@ -113,9 +130,28 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString())
             ?? throw new NotFoundException("Staff", id);
 
+        if (await IsMainSuperAdminAsync(user) &&
+            !roles.Any(r => string.Equals(r, UserRole.SuperAdmin, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new BusinessRuleException("Main SuperAdmin account must retain SuperAdmin role.");
+        }
+
         var currentRoles = await _userManager.GetRolesAsync(user);
         await _userManager.RemoveFromRolesAsync(user, currentRoles);
         await _userManager.AddToRolesAsync(user, roles);
+    }
+
+    private async Task<bool> IsMainSuperAdminAsync(Staff user)
+    {
+        var emailMatches = !string.IsNullOrWhiteSpace(_superAdmin.Email) &&
+            string.Equals(user.Email, _superAdmin.Email, StringComparison.OrdinalIgnoreCase);
+        var userNameMatches = !string.IsNullOrWhiteSpace(_superAdmin.UserName) &&
+            string.Equals(user.UserName, _superAdmin.UserName, StringComparison.OrdinalIgnoreCase);
+
+        if (!emailMatches && !userNameMatches)
+            return false;
+
+        return await _userManager.IsInRoleAsync(user, UserRole.SuperAdmin);
     }
 
     private static UserResponse MapToResponse(Staff user, IList<string> roles)
