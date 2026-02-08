@@ -1,0 +1,230 @@
+@baseUrl = {{baseUrl}}
+@adminEmail = {{adminEmail}}
+@adminPassword = {{adminPassword}}
+@runSuffix = {{runSuffix}}
+@runYear = {{runYear}}
+
+###
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+?? status == 200
+@accessToken={{response.parsedBody.data.accessToken}}
+@refreshToken={{response.parsedBody.data.refreshToken}}
+
+###
+# @name auth_me
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name auth_refresh
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "accessToken": "{{accessToken}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+?? status == 200
+@accessToken={{response.parsedBody.data.accessToken}}
+@refreshToken={{response.parsedBody.data.refreshToken}}
+
+###
+# @name auth_me_after_refresh
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name create_keystage
+POST {{baseUrl}}/api/keystages
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "KS{{runSuffix}}",
+  "name": "Keystage {{runSuffix}}",
+  "sortOrder": 50
+}
+
+?? status == 201
+@keystageId={{response.parsedBody.data.id}}
+
+###
+# @name create_subject
+POST {{baseUrl}}/api/subjects
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "SUB{{runSuffix}}",
+  "name": "Subject {{runSuffix}}"
+}
+
+?? status == 201
+@subjectId={{response.parsedBody.data.id}}
+
+###
+# @name create_academic_year
+POST {{baseUrl}}/api/AcademicYears
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "AY {{runYear}}",
+  "year": {{runYear}},
+  "startDate": "{{runYear}}-01-01T00:00:00Z",
+  "endDate": "{{runYear}}-12-31T00:00:00Z"
+}
+
+?? status == 201
+@academicYearId={{response.parsedBody.data.id}}
+
+###
+# @name activate_academic_year
+POST {{baseUrl}}/api/AcademicYears/{{academicYearId}}/activate
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name create_class_section
+POST {{baseUrl}}/api/ClassSections
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "keystageId": {{keystageId}},
+  "grade": "G{{runSuffix}}",
+  "section": "A"
+}
+
+?? status == 201
+@classSectionId={{response.parsedBody.data.id}}
+
+###
+# @name create_user
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "userName": "apitest{{runSuffix}}",
+  "email": "apitest{{runSuffix}}@booksportal.local",
+  "password": "Pass@12345",
+  "fullName": "API Test {{runSuffix}}",
+  "nationalId": "NID{{runSuffix}}",
+  "designation": "Automation",
+  "roles": ["Admin"]
+}
+
+?? status == 201
+@userId={{response.parsedBody.data.id}}
+
+###
+# @name update_user
+PUT {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "apitest{{runSuffix}}@booksportal.local",
+  "fullName": "API Test {{runSuffix}} Updated",
+  "nationalId": "NID{{runSuffix}}",
+  "designation": "Automation Updated",
+  "isActive": true
+}
+
+?? status == 200
+
+###
+# @name update_user_roles
+PUT {{baseUrl}}/api/users/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+["Admin","User"]
+
+?? status == 200
+
+###
+# @name toggle_user_active_off
+POST {{baseUrl}}/api/users/{{userId}}/toggle-active
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name toggle_user_active_on
+POST {{baseUrl}}/api/users/{{userId}}/toggle-active
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name create_book
+POST {{baseUrl}}/api/books
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "isbn": "978-{{runSuffix}}",
+  "code": "BK{{runSuffix}}",
+  "title": "Book {{runSuffix}}",
+  "author": "Automation",
+  "edition": "1",
+  "publisher": "BooksPortal",
+  "publishedYear": {{runYear}},
+  "subjectId": {{subjectId}},
+  "grade": "G{{runSuffix}}"
+}
+
+?? status == 201
+@bookId={{response.parsedBody.data.id}}
+
+###
+# @name add_book_stock
+POST {{baseUrl}}/api/books/{{bookId}}/stock-entry
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "quantity": 25,
+  "source": "API contract suite",
+  "notes": "Initial stock from suite run {{runSuffix}}"
+}
+
+?? status == 201
+
+###
+# @name get_book
+GET {{baseUrl}}/api/books/{{bookId}}
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name get_books
+GET {{baseUrl}}/api/books?pageNumber=1&pageSize=10&search=BK{{runSuffix}}
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name health
+GET {{baseUrl}}/health
+
+?? status == 200

@@ -1,0 +1,18 @@
+{
+  "backend": {
+    "projectPath": "BooksPortal/src/BooksPortal.API/BooksPortal.API.csproj",
+    "baseUrl": "http://localhost:5071",
+    "healthPath": "/health",
+    "startupTimeoutSeconds": 120
+  },
+  "suite": {
+    "filePath": "tools/api-contract-tester/http/contract-suite.http"
+  },
+  "auth": {
+    "adminEmail": "admin@booksportal.local",
+    "adminPassword": "Admin@123456"
+  },
+  "logging": {
+    "outputDir": "tools/api-contract-tester/logs"
+  }
+}

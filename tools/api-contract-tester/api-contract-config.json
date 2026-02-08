@@ -32,7 +32,10 @@
     "skipDisruptiveEndpoints": true,
     "disruptiveEndpoints": [
       "/api/auth/logout",
-      "/api/auth/change-password"
+      "/api/auth/change-password",
+      "/api/users",
+      "/api/users/{id}/toggle-active",
+      "/api/users/{id}/roles"
     ]
   },
   "requestTemplates": {

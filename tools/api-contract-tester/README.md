@@ -22,6 +22,24 @@ This tool validates `documentation/api-reference.md` against the running backend
 pwsh ./tools/api-contract-tester/run-api-contract-tests.ps1
 ```
 
+## httpyac Contract Suite
+
+The `httpyac` suite uses real request bodies and chained auth variables.
+
+Files:
+- `tools/api-contract-tester/http/contract-suite.http`
+- `tools/api-contract-tester/httpyac-config.json`
+- `tools/api-contract-tester/run-httpyac-contract-tests.ps1`
+
+Run:
+
+```powershell
+pwsh ./tools/api-contract-tester/run-httpyac-contract-tests.ps1
+```
+
+This writes a structured log:
+- `tools/api-contract-tester/logs/httpyac-contract-log-<runId>.json`
+
 ### Optional flags
 
 ```powershell
@@ -39,6 +57,9 @@ Edit `tools/api-contract-tester/api-contract-config.json`:
 - `placeholders` for path variables
 - `test.disruptiveEndpoints` and timeout values
 - `requestTemplates` for endpoints that require request bodies
+
+Important:
+- Keep mutating user/auth endpoints in `disruptiveEndpoints` to avoid accidentally deactivating admin users in local databases.
 
 ## Exit codes
 
