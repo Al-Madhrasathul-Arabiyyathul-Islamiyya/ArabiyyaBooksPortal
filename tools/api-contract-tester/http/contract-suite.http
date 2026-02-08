@@ -2,6 +2,7 @@
 @adminEmail = {{adminEmail}}
 @adminPassword = {{adminPassword}}
 @runSuffix = {{runSuffix}}
+@runKey = {{runKey}}
 @runYear = {{runYear}}
 
 ###
@@ -53,8 +54,8 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "code": "KS{{runSuffix}}",
-  "name": "Keystage {{runSuffix}}",
+  "code": "KS{{runKey}}",
+  "name": "Keystage {{runKey}}",
   "sortOrder": 50
 }
 
@@ -68,8 +69,8 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "code": "SUB{{runSuffix}}",
-  "name": "Subject {{runSuffix}}"
+  "code": "SB{{runKey}}",
+  "name": "Subject {{runKey}}"
 }
 
 ?? status == 201
@@ -107,7 +108,7 @@ Content-Type: application/json
 {
   "academicYearId": {{academicYearId}},
   "keystageId": {{keystageId}},
-  "grade": "G{{runSuffix}}",
+  "grade": "G{{runKey}}",
   "section": "A"
 }
 
@@ -180,15 +181,15 @@ Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "isbn": "978-{{runSuffix}}",
-  "code": "BK{{runSuffix}}",
-  "title": "Book {{runSuffix}}",
+  "isbn": "978-{{runKey}}",
+  "code": "BK{{runKey}}",
+  "title": "Book {{runKey}}",
   "author": "Automation",
   "edition": "1",
   "publisher": "BooksPortal",
   "publishedYear": {{runYear}},
   "subjectId": {{subjectId}},
-  "grade": "G{{runSuffix}}"
+  "grade": "G{{runKey}}"
 }
 
 ?? status == 201

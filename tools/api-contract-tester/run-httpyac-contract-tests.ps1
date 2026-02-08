@@ -60,7 +60,8 @@ try {
     }
 
     $runSuffix = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString()
-    $runYear = (Get-Date).Year + 50
+    $runKey = $runSuffix.Substring($runSuffix.Length - 4)
+    $runYear = 3000 + [int]$runKey
 
     $httpyacArgs = @(
         "send"
@@ -79,6 +80,8 @@ try {
         "adminPassword=$($config.auth.adminPassword)"
         "--var"
         "runSuffix=$runSuffix"
+        "--var"
+        "runKey=$runKey"
         "--var"
         "runYear=$runYear"
     )
@@ -122,6 +125,7 @@ try {
         baseUrl = $baseUrl
         vars = [ordered]@{
             runSuffix = $runSuffix
+            runKey = $runKey
             runYear = $runYear
         }
         httpyacExitCode = $httpyacExitCode
