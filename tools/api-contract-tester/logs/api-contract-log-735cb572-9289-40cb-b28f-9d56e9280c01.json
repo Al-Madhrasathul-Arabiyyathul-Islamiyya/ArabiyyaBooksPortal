@@ -1,0 +1,1452 @@
+{
+  "runId": "735cb572-9289-40cb-b28f-9d56e9280c01",
+  "startedAtUtc": "2026-02-08T22:14:31.7283448Z",
+  "finishedAtUtc": "2026-02-08T22:14:38.7932218Z",
+  "baseUrl": "http://localhost:5071",
+  "documentationPath": "documentation/api-reference.md",
+  "totals": {
+    "all": 103,
+    "success": 98,
+    "warn": 2,
+    "fail": 9,
+    "skipped": 2
+  },
+  "entries": [
+    {
+      "timestampUtc": "2026-02-08T22:14:38.2457706Z",
+      "category": "doc-vs-swagger",
+      "method": "GET",
+      "pathTemplate": "/health",
+      "resolvedPath": "",
+      "statusCode": 0,
+      "outcome": "warn",
+      "message": "Swagger endpoint not documented",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3355593Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/login",
+      "resolvedPath": "/api/auth/login",
+      "statusCode": 400,
+      "outcome": "warn",
+      "message": "Validation/business-rule rejection.",
+      "details": {
+        "requiresAuth": false,
+        "responseContentType": "application/json; charset=utf-8"
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3511459Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/TeacherIssues",
+      "resolvedPath": "/api/TeacherIssues",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3636464Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns/{id}/print",
+      "resolvedPath": "/api/returns/1/print",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3699219Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/returns/{id}",
+      "resolvedPath": "/api/returns/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3740598Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/returns",
+      "resolvedPath": "/api/returns",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3781584Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns/by-reference/{referenceNo}",
+      "resolvedPath": "/api/returns/by-reference/DUMMY-REF-0001",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3828112Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns/{id}",
+      "resolvedPath": "/api/returns/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3867705Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns",
+      "resolvedPath": "/api/returns",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3908007Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions/{id}/print",
+      "resolvedPath": "/api/distributions/1/print",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.3947982Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/distributions/{id}",
+      "resolvedPath": "/api/distributions/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4003922Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/distributions",
+      "resolvedPath": "/api/distributions",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4055311Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions/by-reference/{referenceNo}",
+      "resolvedPath": "/api/distributions/by-reference/DUMMY-REF-0001",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4097380Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions/{id}",
+      "resolvedPath": "/api/distributions/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4138504Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions",
+      "resolvedPath": "/api/distributions",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4189919Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/search",
+      "resolvedPath": "/api/books/search",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4238915Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/books/{id}/adjust-stock",
+      "resolvedPath": "/api/books/1/adjust-stock",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4289738Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/{id}/stock-movements",
+      "resolvedPath": "/api/books/1/stock-movements",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4347024Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/{id}/stock-entries",
+      "resolvedPath": "/api/books/1/stock-entries",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4397673Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/books/{id}/stock-entry",
+      "resolvedPath": "/api/books/1/stock-entry",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4441068Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/books/{id}",
+      "resolvedPath": "/api/books/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4488341Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/books/{id}",
+      "resolvedPath": "/api/books/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4538250Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/books",
+      "resolvedPath": "/api/books",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4580640Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/TeacherIssues/{id}",
+      "resolvedPath": "/api/TeacherIssues/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4635125Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/TeacherIssues",
+      "resolvedPath": "/api/TeacherIssues",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4718286Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/TeacherIssues/{id}/return",
+      "resolvedPath": "/api/TeacherIssues/1/return",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4763103Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/TeacherIssues/{id}",
+      "resolvedPath": "/api/TeacherIssues/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4806586Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/SlipTemplateSettings/{id}",
+      "resolvedPath": "/api/SlipTemplateSettings/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4853734Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/SlipTemplateSettings/{id}",
+      "resolvedPath": "/api/SlipTemplateSettings/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4892615Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/SlipTemplateSettings",
+      "resolvedPath": "/api/SlipTemplateSettings",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4931442Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/ReferenceNumberFormats/{id}",
+      "resolvedPath": "/api/ReferenceNumberFormats/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.4972116Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/ReferenceNumberFormats/{id}",
+      "resolvedPath": "/api/ReferenceNumberFormats/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5015712Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/ReferenceNumberFormats",
+      "resolvedPath": "/api/ReferenceNumberFormats",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5056496Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ReferenceNumberFormats/{id}",
+      "resolvedPath": "/api/ReferenceNumberFormats/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5095145Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ReferenceNumberFormats",
+      "resolvedPath": "/api/ReferenceNumberFormats",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5136497Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/users/{id}/roles",
+      "resolvedPath": "/api/users/1/roles",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5193377Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/users/{id}/toggle-active",
+      "resolvedPath": "/api/users/1/toggle-active",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5236010Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/{id}",
+      "resolvedPath": "/api/books/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5277233Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/users/{id}",
+      "resolvedPath": "/api/users/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5316254Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/users/{id}",
+      "resolvedPath": "/api/users/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5356937Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/users",
+      "resolvedPath": "/api/users",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5391360Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/export/teacher-outstanding",
+      "resolvedPath": "/api/reports/export/teacher-outstanding",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5443188Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/export/distribution-summary",
+      "resolvedPath": "/api/reports/export/distribution-summary",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5481200Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/export/stock-summary",
+      "resolvedPath": "/api/reports/export/stock-summary",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5525122Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/student-history/{studentId}",
+      "resolvedPath": "/api/reports/student-history/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5563553Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/teacher-outstanding",
+      "resolvedPath": "/api/reports/teacher-outstanding",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5597990Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/distribution-summary",
+      "resolvedPath": "/api/reports/distribution-summary",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5635465Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/stock-summary",
+      "resolvedPath": "/api/reports/stock-summary",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5688258Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/TeacherIssues/{id}/print",
+      "resolvedPath": "/api/TeacherIssues/1/print",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5724598Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/users",
+      "resolvedPath": "/api/users",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5759264Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books",
+      "resolvedPath": "/api/books",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5794382Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/movement-types",
+      "resolvedPath": "/api/lookups/movement-types",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5847150Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/book-conditions",
+      "resolvedPath": "/api/lookups/book-conditions",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5888315Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ClassSections",
+      "resolvedPath": "/api/ClassSections",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5925791Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/subjects/{id}",
+      "resolvedPath": "/api/subjects/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.5962098Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/subjects/{id}",
+      "resolvedPath": "/api/subjects/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6008419Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/subjects",
+      "resolvedPath": "/api/subjects",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6045934Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/subjects/{id}",
+      "resolvedPath": "/api/subjects/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6095947Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/subjects",
+      "resolvedPath": "/api/subjects",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6133429Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/keystages/{id}",
+      "resolvedPath": "/api/keystages/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6188622Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/keystages/{id}",
+      "resolvedPath": "/api/keystages/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6237863Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/keystages",
+      "resolvedPath": "/api/keystages",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6273953Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/keystages/{id}",
+      "resolvedPath": "/api/keystages/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6309663Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/keystages",
+      "resolvedPath": "/api/keystages",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6354817Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/AcademicYears/{id}",
+      "resolvedPath": "/api/AcademicYears/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6396783Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AcademicYears/active",
+      "resolvedPath": "/api/AcademicYears/active",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6434425Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/AcademicYears/{id}/activate",
+      "resolvedPath": "/api/AcademicYears/1/activate",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6488950Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/AcademicYears/{id}",
+      "resolvedPath": "/api/AcademicYears/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6531015Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/AcademicYears",
+      "resolvedPath": "/api/AcademicYears",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6565908Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AcademicYears/{id}",
+      "resolvedPath": "/api/AcademicYears/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6601340Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AcademicYears",
+      "resolvedPath": "/api/AcademicYears",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6602793Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/change-password",
+      "resolvedPath": "",
+      "statusCode": 0,
+      "outcome": "skipped",
+      "message": "Skipped disruptive endpoint by config.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6636397Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/auth/me",
+      "resolvedPath": "/api/auth/me",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6854801Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/refresh",
+      "resolvedPath": "/api/auth/refresh",
+      "statusCode": 500,
+      "outcome": "fail",
+      "message": "Server error.",
+      "details": {
+        "requiresAuth": false,
+        "responseContentType": "application/json"
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6891821Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ClassSections/{id}",
+      "resolvedPath": "/api/ClassSections/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.6965930Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/SlipTemplateSettings/reset",
+      "resolvedPath": "/api/SlipTemplateSettings/reset",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7006141Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/ClassSections",
+      "resolvedPath": "/api/ClassSections",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7040461Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/ClassSections/{id}",
+      "resolvedPath": "/api/ClassSections/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7072310Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/terms",
+      "resolvedPath": "/api/lookups/terms",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7103877Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/class-sections",
+      "resolvedPath": "/api/lookups/class-sections",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7136822Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/subjects",
+      "resolvedPath": "/api/lookups/subjects",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7174527Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/keystages",
+      "resolvedPath": "/api/lookups/keystages",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7213226Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/academic-years",
+      "resolvedPath": "/api/lookups/academic-years",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7247731Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/teachers/{id}/assignments/{assignmentId}",
+      "resolvedPath": "/api/teachers/1/assignments/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7282953Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/teachers/{id}/assignments",
+      "resolvedPath": "/api/teachers/1/assignments",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7321849Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/teachers/{id}",
+      "resolvedPath": "/api/teachers/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7362040Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/teachers/{id}",
+      "resolvedPath": "/api/teachers/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7396429Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/teachers",
+      "resolvedPath": "/api/teachers",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7430919Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/ClassSections/{id}",
+      "resolvedPath": "/api/ClassSections/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7463806Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/teachers/{id}",
+      "resolvedPath": "/api/teachers/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7506968Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/parents/{id}",
+      "resolvedPath": "/api/parents/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7549742Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/parents/{id}",
+      "resolvedPath": "/api/parents/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7583360Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/parents",
+      "resolvedPath": "/api/parents",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7624487Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/parents/{id}",
+      "resolvedPath": "/api/parents/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7664329Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/parents",
+      "resolvedPath": "/api/parents",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7702397Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/students/{id}",
+      "resolvedPath": "/api/students/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7737100Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/students/{id}",
+      "resolvedPath": "/api/students/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7770489Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/students",
+      "resolvedPath": "/api/students",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7805424Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/students/{id}",
+      "resolvedPath": "/api/students/1",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7844861Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/students",
+      "resolvedPath": "/api/students",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7878714Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/teachers",
+      "resolvedPath": "/api/teachers",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7913088Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AuditLogs",
+      "resolvedPath": "/api/AuditLogs",
+      "statusCode": 401,
+      "outcome": "success",
+      "message": "Auth enforcement confirmed (unauthenticated mode).",
+      "details": {
+        "requiresAuth": true,
+        "responseContentType": ""
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:14:38.7914543Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/logout",
+      "resolvedPath": "",
+      "statusCode": 0,
+      "outcome": "skipped",
+      "message": "Skipped disruptive endpoint by config.",
+      "details": null
+    }
+  ],
+  "warnings": [
+    "SuperAdmin login failed; continuing in unauthenticated mode."
+  ]
+}

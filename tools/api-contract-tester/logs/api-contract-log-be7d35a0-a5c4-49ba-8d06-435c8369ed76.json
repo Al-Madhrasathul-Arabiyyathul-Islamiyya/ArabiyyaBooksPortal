@@ -1,0 +1,1281 @@
+{
+  "runId": "be7d35a0-a5c4-49ba-8d06-435c8369ed76",
+  "startedAtUtc": "2026-02-08T22:10:37.5589403Z",
+  "finishedAtUtc": "2026-02-08T22:11:25.3141235Z",
+  "baseUrl": "http://localhost:5071",
+  "documentationPath": "documentation/api-reference.md",
+  "totals": {
+    "all": 103,
+    "success": 44,
+    "warn": 9,
+    "fail": 56,
+    "skipped": 2
+  },
+  "entries": [
+    {
+      "timestampUtc": "2026-02-08T22:11:16.8891703Z",
+      "category": "doc-vs-swagger",
+      "method": "GET",
+      "pathTemplate": "/health",
+      "resolvedPath": "",
+      "statusCode": 0,
+      "outcome": "warn",
+      "message": "Swagger endpoint not documented",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.0037524Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/login",
+      "resolvedPath": "/api/auth/login",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.2815320Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/TeacherIssues",
+      "resolvedPath": "/api/TeacherIssues",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.4701275Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns/{id}/print",
+      "resolvedPath": "/api/returns/1/print",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.5135541Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/returns/{id}",
+      "resolvedPath": "/api/returns/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.7421714Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/returns",
+      "resolvedPath": "/api/returns",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.8087542Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns/by-reference/{referenceNo}",
+      "resolvedPath": "/api/returns/by-reference/DUMMY-REF-0001",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.8268144Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns/{id}",
+      "resolvedPath": "/api/returns/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.8902601Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/returns",
+      "resolvedPath": "/api/returns",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:17.9763700Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions/{id}/print",
+      "resolvedPath": "/api/distributions/1/print",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.0150414Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/distributions/{id}",
+      "resolvedPath": "/api/distributions/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.1027315Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/distributions",
+      "resolvedPath": "/api/distributions",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.1723279Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions/by-reference/{referenceNo}",
+      "resolvedPath": "/api/distributions/by-reference/DUMMY-REF-0001",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.1940710Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions/{id}",
+      "resolvedPath": "/api/distributions/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.2615805Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/distributions",
+      "resolvedPath": "/api/distributions",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.2873151Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/search",
+      "resolvedPath": "/api/books/search",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.3266178Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/books/{id}/adjust-stock",
+      "resolvedPath": "/api/books/1/adjust-stock",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.3584311Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/{id}/stock-movements",
+      "resolvedPath": "/api/books/1/stock-movements",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.3774291Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/{id}/stock-entries",
+      "resolvedPath": "/api/books/1/stock-entries",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.3986665Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/books/{id}/stock-entry",
+      "resolvedPath": "/api/books/1/stock-entry",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.4174333Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/books/{id}",
+      "resolvedPath": "/api/books/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.4371125Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/books/{id}",
+      "resolvedPath": "/api/books/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.5690218Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/books",
+      "resolvedPath": "/api/books",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.6271967Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/TeacherIssues/{id}",
+      "resolvedPath": "/api/TeacherIssues/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.7177772Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/TeacherIssues",
+      "resolvedPath": "/api/TeacherIssues",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.7388105Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/TeacherIssues/{id}/return",
+      "resolvedPath": "/api/TeacherIssues/1/return",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.7783142Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/TeacherIssues/{id}",
+      "resolvedPath": "/api/TeacherIssues/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.8437604Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/SlipTemplateSettings/{id}",
+      "resolvedPath": "/api/SlipTemplateSettings/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.8573259Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/SlipTemplateSettings/{id}",
+      "resolvedPath": "/api/SlipTemplateSettings/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.8822011Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/SlipTemplateSettings",
+      "resolvedPath": "/api/SlipTemplateSettings",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.9062667Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/ReferenceNumberFormats/{id}",
+      "resolvedPath": "/api/ReferenceNumberFormats/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.9273634Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/ReferenceNumberFormats/{id}",
+      "resolvedPath": "/api/ReferenceNumberFormats/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:18.9898882Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/ReferenceNumberFormats",
+      "resolvedPath": "/api/ReferenceNumberFormats",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.0237701Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ReferenceNumberFormats/{id}",
+      "resolvedPath": "/api/ReferenceNumberFormats/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.0515299Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ReferenceNumberFormats",
+      "resolvedPath": "/api/ReferenceNumberFormats",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.0704738Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/users/{id}/roles",
+      "resolvedPath": "/api/users/1/roles",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.1391048Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/users/{id}/toggle-active",
+      "resolvedPath": "/api/users/1/toggle-active",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.1692711Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books/{id}",
+      "resolvedPath": "/api/books/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.1929138Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/users/{id}",
+      "resolvedPath": "/api/users/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.2110147Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/users/{id}",
+      "resolvedPath": "/api/users/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:19.2312778Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/users",
+      "resolvedPath": "/api/users",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.4597928Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/export/teacher-outstanding",
+      "resolvedPath": "/api/reports/export/teacher-outstanding",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.5049891Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/export/distribution-summary",
+      "resolvedPath": "/api/reports/export/distribution-summary",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.5343638Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/export/stock-summary",
+      "resolvedPath": "/api/reports/export/stock-summary",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.5971405Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/student-history/{studentId}",
+      "resolvedPath": "/api/reports/student-history/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.6092190Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/teacher-outstanding",
+      "resolvedPath": "/api/reports/teacher-outstanding",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.6231545Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/distribution-summary",
+      "resolvedPath": "/api/reports/distribution-summary",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.6351603Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/reports/stock-summary",
+      "resolvedPath": "/api/reports/stock-summary",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.6523069Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/TeacherIssues/{id}/print",
+      "resolvedPath": "/api/TeacherIssues/1/print",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.6647381Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/users",
+      "resolvedPath": "/api/users",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.6936927Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/books",
+      "resolvedPath": "/api/books",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.7075038Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/movement-types",
+      "resolvedPath": "/api/lookups/movement-types",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.7200962Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/book-conditions",
+      "resolvedPath": "/api/lookups/book-conditions",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.7744494Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ClassSections",
+      "resolvedPath": "/api/ClassSections",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.7961555Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/subjects/{id}",
+      "resolvedPath": "/api/subjects/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.8127529Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/subjects/{id}",
+      "resolvedPath": "/api/subjects/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.8576564Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/subjects",
+      "resolvedPath": "/api/subjects",
+      "statusCode": 201,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.8691682Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/subjects/{id}",
+      "resolvedPath": "/api/subjects/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.8995989Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/subjects",
+      "resolvedPath": "/api/subjects",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.9206509Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/keystages/{id}",
+      "resolvedPath": "/api/keystages/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.9359312Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/keystages/{id}",
+      "resolvedPath": "/api/keystages/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.9806546Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/keystages",
+      "resolvedPath": "/api/keystages",
+      "statusCode": 201,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:23.9921169Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/keystages/{id}",
+      "resolvedPath": "/api/keystages/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.0137160Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/keystages",
+      "resolvedPath": "/api/keystages",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.0345556Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/AcademicYears/{id}",
+      "resolvedPath": "/api/AcademicYears/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.0519675Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AcademicYears/active",
+      "resolvedPath": "/api/AcademicYears/active",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.0684020Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/AcademicYears/{id}/activate",
+      "resolvedPath": "/api/AcademicYears/1/activate",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.0881168Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/AcademicYears/{id}",
+      "resolvedPath": "/api/AcademicYears/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.1422215Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/AcademicYears",
+      "resolvedPath": "/api/AcademicYears",
+      "statusCode": 201,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.1534050Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AcademicYears/{id}",
+      "resolvedPath": "/api/AcademicYears/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.1755035Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AcademicYears",
+      "resolvedPath": "/api/AcademicYears",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.1755717Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/change-password",
+      "resolvedPath": "",
+      "statusCode": 0,
+      "outcome": "skipped",
+      "message": "Skipped disruptive endpoint by config.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.1955083Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/auth/me",
+      "resolvedPath": "/api/auth/me",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.2415402Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/refresh",
+      "resolvedPath": "/api/auth/refresh",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.2750317Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/ClassSections/{id}",
+      "resolvedPath": "/api/ClassSections/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.5061067Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/SlipTemplateSettings/reset",
+      "resolvedPath": "/api/SlipTemplateSettings/reset",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.5643781Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/ClassSections",
+      "resolvedPath": "/api/ClassSections",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.5846874Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/ClassSections/{id}",
+      "resolvedPath": "/api/ClassSections/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.5952110Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/terms",
+      "resolvedPath": "/api/lookups/terms",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.6117171Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/class-sections",
+      "resolvedPath": "/api/lookups/class-sections",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.6261967Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/subjects",
+      "resolvedPath": "/api/lookups/subjects",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.6406413Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/keystages",
+      "resolvedPath": "/api/lookups/keystages",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.6546231Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/lookups/academic-years",
+      "resolvedPath": "/api/lookups/academic-years",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.6779263Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/teachers/{id}/assignments/{assignmentId}",
+      "resolvedPath": "/api/teachers/1/assignments/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.6989472Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/teachers/{id}/assignments",
+      "resolvedPath": "/api/teachers/1/assignments",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.7334149Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/teachers/{id}",
+      "resolvedPath": "/api/teachers/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.7504328Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/teachers/{id}",
+      "resolvedPath": "/api/teachers/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.8363410Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/teachers",
+      "resolvedPath": "/api/teachers",
+      "statusCode": 201,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.8513827Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/ClassSections/{id}",
+      "resolvedPath": "/api/ClassSections/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.8616575Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/teachers/{id}",
+      "resolvedPath": "/api/teachers/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.8837628Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/parents/{id}",
+      "resolvedPath": "/api/parents/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.9023112Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/parents/{id}",
+      "resolvedPath": "/api/parents/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.9558561Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/parents",
+      "resolvedPath": "/api/parents",
+      "statusCode": 201,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.9673350Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/parents/{id}",
+      "resolvedPath": "/api/parents/1",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:24.9922796Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/parents",
+      "resolvedPath": "/api/parents",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.0156207Z",
+      "category": "route-sweep",
+      "method": "DELETE",
+      "pathTemplate": "/api/students/{id}",
+      "resolvedPath": "/api/students/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.0826830Z",
+      "category": "route-sweep",
+      "method": "PUT",
+      "pathTemplate": "/api/students/{id}",
+      "resolvedPath": "/api/students/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.1451255Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/students",
+      "resolvedPath": "/api/students",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.1895432Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/students/{id}",
+      "resolvedPath": "/api/students/1",
+      "statusCode": 0,
+      "outcome": "fail",
+      "message": "Unhandled request exception: Method invocation failed because [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.",
+      "details": null
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.2326076Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/students",
+      "resolvedPath": "/api/students",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.2818725Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/teachers",
+      "resolvedPath": "/api/teachers",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.3122140Z",
+      "category": "route-sweep",
+      "method": "GET",
+      "pathTemplate": "/api/AuditLogs",
+      "resolvedPath": "/api/AuditLogs",
+      "statusCode": 200,
+      "outcome": "success",
+      "message": "Endpoint reachable.",
+      "details": {
+        "responseContentType": "application/json; charset=utf-8",
+        "requiresAuth": true
+      }
+    },
+    {
+      "timestampUtc": "2026-02-08T22:11:25.3122763Z",
+      "category": "route-sweep",
+      "method": "POST",
+      "pathTemplate": "/api/auth/logout",
+      "resolvedPath": "",
+      "statusCode": 0,
+      "outcome": "skipped",
+      "message": "Skipped disruptive endpoint by config.",
+      "details": null
+    }
+  ]
+}
