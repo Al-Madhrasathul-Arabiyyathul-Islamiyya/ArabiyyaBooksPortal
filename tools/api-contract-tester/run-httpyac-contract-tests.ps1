@@ -63,6 +63,47 @@ function Wait-ForApi {
     return $false
 }
 
+function Stop-StaleBackendProcesses {
+    param(
+        [string]$ProjectPath,
+        [string]$BaseUrl
+    )
+
+    $resolvedProjectPath = $null
+    try {
+        $resolvedProjectPath = (Resolve-Path -Path $ProjectPath).Path
+    } catch {}
+
+    $candidates = Get-CimInstance Win32_Process -Filter "Name = 'dotnet.exe'" -ErrorAction SilentlyContinue
+    if (-not $candidates) {
+        return
+    }
+
+    foreach ($process in $candidates) {
+        $cmd = $process.CommandLine
+        if ([string]::IsNullOrWhiteSpace($cmd)) {
+            continue
+        }
+
+        $matchesProject = $false
+        if ($resolvedProjectPath) {
+            $matchesProject = $cmd.IndexOf($resolvedProjectPath, [StringComparison]::OrdinalIgnoreCase) -ge 0
+        }
+
+        $matchesUrl = $cmd.IndexOf($BaseUrl, [StringComparison]::OrdinalIgnoreCase) -ge 0
+        if (-not $matchesProject -and -not $matchesUrl) {
+            continue
+        }
+
+        try {
+            Stop-Process -Id $process.ProcessId -Force -ErrorAction Stop
+            Write-Host ("Stopped stale backend process PID={0}" -f $process.ProcessId)
+        } catch {
+            Write-Warning ("Failed to stop stale backend process PID={0}: {1}" -f $process.ProcessId, $_.Exception.Message)
+        }
+    }
+}
+
 $backendProcess = $null
 $runId = [guid]::NewGuid().ToString()
 $startedAt = [DateTime]::UtcNow
@@ -114,6 +155,8 @@ try {
     }
 
     if (-not $SkipStartBackend) {
+        Stop-StaleBackendProcesses -ProjectPath ([string]$config.backend.projectPath) -BaseUrl $baseUrl
+
         $backendArgs = @(
             "run"
             "--project"
