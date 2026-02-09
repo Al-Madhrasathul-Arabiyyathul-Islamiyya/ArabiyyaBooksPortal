@@ -106,6 +106,27 @@ const touched = reactive({
 const loginError = ref('')
 const isLoading = ref(false)
 
+function toFriendlyLoginError(message?: string) {
+  if (!message) {
+    return 'Unable to sign in right now. Please try again.'
+  }
+
+  const normalized = message.toLowerCase()
+  if (
+    normalized.includes('fetch failed')
+    || normalized.includes('econnrefused')
+    || normalized.includes('failed to fetch')
+  ) {
+    return 'Unable to reach the server. Please ensure the backend is running and try again.'
+  }
+
+  if (normalized.includes('csrf')) {
+    return 'Security validation failed. Please refresh the page and try again.'
+  }
+
+  return message
+}
+
 function touchField(field: 'email' | 'password') {
   touched[field] = true
   validateField(field)
@@ -136,12 +157,12 @@ async function handleLogin() {
       navigateTo('/')
     }
     else {
-      loginError.value = response.message || 'Login failed'
+      loginError.value = toFriendlyLoginError(response.message) || 'Login failed'
     }
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    loginError.value = fetchError.data?.message || 'Unable to connect to the server'
+    const fetchError = error as { data?: { message?: string }, message?: string }
+    loginError.value = toFriendlyLoginError(fetchError.data?.message || fetchError.message)
   }
   finally {
     isLoading.value = false

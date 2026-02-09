@@ -61,6 +61,13 @@ export default defineNuxtConfig({
     methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
   },
 
+  routeRules: {
+    // Nuxt hydration internals perform POSTs; do not apply CSRF checks there.
+    '/__nuxt_hydration__/**': {
+      ...({ csurf: false } as Record<string, unknown>),
+    },
+  },
+
   dayjs: {
     locales: ['en'],
     plugins: ['relativeTime', 'utc', 'timezone'],

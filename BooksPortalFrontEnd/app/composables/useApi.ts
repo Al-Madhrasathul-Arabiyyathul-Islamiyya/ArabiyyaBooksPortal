@@ -17,14 +17,21 @@ export function useApi() {
   const baseURL = '/api/bff'
   const { $csrfFetch } = useNuxtApp()
   const csrfFetch = $csrfFetch ?? $fetch
+  const requestFetch = import.meta.server ? useRequestFetch() : $fetch
+  const protectedMethods: ApiMethod[] = ['POST', 'PUT', 'PATCH', 'DELETE']
 
   async function apiFetch<T>(
     url: string,
     options: ApiOptions = {},
   ): Promise<ApiResponse<T>> {
+    const method = options.method ?? 'GET'
+    const useProtectedFetch = import.meta.client && protectedMethods.includes(method)
+    const fetcher = (useProtectedFetch ? csrfFetch : requestFetch) as typeof $fetch
+
     try {
-      return await csrfFetch<ApiResponse<T>>(`${baseURL}${url}`, {
+      return await fetcher<ApiResponse<T>>(`${baseURL}${url}`, {
         ...options,
+        method,
       })
     }
     catch (error: unknown) {
@@ -32,12 +39,14 @@ export function useApi() {
 
       if (fetchError.status === 401) {
         try {
-          await csrfFetch<ApiResponse<{ expiresAt: string }>>(`${baseURL}/auth/refresh`, {
+          const refreshFetcher = (import.meta.client ? csrfFetch : requestFetch) as typeof $fetch
+          await refreshFetcher<ApiResponse<{ expiresAt: string }>>(`${baseURL}/auth/refresh`, {
             method: 'POST',
           })
 
-          return await csrfFetch<ApiResponse<T>>(`${baseURL}${url}`, {
+          return await fetcher<ApiResponse<T>>(`${baseURL}${url}`, {
             ...options,
+            method,
           })
         }
         catch {

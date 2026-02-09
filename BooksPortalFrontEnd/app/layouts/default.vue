@@ -61,7 +61,7 @@
     >
       <!-- Header -->
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
-        <AppBreadcrumb />
+        <CommonAppBreadcrumb />
         <div class="flex items-center gap-3">
           <Button
             :icon="colorMode.value === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
@@ -123,37 +123,28 @@ const userMenuItems = ref([
   },
 ])
 
-const menuItems = computed(() => {
-  return [
-    {
-      label: 'Operations',
-      icon: 'pi pi-briefcase',
-      expanded: true,
-      items: [
-        {
-          label: 'Dashboard',
-          icon: 'pi pi-home',
-          command: () => navigateTo('/'),
-        },
-        {
-          label: 'Distribution',
-          icon: 'pi pi-send',
-          command: () => navigateTo('/distribution'),
-        },
-        {
-          label: 'Returns',
-          icon: 'pi pi-replay',
-          command: () => navigateTo('/returns'),
-        },
-        {
-          label: 'Teacher Issues',
-          icon: 'pi pi-users',
-          command: () => navigateTo('/teacher-issues'),
-        },
-      ],
-    },
-  ]
-})
+const menuItems = computed(() => ([
+  {
+    label: 'Dashboard',
+    icon: 'pi pi-home',
+    command: () => navigateTo('/'),
+  },
+  {
+    label: 'Distribution',
+    icon: 'pi pi-send',
+    command: () => navigateTo('/distribution'),
+  },
+  {
+    label: 'Returns',
+    icon: 'pi pi-replay',
+    command: () => navigateTo('/returns'),
+  },
+  {
+    label: 'Teacher Issues',
+    icon: 'pi pi-users',
+    command: () => navigateTo('/teacher-issues'),
+  },
+]))
 
 // Initialize auth on layout mount
 const authStore = useAuthStore()

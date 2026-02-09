@@ -52,7 +52,7 @@
       :class="sidebarCollapsed ? 'ml-16' : 'ml-64'"
     >
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
-        <AppBreadcrumb />
+        <CommonAppBreadcrumb />
         <div class="flex items-center gap-3">
           <Button
             :icon="colorMode.value === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
