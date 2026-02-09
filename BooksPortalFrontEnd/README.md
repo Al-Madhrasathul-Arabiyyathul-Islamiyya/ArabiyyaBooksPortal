@@ -84,4 +84,5 @@ See [documentation/api-reference.md](../documentation/api-reference.md) for the 
 - Module 10 Phase 1: complete
 - Module 10 Phase 2: complete
 - Module 10 Phase 2.5 (BFF + CSRF alignment): complete
+- Module 10 Phase 2.6 (routing/layout split): in progress
 - Module 10 Phase 3: next to start
