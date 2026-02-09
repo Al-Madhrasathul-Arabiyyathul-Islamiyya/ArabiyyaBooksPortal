@@ -44,6 +44,7 @@ GET {{baseUrl}}/api/auth/me
 Authorization: Bearer {{accessToken}}
 
 ?? status == 200
+@superAdminId={{response.parsedBody.data.id}}
 
 ###
 # @name ay_list_before
@@ -994,6 +995,27 @@ GET {{baseUrl}}/api/AuditLogs?pageNumber=1&pageSize=20
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_toggle_superadmin_forbidden
+POST {{baseUrl}}/api/users/{{superAdminId}}/toggle-active
+Authorization: Bearer {{accessToken}}
+
+?? status >= 400 && status < 500
+
+###
+# @name parent_delete_referenced_forbidden
+DELETE {{baseUrl}}/api/parents/{{parentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status >= 400 && status < 500
+
+###
+# @name ay_delete_referenced_forbidden
+DELETE {{baseUrl}}/api/AcademicYears/{{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status >= 400 && status < 500
 
 ###
 # @name auth_login_temp
