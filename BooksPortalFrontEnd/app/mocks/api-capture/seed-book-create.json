@@ -1,21 +1,25 @@
 {
+  "uri": "http://localhost:5071/api/books",
   "statusCode": 201,
-  "requestBody": "{\r\n  \"isbn\": \"978-9908\",\r\n  \"code\": \"BK9908\",\r\n  \"title\": \"Book 1770659908\",\r\n  \"author\": \"Automation\",\r\n  \"edition\": \"1\",\r\n  \"publisher\": \"BooksPortal\",\r\n  \"publishedYear\": 4909,\r\n  \"subjectId\": 2,\r\n  \"grade\": \"G9908\"\r\n}",
-  "capturedAtUtc": "2026-02-09T17:58:28.6785715Z",
+  "isError": false,
+  "name": "seed-book-create",
+  "requestBody": "{\r\n  \"isbn\": \"978-0248\",\r\n  \"code\": \"BK0248\",\r\n  \"title\": \"Book 1770660248\",\r\n  \"author\": \"Automation\",\r\n  \"edition\": \"1\",\r\n  \"publisher\": \"BooksPortal\",\r\n  \"publishedYear\": 2249,\r\n  \"subjectId\": 2,\r\n  \"grade\": \"G0248\"\r\n}",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-0248\",\"code\":\"BK0248\",\"title\":\"Book 1770660248\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":2249,\"subjectId\":2,\"subjectName\":\"Subject 0248\",\"grade\":\"G0248\",\"totalStock\":0,\"distributed\":0,\"withTeachers\":0,\"damaged\":0,\"lost\":0,\"available\":0}}",
+  "method": "POST",
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "isbn": "978-9908",
-      "code": "BK9908",
-      "title": "Book 1770659908",
+      "isbn": "978-0248",
+      "code": "BK0248",
+      "title": "Book 1770660248",
       "author": "Automation",
       "edition": "1",
       "publisher": "BooksPortal",
-      "publishedYear": 4909,
+      "publishedYear": 2249,
       "subjectId": 2,
-      "subjectName": "Subject 9908",
-      "grade": "G9908",
+      "subjectName": "Subject 0248",
+      "grade": "G0248",
       "totalStock": 0,
       "distributed": 0,
       "withTeachers": 0,
@@ -24,9 +28,5 @@
       "available": 0
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/books",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-9908\",\"code\":\"BK9908\",\"title\":\"Book 1770659908\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":4909,\"subjectId\":2,\"subjectName\":\"Subject 9908\",\"grade\":\"G9908\",\"totalStock\":0,\"distributed\":0,\"withTeachers\":0,\"damaged\":0,\"lost\":0,\"available\":0}}",
-  "method": "POST",
-  "name": "seed-book-create"
+  "capturedAtUtc": "2026-02-09T18:04:09.1155879Z"
 }

@@ -1,7 +1,11 @@
 {
+  "uri": "http://localhost:5071/api/auth/me",
   "statusCode": 200,
+  "isError": false,
+  "name": "auth-me",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.6661589Z",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":1,\"userName\":\"admin\",\"email\":\"admin@booksportal.local\",\"fullName\":\"System Administrator\",\"roles\":[\"SuperAdmin\"]}}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": {
@@ -14,9 +18,5 @@
       ]
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/auth/me",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":1,\"userName\":\"admin\",\"email\":\"admin@booksportal.local\",\"fullName\":\"System Administrator\",\"roles\":[\"SuperAdmin\"]}}",
-  "method": "GET",
-  "name": "auth-me"
+  "capturedAtUtc": "2026-02-09T18:04:43.1193562Z"
 }

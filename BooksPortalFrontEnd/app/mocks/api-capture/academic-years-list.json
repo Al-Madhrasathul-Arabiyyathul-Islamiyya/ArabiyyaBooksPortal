@@ -1,31 +1,31 @@
 {
+  "uri": "http://localhost:5071/api/AcademicYears",
   "statusCode": 200,
+  "isError": false,
+  "name": "academic-years-list",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.4753462Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"AY 2249\",\"year\":2249,\"startDate\":\"2249-01-01T00:00:00\",\"endDate\":\"2249-12-31T00:00:00\",\"isActive\":false},{\"id\":1,\"name\":\"AY 2186 Updated\",\"year\":2186,\"startDate\":\"2186-01-01T00:00:00\",\"endDate\":\"2186-12-31T00:00:00\",\"isActive\":true}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "id": 2,
-        "name": "AY 4909",
-        "year": 4909,
-        "startDate": "4909-01-01T00:00:00",
-        "endDate": "4909-12-31T00:00:00",
+        "name": "AY 2249",
+        "year": 2249,
+        "startDate": "2249-01-01T00:00:00",
+        "endDate": "2249-12-31T00:00:00",
         "isActive": false
       },
       {
         "id": 1,
-        "name": "AY 4842 Updated",
-        "year": 4842,
-        "startDate": "4842-01-01T00:00:00",
-        "endDate": "4842-12-31T00:00:00",
+        "name": "AY 2186 Updated",
+        "year": 2186,
+        "startDate": "2186-01-01T00:00:00",
+        "endDate": "2186-12-31T00:00:00",
         "isActive": true
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/AcademicYears",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"AY 4909\",\"year\":4909,\"startDate\":\"4909-01-01T00:00:00\",\"endDate\":\"4909-12-31T00:00:00\",\"isActive\":false},{\"id\":1,\"name\":\"AY 4842 Updated\",\"year\":4842,\"startDate\":\"4842-01-01T00:00:00\",\"endDate\":\"4842-12-31T00:00:00\",\"isActive\":true}]}",
-  "method": "GET",
-  "name": "academic-years-list"
+  "capturedAtUtc": "2026-02-09T18:04:42.9650985Z"
 }

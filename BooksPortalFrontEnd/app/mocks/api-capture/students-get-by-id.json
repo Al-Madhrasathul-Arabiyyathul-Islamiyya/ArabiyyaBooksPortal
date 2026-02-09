@@ -1,31 +1,31 @@
 {
+  "uri": "http://localhost:5071/api/students/2",
   "statusCode": 200,
+  "isError": false,
+  "name": "students-get-by-id",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.7352641Z",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770660248\",\"indexNo\":\"IDX1770660248\",\"nationalId\":\"SN1770660248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770660248\",\"nationalId\":\"PN1770660248\",\"phone\":\"7000000248\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "fullName": "Student 1770659908",
-      "indexNo": "IDX1770659908",
-      "nationalId": "SN1770659908",
+      "fullName": "Student 1770660248",
+      "indexNo": "IDX1770660248",
+      "nationalId": "SN1770660248",
       "classSectionId": 2,
-      "classSectionDisplayName": "G9908 A",
+      "classSectionDisplayName": "G0248 A",
       "parents": [
         {
           "parentId": 2,
-          "fullName": "Parent 1770659908",
-          "nationalId": "PN1770659908",
-          "phone": "7000009908",
+          "fullName": "Parent 1770660248",
+          "nationalId": "PN1770660248",
+          "phone": "7000000248",
           "relationship": "Father",
           "isPrimary": true
         }
       ]
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/students/2",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770659908\",\"indexNo\":\"IDX1770659908\",\"nationalId\":\"SN1770659908\",\"classSectionId\":2,\"classSectionDisplayName\":\"G9908 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770659908\",\"nationalId\":\"PN1770659908\",\"phone\":\"7000009908\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
-  "method": "GET",
-  "name": "students-get-by-id"
+  "capturedAtUtc": "2026-02-09T18:04:43.1618325Z"
 }

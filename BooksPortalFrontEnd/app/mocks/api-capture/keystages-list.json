@@ -1,21 +1,21 @@
 {
+  "uri": "http://localhost:5071/api/keystages",
   "statusCode": 200,
+  "isError": false,
+  "name": "keystages-list",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.4813066Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"code\":\"KS0248\",\"name\":\"Keystage 0248\",\"sortOrder\":50}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "id": 2,
-        "code": "KS9908",
-        "name": "Keystage 9908",
+        "code": "KS0248",
+        "name": "Keystage 0248",
         "sortOrder": 50
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/keystages",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"code\":\"KS9908\",\"name\":\"Keystage 9908\",\"sortOrder\":50}]}",
-  "method": "GET",
-  "name": "keystages-list"
+  "capturedAtUtc": "2026-02-09T18:04:42.9702272Z"
 }

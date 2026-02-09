@@ -1,24 +1,24 @@
 {
+  "uri": "http://localhost:5071/api/ClassSections",
   "statusCode": 201,
-  "requestBody": "{\r\n  \"academicYearId\": 2,\r\n  \"keystageId\": 2,\r\n  \"grade\": \"G9908\",\r\n  \"section\": \"A\"\r\n}",
-  "capturedAtUtc": "2026-02-09T17:58:28.4945917Z",
+  "isError": false,
+  "name": "seed-class-section-create",
+  "requestBody": "{\r\n  \"academicYearId\": 2,\r\n  \"keystageId\": 2,\r\n  \"grade\": \"G0248\",\r\n  \"section\": \"A\"\r\n}",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"academicYearId\":2,\"academicYearName\":\"AY 2249\",\"keystageId\":2,\"keystageName\":\"Keystage 0248\",\"grade\":\"G0248\",\"section\":\"A\",\"displayName\":\"G0248 A\",\"studentCount\":0}}",
+  "method": "POST",
   "body": {
     "success": true,
     "data": {
       "id": 2,
       "academicYearId": 2,
-      "academicYearName": "AY 4909",
+      "academicYearName": "AY 2249",
       "keystageId": 2,
-      "keystageName": "Keystage 9908",
-      "grade": "G9908",
+      "keystageName": "Keystage 0248",
+      "grade": "G0248",
       "section": "A",
-      "displayName": "G9908 A",
+      "displayName": "G0248 A",
       "studentCount": 0
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/ClassSections",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"academicYearId\":2,\"academicYearName\":\"AY 4909\",\"keystageId\":2,\"keystageName\":\"Keystage 9908\",\"grade\":\"G9908\",\"section\":\"A\",\"displayName\":\"G9908 A\",\"studentCount\":0}}",
-  "method": "POST",
-  "name": "seed-class-section-create"
+  "capturedAtUtc": "2026-02-09T18:04:08.9954692Z"
 }

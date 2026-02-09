@@ -1,7 +1,11 @@
 {
+  "uri": "http://localhost:5071/api/lookups/movement-types",
   "statusCode": 200,
+  "isError": false,
+  "name": "lookups-movement-types",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.7155620Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"StockEntry\"},{\"id\":2,\"name\":\"Distribution\"},{\"id\":3,\"name\":\"Return\"},{\"id\":4,\"name\":\"TeacherIssue\"},{\"id\":5,\"name\":\"TeacherReturn\"},{\"id\":6,\"name\":\"MarkDamaged\"},{\"id\":7,\"name\":\"MarkLost\"},{\"id\":8,\"name\":\"Adjustment\"},{\"id\":9,\"name\":\"WriteOff\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
@@ -43,9 +47,5 @@
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/lookups/movement-types",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"StockEntry\"},{\"id\":2,\"name\":\"Distribution\"},{\"id\":3,\"name\":\"Return\"},{\"id\":4,\"name\":\"TeacherIssue\"},{\"id\":5,\"name\":\"TeacherReturn\"},{\"id\":6,\"name\":\"MarkDamaged\"},{\"id\":7,\"name\":\"MarkLost\"},{\"id\":8,\"name\":\"Adjustment\"},{\"id\":9,\"name\":\"WriteOff\"}]}",
-  "method": "GET",
-  "name": "lookups-movement-types"
+  "capturedAtUtc": "2026-02-09T18:04:43.1493949Z"
 }

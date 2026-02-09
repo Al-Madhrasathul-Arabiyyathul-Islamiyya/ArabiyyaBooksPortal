@@ -1,16 +1,16 @@
 {
+  "uri": "http://localhost:5071/api/AcademicYears/2",
   "statusCode": 409,
+  "isError": true,
+  "name": "errors-academic-year-delete-referenced",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:11.3295910Z",
+  "rawBody": "\r\n{\r\n  \"success\": false,\r\n  \"data\": null,\r\n  \"message\": \"Cannot delete academic year because it is referenced by existing records.\",\r\n  \"errors\": null\r\n}",
+  "method": "DELETE",
   "body": {
     "success": false,
     "data": null,
     "message": "Cannot delete academic year because it is referenced by existing records.",
     "errors": null
   },
-  "isError": true,
-  "uri": "http://localhost:5071/api/AcademicYears/2",
-  "rawBody": "\r\n{\r\n  \"success\": false,\r\n  \"data\": null,\r\n  \"message\": \"Cannot delete academic year because it is referenced by existing records.\",\r\n  \"errors\": null\r\n}",
-  "method": "DELETE",
-  "name": "errors-academic-year-delete-referenced"
+  "capturedAtUtc": "2026-02-09T18:04:43.5301293Z"
 }

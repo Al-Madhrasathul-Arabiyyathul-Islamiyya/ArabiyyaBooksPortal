@@ -1,7 +1,11 @@
 {
+  "uri": "http://localhost:5071/api/books/2/stock-entries",
   "statusCode": 200,
+  "isError": false,
+  "name": "books-stock-entries",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.7725907Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"bookId\":2,\"academicYearId\":2,\"quantity\":30,\"source\":\"Mock Capture\",\"notes\":\"Initial stock for frontend mock capture\",\"enteredById\":1,\"enteredAt\":\"2026-02-09T18:04:09.1221941\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
@@ -13,13 +17,9 @@
         "source": "Mock Capture",
         "notes": "Initial stock for frontend mock capture",
         "enteredById": 1,
-        "enteredAt": "2026-02-09T17:58:28.685905"
+        "enteredAt": "2026-02-09T18:04:09.1221941"
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/books/2/stock-entries",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"bookId\":2,\"academicYearId\":2,\"quantity\":30,\"source\":\"Mock Capture\",\"notes\":\"Initial stock for frontend mock capture\",\"enteredById\":1,\"enteredAt\":\"2026-02-09T17:58:28.685905\"}]}",
-  "method": "GET",
-  "name": "books-stock-entries"
+  "capturedAtUtc": "2026-02-09T18:04:43.1824568Z"
 }

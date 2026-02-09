@@ -1,20 +1,20 @@
 {
+  "uri": "http://localhost:5071/api/parents",
   "statusCode": 201,
-  "requestBody": "{\r\n  \"fullName\": \"Parent 1770659908\",\r\n  \"nationalId\": \"PN1770659908\",\r\n  \"phone\": \"7000009908\",\r\n  \"relationship\": \"Father\"\r\n}",
-  "capturedAtUtc": "2026-02-09T17:58:28.5107701Z",
+  "isError": false,
+  "name": "seed-parent-create",
+  "requestBody": "{\r\n  \"fullName\": \"Parent 1770660248\",\r\n  \"nationalId\": \"PN1770660248\",\r\n  \"phone\": \"7000000248\",\r\n  \"relationship\": \"Father\"\r\n}",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Parent 1770660248\",\"nationalId\":\"PN1770660248\",\"phone\":\"7000000248\",\"relationship\":\"Father\"}}",
+  "method": "POST",
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "fullName": "Parent 1770659908",
-      "nationalId": "PN1770659908",
-      "phone": "7000009908",
+      "fullName": "Parent 1770660248",
+      "nationalId": "PN1770660248",
+      "phone": "7000000248",
       "relationship": "Father"
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/parents",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Parent 1770659908\",\"nationalId\":\"PN1770659908\",\"phone\":\"7000009908\",\"relationship\":\"Father\"}}",
-  "method": "POST",
-  "name": "seed-parent-create"
+  "capturedAtUtc": "2026-02-09T18:04:09.0079932Z"
 }

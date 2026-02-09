@@ -1,7 +1,11 @@
 {
+  "uri": "http://localhost:5071/api/lookups/terms",
   "statusCode": 200,
+  "isError": false,
+  "name": "lookups-terms",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.7094917Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Term1\"},{\"id\":2,\"name\":\"Term2\"},{\"id\":3,\"name\":\"Both\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
@@ -19,9 +23,5 @@
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/lookups/terms",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Term1\"},{\"id\":2,\"name\":\"Term2\"},{\"id\":3,\"name\":\"Both\"}]}",
-  "method": "GET",
-  "name": "lookups-terms"
+  "capturedAtUtc": "2026-02-09T18:04:43.1429330Z"
 }

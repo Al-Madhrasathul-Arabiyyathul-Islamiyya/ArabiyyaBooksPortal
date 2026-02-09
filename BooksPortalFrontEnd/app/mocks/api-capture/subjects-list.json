@@ -1,20 +1,20 @@
 {
+  "uri": "http://localhost:5071/api/subjects",
   "statusCode": 200,
+  "isError": false,
+  "name": "subjects-list",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.4878616Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"code\":\"SB0248\",\"name\":\"Subject 0248\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "id": 2,
-        "code": "SB9908",
-        "name": "Subject 9908"
+        "code": "SB0248",
+        "name": "Subject 0248"
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/subjects",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"code\":\"SB9908\",\"name\":\"Subject 9908\"}]}",
-  "method": "GET",
-  "name": "subjects-list"
+  "capturedAtUtc": "2026-02-09T18:04:42.9863811Z"
 }

@@ -1,14 +1,14 @@
 {
+  "uri": "http://localhost:5071/api/books/2/stock-movements",
   "statusCode": 200,
+  "isError": false,
+  "name": "books-stock-movements",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.7928571Z",
+  "rawBody": "{\"success\":true,\"data\":[]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": []
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/books/2/stock-movements",
-  "rawBody": "{\"success\":true,\"data\":[]}",
-  "method": "GET",
-  "name": "books-stock-movements"
+  "capturedAtUtc": "2026-02-09T18:04:43.1937751Z"
 }

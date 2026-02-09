@@ -1,32 +1,32 @@
 {
+  "uri": "http://localhost:5071/api/reports/student-history/2",
   "statusCode": 200,
+  "isError": false,
+  "name": "reports-student-history",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:11.0433434Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"type\":\"Return\",\"referenceNo\":\"RTN2249000001\",\"date\":\"2026-02-09T18:04:20.4115189\",\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1,\"condition\":\"Good\"},{\"type\":\"Distribution\",\"referenceNo\":\"DST2249000001\",\"date\":\"2026-02-09T18:04:09.1479967\",\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "type": "Return",
-        "referenceNo": "RTN4909000001",
-        "date": "2026-02-09T17:58:42.3722146",
-        "bookTitle": "Book 1770659908",
-        "bookCode": "BK9908",
+        "referenceNo": "RTN2249000001",
+        "date": "2026-02-09T18:04:20.4115189",
+        "bookTitle": "Book 1770660248",
+        "bookCode": "BK0248",
         "quantity": 1,
         "condition": "Good"
       },
       {
         "type": "Distribution",
-        "referenceNo": "DST4909000001",
-        "date": "2026-02-09T17:58:28.7247465",
-        "bookTitle": "Book 1770659908",
-        "bookCode": "BK9908",
+        "referenceNo": "DST2249000001",
+        "date": "2026-02-09T18:04:09.1479967",
+        "bookTitle": "Book 1770660248",
+        "bookCode": "BK0248",
         "quantity": 1
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/reports/student-history/2",
-  "rawBody": "{\"success\":true,\"data\":[{\"type\":\"Return\",\"referenceNo\":\"RTN4909000001\",\"date\":\"2026-02-09T17:58:42.3722146\",\"bookTitle\":\"Book 1770659908\",\"bookCode\":\"BK9908\",\"quantity\":1,\"condition\":\"Good\"},{\"type\":\"Distribution\",\"referenceNo\":\"DST4909000001\",\"date\":\"2026-02-09T17:58:28.7247465\",\"bookTitle\":\"Book 1770659908\",\"bookCode\":\"BK9908\",\"quantity\":1}]}",
-  "method": "GET",
-  "name": "reports-student-history"
+  "capturedAtUtc": "2026-02-09T18:04:43.3511889Z"
 }

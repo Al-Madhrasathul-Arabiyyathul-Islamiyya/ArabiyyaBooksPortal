@@ -1,16 +1,16 @@
 {
+  "uri": "http://localhost:5071/api/users/1/toggle-active",
   "statusCode": 409,
+  "isError": true,
+  "name": "errors-superadmin-toggle-forbidden",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:11.2198864Z",
+  "rawBody": "\r\n{\r\n  \"success\": false,\r\n  \"data\": null,\r\n  \"message\": \"Main SuperAdmin account cannot be deactivated.\",\r\n  \"errors\": null\r\n}",
+  "method": "POST",
   "body": {
     "success": false,
     "data": null,
     "message": "Main SuperAdmin account cannot be deactivated.",
     "errors": null
   },
-  "isError": true,
-  "uri": "http://localhost:5071/api/users/1/toggle-active",
-  "rawBody": "\r\n{\r\n  \"success\": false,\r\n  \"data\": null,\r\n  \"message\": \"Main SuperAdmin account cannot be deactivated.\",\r\n  \"errors\": null\r\n}",
-  "method": "POST",
-  "name": "errors-superadmin-toggle-forbidden"
+  "capturedAtUtc": "2026-02-09T18:04:43.4614635Z"
 }

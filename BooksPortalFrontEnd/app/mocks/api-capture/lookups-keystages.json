@@ -1,19 +1,19 @@
 {
+  "uri": "http://localhost:5071/api/lookups/keystages",
   "statusCode": 200,
+  "isError": false,
+  "name": "lookups-keystages",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.6803735Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"Keystage 0248\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "id": 2,
-        "name": "Keystage 9908"
+        "name": "Keystage 0248"
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/lookups/keystages",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"Keystage 9908\"}]}",
-  "method": "GET",
-  "name": "lookups-keystages"
+  "capturedAtUtc": "2026-02-09T18:04:43.1294841Z"
 }

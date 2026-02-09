@@ -1,28 +1,28 @@
 {
+  "uri": "http://localhost:5071/api/reports/teacher-outstanding?academicYearId=2",
   "statusCode": 200,
+  "isError": false,
+  "name": "reports-teacher-outstanding",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:11.0120842Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"issueId\":2,\"referenceNo\":\"TIS2249000001\",\"teacherName\":\"Teacher 1770660248\",\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1,\"returnedQuantity\":0,\"outstanding\":1,\"status\":\"Active\",\"issuedAt\":\"2026-02-09T18:04:31.6690185\",\"expectedReturnDate\":\"2249-12-31T00:00:00\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "issueId": 2,
-        "referenceNo": "TIS4909000001",
-        "teacherName": "Teacher 1770659908",
-        "bookTitle": "Book 1770659908",
-        "bookCode": "BK9908",
+        "referenceNo": "TIS2249000001",
+        "teacherName": "Teacher 1770660248",
+        "bookTitle": "Book 1770660248",
+        "bookCode": "BK0248",
         "quantity": 1,
         "returnedQuantity": 0,
         "outstanding": 1,
         "status": "Active",
-        "issuedAt": "2026-02-09T17:58:56.788735",
-        "expectedReturnDate": "4909-12-31T00:00:00"
+        "issuedAt": "2026-02-09T18:04:31.6690185",
+        "expectedReturnDate": "2249-12-31T00:00:00"
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/reports/teacher-outstanding?academicYearId=2",
-  "rawBody": "{\"success\":true,\"data\":[{\"issueId\":2,\"referenceNo\":\"TIS4909000001\",\"teacherName\":\"Teacher 1770659908\",\"bookTitle\":\"Book 1770659908\",\"bookCode\":\"BK9908\",\"quantity\":1,\"returnedQuantity\":0,\"outstanding\":1,\"status\":\"Active\",\"issuedAt\":\"2026-02-09T17:58:56.788735\",\"expectedReturnDate\":\"4909-12-31T00:00:00\"}]}",
-  "method": "GET",
-  "name": "reports-teacher-outstanding"
+  "capturedAtUtc": "2026-02-09T18:04:43.3315250Z"
 }

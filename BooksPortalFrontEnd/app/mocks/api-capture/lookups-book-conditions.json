@@ -1,7 +1,11 @@
 {
+  "uri": "http://localhost:5071/api/lookups/book-conditions",
   "statusCode": 200,
+  "isError": false,
+  "name": "lookups-book-conditions",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.7127487Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Good\"},{\"id\":2,\"name\":\"Fair\"},{\"id\":3,\"name\":\"Poor\"},{\"id\":4,\"name\":\"Damaged\"},{\"id\":5,\"name\":\"Lost\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
@@ -27,9 +31,5 @@
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/lookups/book-conditions",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Good\"},{\"id\":2,\"name\":\"Fair\"},{\"id\":3,\"name\":\"Poor\"},{\"id\":4,\"name\":\"Damaged\"},{\"id\":5,\"name\":\"Lost\"}]}",
-  "method": "GET",
-  "name": "lookups-book-conditions"
+  "capturedAtUtc": "2026-02-09T18:04:43.1460591Z"
 }

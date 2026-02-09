@@ -1,23 +1,23 @@
 {
+  "uri": "http://localhost:5071/api/lookups/academic-years",
   "statusCode": 200,
+  "isError": false,
+  "name": "lookups-academic-years",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.6732032Z",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"AY 2249\"},{\"id\":1,\"name\":\"AY 2186 Updated\"}]}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": [
       {
         "id": 2,
-        "name": "AY 4909"
+        "name": "AY 2249"
       },
       {
         "id": 1,
-        "name": "AY 4842 Updated"
+        "name": "AY 2186 Updated"
       }
     ]
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/lookups/academic-years",
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"AY 4909\"},{\"id\":1,\"name\":\"AY 4842 Updated\"}]}",
-  "method": "GET",
-  "name": "lookups-academic-years"
+  "capturedAtUtc": "2026-02-09T18:04:43.1245544Z"
 }

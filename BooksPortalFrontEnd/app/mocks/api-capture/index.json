@@ -1,13 +1,13 @@
 {
-  "runId": "bc855e13-a7be-468b-8b4f-0f221bcd3856",
-  "startedAtUtc": "2026-02-09T17:56:47.7882563Z",
-  "finishedAtUtc": "2026-02-09T17:59:11.7209942Z",
+  "runId": "52150f8d-b8a8-47e7-86c1-225ed609caf2",
+  "startedAtUtc": "2026-02-09T18:02:08.4298962Z",
+  "finishedAtUtc": "2026-02-09T18:04:43.6345196Z",
   "source": {
     "baseUrl": "http://localhost:5071",
-    "httpyacLog": "D:\\Stuff\\Arabiyya\\2026\\BookPortal\\BookPortal\\tools\\api-contract-tester\\logs\\httpyac-contract-log-35695585-abfe-415b-8bd3-4743fcdac509.json",
-    "runSuffix": "1770659908",
-    "runKey": "9908",
-    "runYear": 4909
+    "httpyacLog": "D:\\Stuff\\Arabiyya\\2026\\BookPortal\\BookPortal\\tools\\api-contract-tester\\logs\\httpyac-contract-log-f9a60158-1ef7-48c3-aab9-128b6a737503.json",
+    "runSuffix": "1770660248",
+    "runKey": "0248",
+    "runYear": 2249
   },
   "entities": {
     "academicYearId": 2,

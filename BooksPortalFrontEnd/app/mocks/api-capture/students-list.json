@@ -1,24 +1,28 @@
 {
+  "uri": "http://localhost:5071/api/students?pageNumber=1&pageSize=20&search=1770660248",
   "statusCode": 200,
+  "isError": false,
+  "name": "students-list",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.5591497Z",
+  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Student 1770660248\",\"indexNo\":\"IDX1770660248\",\"nationalId\":\"SN1770660248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770660248\",\"nationalId\":\"PN1770660248\",\"phone\":\"7000000248\",\"relationship\":\"Father\",\"isPrimary\":true}]}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": {
       "items": [
         {
           "id": 2,
-          "fullName": "Student 1770659908",
-          "indexNo": "IDX1770659908",
-          "nationalId": "SN1770659908",
+          "fullName": "Student 1770660248",
+          "indexNo": "IDX1770660248",
+          "nationalId": "SN1770660248",
           "classSectionId": 2,
-          "classSectionDisplayName": "G9908 A",
+          "classSectionDisplayName": "G0248 A",
           "parents": [
             {
               "parentId": 2,
-              "fullName": "Parent 1770659908",
-              "nationalId": "PN1770659908",
-              "phone": "7000009908",
+              "fullName": "Parent 1770660248",
+              "nationalId": "PN1770660248",
+              "phone": "7000000248",
               "relationship": "Father",
               "isPrimary": true
             }
@@ -33,9 +37,5 @@
       "hasNext": false
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/students?pageNumber=1&pageSize=20&search=1770659908",
-  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Student 1770659908\",\"indexNo\":\"IDX1770659908\",\"nationalId\":\"SN1770659908\",\"classSectionId\":2,\"classSectionDisplayName\":\"G9908 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770659908\",\"nationalId\":\"PN1770659908\",\"phone\":\"7000009908\",\"relationship\":\"Father\",\"isPrimary\":true}]}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
-  "method": "GET",
-  "name": "students-list"
+  "capturedAtUtc": "2026-02-09T18:04:43.0371000Z"
 }

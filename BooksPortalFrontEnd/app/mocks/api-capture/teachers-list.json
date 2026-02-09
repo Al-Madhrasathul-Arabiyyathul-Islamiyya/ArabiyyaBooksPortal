@@ -1,24 +1,28 @@
 {
+  "uri": "http://localhost:5071/api/teachers?pageNumber=1&pageSize=20&search=1770660248",
   "statusCode": 200,
+  "isError": false,
+  "name": "teachers-list",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.5329363Z",
+  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Teacher 1770660248\",\"nationalId\":\"TN1770660248\",\"email\":\"teacher1770660248@booksportal.local\",\"phone\":\"7222220248\",\"assignments\":[{\"id\":2,\"subjectId\":2,\"subjectName\":\"Subject 0248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\"}]}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": {
       "items": [
         {
           "id": 2,
-          "fullName": "Teacher 1770659908",
-          "nationalId": "TN1770659908",
-          "email": "teacher1770659908@booksportal.local",
-          "phone": "7222229908",
+          "fullName": "Teacher 1770660248",
+          "nationalId": "TN1770660248",
+          "email": "teacher1770660248@booksportal.local",
+          "phone": "7222220248",
           "assignments": [
             {
               "id": 2,
               "subjectId": 2,
-              "subjectName": "Subject 9908",
+              "subjectName": "Subject 0248",
               "classSectionId": 2,
-              "classSectionDisplayName": "G9908 A"
+              "classSectionDisplayName": "G0248 A"
             }
           ]
         }
@@ -31,9 +35,5 @@
       "hasNext": false
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/teachers?pageNumber=1&pageSize=20&search=1770659908",
-  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Teacher 1770659908\",\"nationalId\":\"TN1770659908\",\"email\":\"teacher1770659908@booksportal.local\",\"phone\":\"7222229908\",\"assignments\":[{\"id\":2,\"subjectId\":2,\"subjectName\":\"Subject 9908\",\"classSectionId\":2,\"classSectionDisplayName\":\"G9908 A\"}]}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
-  "method": "GET",
-  "name": "teachers-list"
+  "capturedAtUtc": "2026-02-09T18:04:43.0185724Z"
 }

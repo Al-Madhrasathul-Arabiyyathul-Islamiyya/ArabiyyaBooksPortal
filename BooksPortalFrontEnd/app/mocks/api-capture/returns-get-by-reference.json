@@ -1,31 +1,35 @@
 {
+  "uri": "http://localhost:5071/api/returns/by-reference/RTN2249000001",
   "statusCode": 200,
+  "isError": false,
+  "name": "returns-get-by-reference",
   "requestBody": null,
-  "capturedAtUtc": "2026-02-09T17:59:10.8959633Z",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"RTN2249000001\",\"academicYearId\":2,\"academicYearName\":\"AY 2249\",\"studentId\":2,\"studentName\":\"Student 1770660248\",\"studentIndexNo\":\"IDX1770660248\",\"studentClassName\":\"G0248 - A\",\"studentNationalId\":\"SN1770660248\",\"returnedById\":2,\"returnedByName\":\"\",\"receivedById\":1,\"receivedAt\":\"2026-02-09T18:04:20.4115189\",\"notes\":\"Return for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\Return\\\\AY 2249\\\\RTN2249000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1,\"condition\":\"Good\",\"conditionNotes\":\"Good\"}]}}",
+  "method": "GET",
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "referenceNo": "RTN4909000001",
+      "referenceNo": "RTN2249000001",
       "academicYearId": 2,
-      "academicYearName": "AY 4909",
+      "academicYearName": "AY 2249",
       "studentId": 2,
-      "studentName": "Student 1770659908",
-      "studentIndexNo": "IDX1770659908",
-      "studentClassName": "G9908 - A",
-      "studentNationalId": "SN1770659908",
+      "studentName": "Student 1770660248",
+      "studentIndexNo": "IDX1770660248",
+      "studentClassName": "G0248 - A",
+      "studentNationalId": "SN1770660248",
       "returnedById": 2,
       "returnedByName": "",
       "receivedById": 1,
-      "receivedAt": "2026-02-09T17:58:42.3722146",
+      "receivedAt": "2026-02-09T18:04:20.4115189",
       "notes": "Return for frontend mock capture",
-      "pdfFilePath": "D:\\SlipStorage\\Return\\AY 4909\\RTN4909000001.pdf",
+      "pdfFilePath": "D:\\SlipStorage\\Return\\AY 2249\\RTN2249000001.pdf",
       "items": [
         {
           "id": 2,
           "bookId": 2,
-          "bookTitle": "Book 1770659908",
-          "bookCode": "BK9908",
+          "bookTitle": "Book 1770660248",
+          "bookCode": "BK0248",
           "quantity": 1,
           "condition": "Good",
           "conditionNotes": "Good"
@@ -33,9 +37,5 @@
       ]
     }
   },
-  "isError": false,
-  "uri": "http://localhost:5071/api/returns/by-reference/RTN4909000001",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"RTN4909000001\",\"academicYearId\":2,\"academicYearName\":\"AY 4909\",\"studentId\":2,\"studentName\":\"Student 1770659908\",\"studentIndexNo\":\"IDX1770659908\",\"studentClassName\":\"G9908 - A\",\"studentNationalId\":\"SN1770659908\",\"returnedById\":2,\"returnedByName\":\"\",\"receivedById\":1,\"receivedAt\":\"2026-02-09T17:58:42.3722146\",\"notes\":\"Return for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\Return\\\\AY 4909\\\\RTN4909000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770659908\",\"bookCode\":\"BK9908\",\"quantity\":1,\"condition\":\"Good\",\"conditionNotes\":\"Good\"}]}}",
-  "method": "GET",
-  "name": "returns-get-by-reference"
+  "capturedAtUtc": "2026-02-09T18:04:43.2579176Z"
 }
