@@ -8,12 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { ROLES } from '~/utils/constants'
-
 definePageMeta({
   layout: 'admin',
-  middleware: ['role'],
-  roles: [ROLES.superAdmin, ROLES.admin],
+  middleware: ['admin'],
   breadcrumb: {
     admin: 'Admin',
     'audit-log': 'Audit Log',

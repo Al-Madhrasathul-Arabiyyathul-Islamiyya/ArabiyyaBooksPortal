@@ -43,6 +43,16 @@ export default defineNuxtConfig({
     },
   },
 
+  eslint: {
+    config: {
+      stylistic: {
+        indent: 2,
+        quotes: 'single',
+        semi: false,
+      }
+    }
+  },
+
   primevue: {
     options: {
       theme: {

@@ -1,4 +1,5 @@
-import { H3Event, getCookie, setCookie, deleteCookie } from 'h3'
+import type { H3Event } from 'h3'
+import { getCookie, setCookie, deleteCookie } from 'h3'
 
 const ACCESS_COOKIE = 'bp_access_token'
 const REFRESH_COOKIE = 'bp_refresh_token'

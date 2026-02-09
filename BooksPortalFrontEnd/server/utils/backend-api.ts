@@ -1,15 +1,6 @@
-import { FetchError } from 'ofetch'
-import {
-  H3Event,
-  appendHeader,
-  createError,
-  getHeader,
-  getMethod,
-  getQuery,
-  readBody,
-  send,
-  setResponseStatus,
-} from 'h3'
+import type { FetchError } from 'ofetch'
+import type { H3Event } from 'h3'
+import { appendHeader, createError, getHeader, getMethod, getQuery, readBody, send, setResponseStatus } from 'h3'
 import { clearSessionTokens, getSessionTokens, isExpiryExpired, setSessionTokens } from './auth-session'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
