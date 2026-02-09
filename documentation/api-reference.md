@@ -46,6 +46,14 @@ Paginated endpoints return `PaginatedList<T>`:
 }
 ```
 
+### Frontend Payload Freeze
+
+- **Freeze scope**: Auth, Lookups, Students, Books, Distributions, Returns, and frontend-critical report endpoints.
+- **Freeze status**: Active
+- **Last validated**: 2026-02-09
+- **Validation run**: `tools/api-contract-tester/logs/httpyac-contract-log-8838ab0c-93e8-4237-9003-46b28cd0cdbb.json`
+- **Rule**: For the scoped endpoints, example payloads in this document are treated as frontend contracts.
+
 ---
 
 ## 1. Auth
@@ -1437,7 +1445,527 @@ List audit logs (paginated).
 
 ---
 
-## 19. Enums
+## 19. Frontend Payload Freeze (2026-02-09)
+
+The following examples are frozen for frontend integration. All JSON examples use the standard `ApiResponse<T>` envelope unless stated otherwise.
+
+### Auth (`/api/auth`)
+
+#### POST `/api/auth/login` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "jwt...",
+    "refreshToken": "refresh...",
+    "expiresAt": "2026-02-16T03:04:11Z"
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/auth/login` Example Error (frozen)
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Invalid email or password.",
+  "errors": null
+}
+```
+
+#### POST `/api/auth/refresh` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "jwt...",
+    "refreshToken": "refresh...",
+    "expiresAt": "2026-02-16T03:10:00Z"
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### GET `/api/auth/me` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "userName": "superadmin",
+    "email": "admin@booksportal.local",
+    "fullName": "Super Admin",
+    "nationalId": null,
+    "designation": null,
+    "roles": ["SuperAdmin"]
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/auth/change-password` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": true,
+  "message": "Password changed successfully.",
+  "errors": null
+}
+```
+
+#### POST `/api/auth/change-password` Example Business Rule Error (frozen)
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Optimistic concurrency failure, object has been modified.",
+  "errors": null
+}
+```
+
+#### POST `/api/auth/logout` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": true,
+  "message": "Logged out successfully.",
+  "errors": null
+}
+```
+
+### Lookups (`/api/lookups/*`)
+
+Frozen routes:
+- `GET /api/lookups/academic-years`
+- `GET /api/lookups/keystages`
+- `GET /api/lookups/subjects`
+- `GET /api/lookups/class-sections`
+- `GET /api/lookups/terms`
+- `GET /api/lookups/book-conditions`
+- `GET /api/lookups/movement-types`
+
+#### Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": [
+    { "value": 1, "label": "2025/2026" }
+  ],
+  "message": null,
+  "errors": null
+}
+```
+
+### Students (`/api/students`)
+
+Frozen routes:
+- `GET /api/students`
+- `GET /api/students/{id}`
+- `POST /api/students`
+- `PUT /api/students/{id}`
+- `DELETE /api/students/{id}`
+
+#### GET `/api/students` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 12,
+        "indexNo": "IDX-1001",
+        "fullName": "Student One",
+        "classSectionId": 3,
+        "nationalId": null
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST/PUT `/api/students` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 12,
+    "indexNo": "IDX-1001",
+    "fullName": "Student One",
+    "classSectionId": 3,
+    "nationalId": null
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### DELETE `/api/students/{id}` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": "Student deleted successfully.",
+  "message": null,
+  "errors": null
+}
+```
+
+#### DELETE `/api/students/{id}` Example Business Rule Error (frozen)
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Cannot delete student because it is referenced by existing records.",
+  "errors": null
+}
+```
+
+### Books (`/api/books`)
+
+Frozen routes:
+- `GET /api/books`
+- `GET /api/books/{id}`
+- `POST /api/books`
+- `PUT /api/books/{id}`
+- `DELETE /api/books/{id}`
+- `POST /api/books/{id}/stock-entry`
+- `GET /api/books/{id}/stock-entries`
+- `GET /api/books/{id}/stock-movements`
+- `POST /api/books/{id}/adjust-stock`
+- `GET /api/books/search`
+
+#### GET `/api/books` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 21,
+        "code": "BK-001",
+        "title": "Sample Book",
+        "subjectId": 2,
+        "grade": "Grade 6",
+        "availableStock": 10
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST/PUT `/api/books` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 21,
+    "code": "BK-001",
+    "title": "Sample Book",
+    "subjectId": 2,
+    "grade": "Grade 6"
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/books/{id}/stock-entry` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": true,
+  "message": "Stock entry recorded successfully.",
+  "errors": null
+}
+```
+
+#### GET `/api/books/{id}/stock-entries` and GET `/api/books/{id}/stock-movements` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "bookId": 21,
+      "quantity": 5,
+      "movementType": 1,
+      "notes": null,
+      "createdAt": "2026-02-09T03:04:00Z"
+    }
+  ],
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/books/{id}/adjust-stock` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": true,
+  "message": "Stock adjusted successfully.",
+  "errors": null
+}
+```
+
+#### GET `/api/books/search` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 21,
+      "code": "BK-001",
+      "title": "Sample Book"
+    }
+  ],
+  "message": null,
+  "errors": null
+}
+```
+
+#### DELETE `/api/books/{id}` Example Business Rule Error (frozen)
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Cannot delete book because it is referenced by existing records.",
+  "errors": null
+}
+```
+
+### Distributions (`/api/distributions`)
+
+Frozen routes:
+- `GET /api/distributions`
+- `GET /api/distributions/{id}`
+- `GET /api/distributions/by-reference/{referenceNo}`
+- `POST /api/distributions`
+- `DELETE /api/distributions/{id}`
+- `GET /api/distributions/{id}/print`
+
+#### GET `/api/distributions` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 9,
+        "referenceNo": "DIS-2026-0001",
+        "studentId": 12,
+        "studentName": "Student One",
+        "term": 1
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### GET `/api/distributions/{id}` and `/by-reference/{referenceNo}` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 9,
+    "referenceNo": "DIS-2026-0001",
+    "studentId": 12,
+    "parentId": 3,
+    "issuedAt": "2026-02-09T03:04:30Z",
+    "items": [{ "bookId": 21, "bookTitle": "Sample Book", "quantity": 1 }]
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/distributions` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 9,
+    "referenceNo": "DIS-2026-0001"
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### DELETE `/api/distributions/{id}` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": "Distribution slip cancelled successfully.",
+  "message": null,
+  "errors": null
+}
+```
+
+#### GET `/api/distributions/{id}/print` Example Success (frozen)
+- HTTP `200`
+- `Content-Type: application/pdf`
+- Binary body (not JSON envelope)
+
+### Returns (`/api/returns`)
+
+Frozen routes:
+- `GET /api/returns`
+- `GET /api/returns/{id}`
+- `GET /api/returns/by-reference/{referenceNo}`
+- `POST /api/returns`
+- `DELETE /api/returns/{id}`
+- `GET /api/returns/{id}/print`
+
+#### GET `/api/returns` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 7,
+        "referenceNo": "RET-2026-0001",
+        "studentId": 12,
+        "studentName": "Student One"
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### GET `/api/returns/{id}` and `/by-reference/{referenceNo}` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 7,
+    "referenceNo": "RET-2026-0001",
+    "studentId": 12,
+    "returnedById": 3,
+    "receivedAt": "2026-02-09T03:04:50Z",
+    "items": [{ "bookId": 21, "bookTitle": "Sample Book", "quantity": 1, "condition": 1 }]
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/returns` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 7,
+    "referenceNo": "RET-2026-0001"
+  },
+  "message": null,
+  "errors": null
+}
+```
+
+#### DELETE `/api/returns/{id}` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": "Return slip cancelled successfully.",
+  "message": null,
+  "errors": null
+}
+```
+
+#### GET `/api/returns/{id}/print` Example Success (frozen)
+- HTTP `200`
+- `Content-Type: application/pdf`
+- Binary body (not JSON envelope)
+
+### Frontend-Critical Reports
+
+Frozen routes:
+- `GET /api/reports/distribution-summary`
+- `GET /api/reports/student-history/{studentId}`
+
+#### GET `/api/reports/distribution-summary` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "slipId": 9,
+      "referenceNo": "DIS-2026-0001",
+      "studentName": "Student One",
+      "totalBooks": 3
+    }
+  ],
+  "message": null,
+  "errors": null
+}
+```
+
+#### GET `/api/reports/student-history/{studentId}` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "referenceNo": "DIS-2026-0001",
+      "bookTitle": "Sample Book",
+      "movementType": 2,
+      "quantity": 1,
+      "date": "2026-02-09T03:05:00Z"
+    }
+  ],
+  "message": null,
+  "errors": null
+}
+```
+
+### Freeze Validation
+
+Re-validate after any backend contract change:
+
+```powershell
+pwsh ./tools/api-contract-tester/run-backend-verification.ps1
+```
+
+The frontend freeze is considered current only when this run passes and the scoped example payloads remain accurate.
+
+## 20. Enums
 
 ### Term
 | Value | Name |
