@@ -38,7 +38,10 @@
           :label="sidebarCollapsed ? undefined : 'Admin'"
           text
           severity="secondary"
-          class="w-full justify-start"
+          :class="[
+            'w-full',
+            sidebarCollapsed ? 'justify-center' : 'justify-start',
+          ]"
           @click="navigateTo('/admin')"
         />
       </div>
@@ -62,7 +65,9 @@
     >
       <!-- Header -->
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
-        <CommonAppBreadcrumb />
+        <h1 class="text-base font-semibold text-surface-900 dark:text-surface-0">
+          Arabiyya Books Portal
+        </h1>
         <div class="flex items-center gap-3">
           <Button
             :icon="colorMode.value === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
@@ -169,6 +174,8 @@ onMounted(() => {
 }
 
 .sidebar-panel-collapsed :deep(.p-menuitem-text),
+.sidebar-panel-collapsed :deep(.p-panelmenu-header-label),
+.sidebar-panel-collapsed :deep(.p-panelmenu-header-chevron),
 .sidebar-panel-collapsed :deep(.p-submenu-icon) {
   display: none;
 }
