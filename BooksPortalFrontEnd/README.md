@@ -60,6 +60,12 @@ BooksPortalFrontEnd/
 - Frontend app calls internal BFF routes under `/api/bff`
 - BFF routes proxy to backend with server-managed auth cookies and refresh flow
 
+## Route Surface Model (Planned)
+
+- Operational area (all authenticated users): `/`, `/distribution/*`, `/returns/*`, `/teacher-issues/*`
+- Admin area (`Admin` and `SuperAdmin` only): `/admin/*`
+- Planned IA change: move master-data, books management, reports, settings, and audit screens under `/admin`
+
 ## API Reference
 
 See [documentation/api-reference.md](../documentation/api-reference.md) for the backend API this frontend consumes.
