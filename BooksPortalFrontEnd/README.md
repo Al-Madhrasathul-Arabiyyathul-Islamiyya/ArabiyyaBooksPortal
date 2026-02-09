@@ -66,6 +66,15 @@ BooksPortalFrontEnd/
 - Admin area (`Admin` and `SuperAdmin` only): `/admin/*`
 - Planned IA change: move master-data, books management, reports, settings, and audit screens under `/admin`
 
+## UX Conventions (Planned)
+
+- Prefer modal forms for create/edit actions.
+- Keep full-page forms only for high-complexity workflows.
+- Lookup flows should support inline create actions for missing:
+  - students
+  - parents
+  - teachers
+
 ## API Reference
 
 See [documentation/api-reference.md](../documentation/api-reference.md) for the backend API this frontend consumes.
