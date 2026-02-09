@@ -44,6 +44,31 @@ Coverage enforcement:
 - Every documented endpoint in `documentation/api-reference.md` must have a `# @covers METHOD /path` entry in the suite.
 - The runner fails before execution if documented route coverage is below 100% (except explicit entries in `coverage.ignoreDocumentedRoutes`).
 
+## One-Command Backend Verification
+
+This runner does a complete local verification pass in one command:
+- runs a preflight `dotnet clean` + `dotnet build`,
+- stops stale API processes,
+- recreates the database from migrations,
+- runs the full `httpyac` contract suite,
+- runs backend unit and integration tests,
+- writes a structured log file.
+
+Run:
+
+```powershell
+pwsh ./tools/api-contract-tester/run-backend-verification.ps1
+```
+
+Optional:
+
+```powershell
+pwsh ./tools/api-contract-tester/run-backend-verification.ps1 -SkipPreflight
+```
+
+Structured log:
+- `tools/api-contract-tester/logs/backend-verification-log-<runId>.json`
+
 ### Optional flags
 
 ```powershell
