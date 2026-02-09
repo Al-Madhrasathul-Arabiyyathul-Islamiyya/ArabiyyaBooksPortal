@@ -1,8 +1,10 @@
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path === '/login') return
 
-  const token = useCookie('bp_access_token')
-  if (!token.value) {
+  const authStore = useAuthStore()
+  await authStore.initialize()
+
+  if (!authStore.isAuthenticated) {
     return navigateTo('/login')
   }
 })

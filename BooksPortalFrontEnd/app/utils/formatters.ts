@@ -29,8 +29,8 @@ export const movementTypeLabels: Record<number, string> = {
 
 export const teacherIssueStatusLabels: Record<number, string> = {
   [TeacherIssueStatusValue.Active]: 'Active',
-  [TeacherIssueStatusValue.PartiallyReturned]: 'Partially Returned',
-  [TeacherIssueStatusValue.FullyReturned]: 'Fully Returned',
+  [TeacherIssueStatusValue.Partial]: 'Partially Returned',
+  [TeacherIssueStatusValue.Returned]: 'Fully Returned',
   [TeacherIssueStatusValue.Overdue]: 'Overdue',
 }
 
@@ -53,8 +53,8 @@ export const conditionSeverity: Record<number, string> = {
 // Teacher issue status severity
 export const teacherIssueStatusSeverity: Record<number, string> = {
   [TeacherIssueStatusValue.Active]: 'info',
-  [TeacherIssueStatusValue.PartiallyReturned]: 'warn',
-  [TeacherIssueStatusValue.FullyReturned]: 'success',
+  [TeacherIssueStatusValue.Partial]: 'warn',
+  [TeacherIssueStatusValue.Returned]: 'success',
   [TeacherIssueStatusValue.Overdue]: 'danger',
 }
 

@@ -1,127 +1,61 @@
 import type { ApiResponse } from '~/types/api'
-import { API } from '~/utils/constants'
 
-const TOKEN_COOKIE = 'bp_access_token'
-const REFRESH_COOKIE = 'bp_refresh_token'
-const EXPIRY_COOKIE = 'bp_token_expiry'
+type ApiMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+type QueryValue = string | number | boolean | null | undefined
+type QueryParams = Record<string, QueryValue>
+type JsonBody = Record<string, unknown>
+type ApiBody = BodyInit | JsonBody | null
 
-interface ApiOptions extends Record<string, unknown> {
-  headers?: Record<string, string>
+interface ApiOptions {
+  method?: ApiMethod
+  body?: ApiBody
+  query?: QueryParams
+  headers?: HeadersInit
 }
 
 export function useApi() {
-  const config = useRuntimeConfig()
-  const baseURL = config.public.apiBase as string
-
-  const accessToken = useCookie(TOKEN_COOKIE, { maxAge: 60 * 60 * 24 * 7 })
-  const refreshToken = useCookie(REFRESH_COOKIE, { maxAge: 60 * 60 * 24 * 30 })
-  const tokenExpiry = useCookie(EXPIRY_COOKIE, { maxAge: 60 * 60 * 24 * 7 })
-
-  function getAccessToken(): string | null {
-    return accessToken.value ?? null
-  }
-
-  function setTokens(access: string, refresh: string, expiresAt: string) {
-    accessToken.value = access
-    refreshToken.value = refresh
-    tokenExpiry.value = expiresAt
-  }
-
-  function clearTokens() {
-    accessToken.value = null
-    refreshToken.value = null
-    tokenExpiry.value = null
-  }
-
-  function isTokenExpired(): boolean {
-    if (!tokenExpiry.value) return true
-    return new Date(tokenExpiry.value) <= new Date()
-  }
-
-  async function refreshAccessToken(): Promise<boolean> {
-    const access = accessToken.value
-    const refresh = refreshToken.value
-    if (!access || !refresh) return false
-
-    try {
-      const response = await $fetch<ApiResponse<{ accessToken: string; refreshToken: string; expiresAt: string }>>(
-        `${baseURL}${API.auth.refresh}`,
-        {
-          method: 'POST',
-          body: { accessToken: access, refreshToken: refresh },
-        },
-      )
-
-      if (response.success) {
-        setTokens(response.data.accessToken, response.data.refreshToken, response.data.expiresAt)
-        return true
-      }
-      return false
-    }
-    catch {
-      clearTokens()
-      return false
-    }
-  }
+  const baseURL = '/api/bff'
+  const { $csrfFetch } = useNuxtApp()
+  const csrfFetch = $csrfFetch ?? $fetch
 
   async function apiFetch<T>(
     url: string,
-    options: ApiOptions & { method?: string; body?: unknown; query?: Record<string, unknown> } = {},
+    options: ApiOptions = {},
   ): Promise<ApiResponse<T>> {
-    // Try refreshing if token is expired
-    if (isTokenExpired() && refreshToken.value) {
-      const refreshed = await refreshAccessToken()
-      if (!refreshed) {
-        clearTokens()
-        navigateTo('/login')
-        throw new Error('Session expired')
-      }
-    }
-
-    const token = accessToken.value
-    const headers: Record<string, string> = {
-      ...options.headers,
-    }
-    if (token) {
-      headers.Authorization = `Bearer ${token}`
-    }
-
     try {
-      return await $fetch<ApiResponse<T>>(`${baseURL}${url}`, {
+      return await csrfFetch<ApiResponse<T>>(`${baseURL}${url}`, {
         ...options,
-        headers,
       })
-    }
-    catch (error: unknown) {
-      const fetchError = error as { status?: number; data?: ApiResponse<unknown> }
+    } catch (error: unknown) {
+      const fetchError = error as { status?: number }
 
-      // On 401, try refresh once
-      if (fetchError.status === 401 && refreshToken.value) {
-        const refreshed = await refreshAccessToken()
-        if (refreshed) {
-          headers.Authorization = `Bearer ${accessToken.value}`
-          return await $fetch<ApiResponse<T>>(`${baseURL}${url}`, {
-            ...options,
-            headers,
+      if (fetchError.status === 401) {
+        try {
+          await csrfFetch<ApiResponse<{ expiresAt: string }>>(`${baseURL}/auth/refresh`, {
+            method: 'POST',
           })
+
+          return await csrfFetch<ApiResponse<T>>(`${baseURL}${url}`, {
+            ...options,
+          })
+        } catch {
+          await navigateTo('/login')
         }
-        clearTokens()
-        navigateTo('/login')
       }
 
       throw error
     }
   }
 
-  function get<T>(url: string, query?: Record<string, unknown>) {
+  function get<T>(url: string, query?: QueryParams) {
     return apiFetch<T>(url, { method: 'GET', query })
   }
 
-  function post<T>(url: string, body?: unknown) {
+  function post<T>(url: string, body?: ApiBody) {
     return apiFetch<T>(url, { method: 'POST', body })
   }
 
-  function put<T>(url: string, body?: unknown) {
+  function put<T>(url: string, body?: ApiBody) {
     return apiFetch<T>(url, { method: 'PUT', body })
   }
 
@@ -129,19 +63,21 @@ export function useApi() {
     return apiFetch<T>(url, { method: 'DELETE' })
   }
 
-  async function downloadBlob(url: string, filename: string) {
-    const token = accessToken.value
-    const headers: Record<string, string> = {}
-    if (token) {
-      headers.Authorization = `Bearer ${token}`
-    }
+  async function downloadBlob(url: string, filename: string, openInNewTab = false) {
+    if (!import.meta.client) return
 
-    const blob = await $fetch<Blob>(`${baseURL}${url}`, {
-      headers,
-      responseType: 'blob',
+    const response = await $fetch.raw(`${baseURL}${url}`, { method: 'GET' })
+    const blob = new Blob([response._data as BlobPart], {
+      type: response.headers.get('content-type') ?? 'application/octet-stream',
     })
 
     const objectUrl = URL.createObjectURL(blob)
+    if (openInNewTab) {
+      window.open(objectUrl, '_blank')
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
+      return
+    }
+
     const link = document.createElement('a')
     link.href = objectUrl
     link.download = filename
@@ -156,9 +92,5 @@ export function useApi() {
     del,
     downloadBlob,
     apiFetch,
-    getAccessToken,
-    setTokens,
-    clearTokens,
-    isTokenExpired,
   }
 }

@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     '@nuxt/hints',
     '@nuxt/image',
     '@nuxtjs/color-mode',
+    'nuxt-csurf',
     '@primevue/nuxt-module',
     '@pinia/nuxt',
     '@pinia/colada-nuxt',
@@ -65,6 +66,16 @@ export default defineNuxtConfig({
     classSuffix: '',
     storage: 'cookie',
     storageKey: 'nuxt-color-mode',
+  },
+
+  csurf: {
+    cookieKey: 'bp_csrf',
+    cookie: {
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: !import.meta.dev,
+    },
+    methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
   },
 
   fonts: {

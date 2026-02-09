@@ -6,31 +6,8 @@ export function usePrint() {
     if (!import.meta.client) return
 
     try {
-      const token = api.getAccessToken()
-      const config = useRuntimeConfig()
-      const baseURL = config.public.apiBase as string
-
-      const blob = await $fetch<Blob>(`${baseURL}${url}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        responseType: 'blob',
-      })
-
-      const objectUrl = URL.createObjectURL(blob)
-
-      if (openInNewTab) {
-        window.open(objectUrl, '_blank')
-        // Clean up after a delay to allow browser to load
-        setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
-      }
-      else {
-        const link = document.createElement('a')
-        link.href = objectUrl
-        link.download = filename
-        link.click()
-        URL.revokeObjectURL(objectUrl)
-      }
-    }
-    catch (error) {
+      await api.downloadBlob(url, filename, openInNewTab)
+    } catch (error) {
       console.error('Failed to fetch PDF:', error)
       toast.showError('Failed to load PDF')
     }

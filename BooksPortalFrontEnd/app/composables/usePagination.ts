@@ -1,7 +1,7 @@
 import { PAGINATION } from '~/utils/constants'
 import type { PaginationParams } from '~/types/api'
 
-export function usePagination(initialPageSize = PAGINATION.defaultPageSize) {
+export function usePagination(initialPageSize: number = PAGINATION.defaultPageSize) {
   const page = ref(1)
   const pageSize = ref(initialPageSize)
   const totalRecords = ref(0)

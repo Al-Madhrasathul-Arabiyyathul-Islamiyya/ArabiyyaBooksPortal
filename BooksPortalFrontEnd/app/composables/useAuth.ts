@@ -5,7 +5,7 @@ export function useAuth() {
 
   const isSuperAdmin = computed(() => authStore.hasRole(ROLES.superAdmin))
   const isAdmin = computed(() => authStore.hasAnyRole(ROLES.superAdmin, ROLES.admin))
-  const isStaff = computed(() => authStore.hasAnyRole(ROLES.superAdmin, ROLES.admin, ROLES.staff))
+  const isStaff = computed(() => authStore.hasAnyRole(ROLES.superAdmin, ROLES.admin, ROLES.user))
 
   return {
     user: computed(() => authStore.user),

@@ -1,4 +1,4 @@
-// API endpoint paths
+// API endpoint paths (relative to /api/bff)
 export const API = {
   auth: {
     login: '/auth/login',
@@ -8,10 +8,10 @@ export const API = {
     changePassword: '/auth/change-password',
   },
   academicYears: {
-    base: '/academic-years',
-    active: '/academic-years/active',
-    activate: (id: number) => `/academic-years/${id}/activate`,
-    byId: (id: number) => `/academic-years/${id}`,
+    base: '/AcademicYears',
+    active: '/AcademicYears/active',
+    activate: (id: number) => `/AcademicYears/${id}/activate`,
+    byId: (id: number) => `/AcademicYears/${id}`,
   },
   keystages: {
     base: '/keystages',
@@ -22,8 +22,8 @@ export const API = {
     byId: (id: number) => `/subjects/${id}`,
   },
   classSections: {
-    base: '/class-sections',
-    byId: (id: number) => `/class-sections/${id}`,
+    base: '/ClassSections',
+    byId: (id: number) => `/ClassSections/${id}`,
   },
   students: {
     base: '/students',
@@ -45,13 +45,15 @@ export const API = {
     keystages: '/lookups/keystages',
     subjects: '/lookups/subjects',
     classSections: '/lookups/class-sections',
-    teachers: '/lookups/teachers',
-    parents: '/lookups/parents',
+    terms: '/lookups/terms',
+    bookConditions: '/lookups/book-conditions',
+    movementTypes: '/lookups/movement-types',
   },
   books: {
     base: '/books',
     byId: (id: number) => `/books/${id}`,
-    stock: (id: number) => `/books/${id}/stock`,
+    search: '/books/search',
+    stockEntry: (id: number) => `/books/${id}/stock-entry`,
     adjustStock: (id: number) => `/books/${id}/adjust-stock`,
     stockEntries: (id: number) => `/books/${id}/stock-entries`,
     stockMovements: (id: number) => `/books/${id}/stock-movements`,
@@ -59,23 +61,20 @@ export const API = {
   distributions: {
     base: '/distributions',
     byId: (id: number) => `/distributions/${id}`,
-    cancel: (id: number) => `/distributions/${id}/cancel`,
+    byReference: (referenceNo: string) => `/distributions/by-reference/${referenceNo}`,
     print: (id: number) => `/distributions/${id}/print`,
   },
   returns: {
     base: '/returns',
     byId: (id: number) => `/returns/${id}`,
-    cancel: (id: number) => `/returns/${id}/cancel`,
+    byReference: (referenceNo: string) => `/returns/by-reference/${referenceNo}`,
     print: (id: number) => `/returns/${id}/print`,
   },
   teacherIssues: {
-    base: '/teacher-issues',
-    byId: (id: number) => `/teacher-issues/${id}`,
-    return: (id: number) => `/teacher-issues/${id}/return`,
-    cancel: (id: number) => `/teacher-issues/${id}/cancel`,
-    print: (id: number) => `/teacher-issues/${id}/print`,
-    printReturn: (id: number, returnId: number) =>
-      `/teacher-issues/${id}/returns/${returnId}/print`,
+    base: '/TeacherIssues',
+    byId: (id: number) => `/TeacherIssues/${id}`,
+    return: (id: number) => `/TeacherIssues/${id}/return`,
+    print: (id: number) => `/TeacherIssues/${id}/print`,
   },
   reports: {
     stockSummary: '/reports/stock-summary',
@@ -90,18 +89,19 @@ export const API = {
     base: '/users',
     byId: (id: number) => `/users/${id}`,
     roles: (id: number) => `/users/${id}/roles`,
+    toggleActive: (id: number) => `/users/${id}/toggle-active`,
   },
   referenceNumberFormats: {
-    base: '/reference-number-formats',
-    byId: (id: number) => `/reference-number-formats/${id}`,
+    base: '/ReferenceNumberFormats',
+    byId: (id: number) => `/ReferenceNumberFormats/${id}`,
   },
   slipTemplateSettings: {
-    base: '/slip-template-settings',
-    byId: (id: number) => `/slip-template-settings/${id}`,
-    reset: '/slip-template-settings/reset',
+    base: '/SlipTemplateSettings',
+    byId: (id: number) => `/SlipTemplateSettings/${id}`,
+    reset: '/SlipTemplateSettings/reset',
   },
   auditLogs: {
-    base: '/audit-logs',
+    base: '/AuditLogs',
   },
 } as const
 
@@ -115,6 +115,6 @@ export const PAGINATION = {
 export const ROLES = {
   superAdmin: 'SuperAdmin',
   admin: 'Admin',
-  staff: 'Staff',
+  user: 'User',
 } as const
 

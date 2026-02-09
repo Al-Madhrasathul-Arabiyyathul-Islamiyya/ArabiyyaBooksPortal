@@ -4,6 +4,7 @@ import { API } from '~/utils/constants'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<UserProfile | null>(null)
+  const initialized = ref(false)
   const isAuthenticated = computed(() => !!user.value)
   const roles = computed(() => user.value?.roles ?? [])
 
@@ -17,13 +18,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(credentials: LoginRequest) {
     const api = useApi()
-    const response = await api.post<{ accessToken: string; refreshToken: string; expiresAt: string }>(
+    const response = await api.post<{ expiresAt: string }>(
       API.auth.login,
       credentials,
     )
 
     if (response.success) {
-      api.setTokens(response.data.accessToken, response.data.refreshToken, response.data.expiresAt)
       await fetchProfile()
     }
 
@@ -36,10 +36,13 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.get<UserProfile>(API.auth.me)
       if (response.success) {
         user.value = response.data
+      } else {
+        user.value = null
       }
-    }
-    catch {
+    } catch {
       user.value = null
+    } finally {
+      initialized.value = true
     }
   }
 
@@ -53,20 +56,19 @@ export const useAuthStore = defineStore('auth', () => {
     }
     finally {
       user.value = null
-      api.clearTokens()
+      initialized.value = true
       navigateTo('/login')
     }
   }
 
   async function initialize() {
-    const api = useApi()
-    if (api.getAccessToken()) {
-      await fetchProfile()
-    }
+    if (initialized.value) return
+    await fetchProfile()
   }
 
   return {
     user,
+    initialized,
     isAuthenticated,
     roles,
     hasRole,

@@ -15,11 +15,12 @@ const route = useRoute()
 const items = computed(() => {
   const pathSegments = route.path.split('/').filter(Boolean)
   const breadcrumbs = [{ label: 'Home', to: '/' }]
+  const breadcrumbMeta = (route.meta.breadcrumb ?? {}) as Record<string, string>
 
   let currentPath = ''
   for (const segment of pathSegments) {
     currentPath += `/${segment}`
-    const label = route.meta.breadcrumb?.[segment] ?? segment.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase())
+    const label = breadcrumbMeta[segment] ?? segment.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase())
     breadcrumbs.push({
       label,
       to: currentPath === route.path ? undefined : currentPath,

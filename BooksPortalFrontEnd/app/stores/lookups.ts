@@ -16,8 +16,9 @@ export const useLookupsStore = defineStore('lookups', () => {
   const keystages = ref<Lookup[]>([])
   const subjects = ref<Lookup[]>([])
   const classSections = ref<Lookup[]>([])
-  const teachers = ref<Lookup[]>([])
-  const parents = ref<Lookup[]>([])
+  const terms = ref<Lookup[]>([])
+  const bookConditions = ref<Lookup[]>([])
+  const movementTypes = ref<Lookup[]>([])
 
   const isLoaded = ref(false)
 
@@ -69,27 +70,39 @@ export const useLookupsStore = defineStore('lookups', () => {
     }
   }
 
-  async function fetchTeachers() {
+  async function fetchTerms() {
     try {
-      const response = await api.get<Lookup[]>(API.lookups.teachers)
+      const response = await api.get<Lookup[]>(API.lookups.terms)
       if (response.success) {
-        teachers.value = response.data
+        terms.value = response.data
       }
     }
     catch (error) {
-      console.error('Failed to fetch teachers lookup:', error)
+      console.error('Failed to fetch terms lookup:', error)
     }
   }
 
-  async function fetchParents() {
+  async function fetchBookConditions() {
     try {
-      const response = await api.get<Lookup[]>(API.lookups.parents)
+      const response = await api.get<Lookup[]>(API.lookups.bookConditions)
       if (response.success) {
-        parents.value = response.data
+        bookConditions.value = response.data
       }
     }
     catch (error) {
-      console.error('Failed to fetch parents lookup:', error)
+      console.error('Failed to fetch book conditions lookup:', error)
+    }
+  }
+
+  async function fetchMovementTypes() {
+    try {
+      const response = await api.get<Lookup[]>(API.lookups.movementTypes)
+      if (response.success) {
+        movementTypes.value = response.data
+      }
+    }
+    catch (error) {
+      console.error('Failed to fetch movement types lookup:', error)
     }
   }
 
@@ -99,8 +112,9 @@ export const useLookupsStore = defineStore('lookups', () => {
       fetchKeystages(),
       fetchSubjects(),
       fetchClassSections(),
-      fetchTeachers(),
-      fetchParents(),
+      fetchTerms(),
+      fetchBookConditions(),
+      fetchMovementTypes(),
     ])
     isLoaded.value = true
   }
@@ -125,16 +139,18 @@ export const useLookupsStore = defineStore('lookups', () => {
     keystages,
     subjects,
     classSections,
-    teachers,
-    parents,
+    terms,
+    bookConditions,
+    movementTypes,
     isLoaded,
     fetchAll,
     fetchAcademicYears,
     fetchKeystages,
     fetchSubjects,
     fetchClassSections,
-    fetchTeachers,
-    fetchParents,
+    fetchTerms,
+    fetchBookConditions,
+    fetchMovementTypes,
     getLookupLabel,
     getEnumLabel,
   }
