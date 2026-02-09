@@ -1,0 +1,21 @@
+{
+  "statusCode": 201,
+  "requestBody": "{\r\n  \"fullName\": \"Teacher 1770659908\",\r\n  \"nationalId\": \"TN1770659908\",\r\n  \"email\": \"teacher1770659908@booksportal.local\",\r\n  \"phone\": \"7222229908\"\r\n}",
+  "capturedAtUtc": "2026-02-09T17:58:28.5440398Z",
+  "body": {
+    "success": true,
+    "data": {
+      "id": 2,
+      "fullName": "Teacher 1770659908",
+      "nationalId": "TN1770659908",
+      "email": "teacher1770659908@booksportal.local",
+      "phone": "7222229908",
+      "assignments": []
+    }
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/teachers",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Teacher 1770659908\",\"nationalId\":\"TN1770659908\",\"email\":\"teacher1770659908@booksportal.local\",\"phone\":\"7222229908\",\"assignments\":[]}}",
+  "method": "POST",
+  "name": "seed-teacher-create"
+}

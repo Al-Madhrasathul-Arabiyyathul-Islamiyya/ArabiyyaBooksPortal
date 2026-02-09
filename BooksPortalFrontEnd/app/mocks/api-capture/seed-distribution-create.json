@@ -1,0 +1,40 @@
+{
+  "statusCode": 201,
+  "requestBody": "{\r\n  \"academicYearId\": 2,\r\n  \"term\": \"Term1\",\r\n  \"studentId\": 2,\r\n  \"parentId\": 2,\r\n  \"notes\": \"Distribution for frontend mock capture\",\r\n  \"items\": [\r\n    {\r\n      \"bookId\": 2,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+  "capturedAtUtc": "2026-02-09T17:58:42.3350811Z",
+  "body": {
+    "success": true,
+    "data": {
+      "id": 2,
+      "referenceNo": "DST4909000001",
+      "academicYearId": 2,
+      "academicYearName": "AY 4909",
+      "term": "Term1",
+      "studentId": 2,
+      "studentName": "Student 1770659908",
+      "studentIndexNo": "IDX1770659908",
+      "studentClassName": "G9908 - A",
+      "studentNationalId": "SN1770659908",
+      "parentId": 2,
+      "parentName": "Parent 1770659908",
+      "issuedById": 1,
+      "issuedAt": "2026-02-09T17:58:28.7247465Z",
+      "notes": "Distribution for frontend mock capture",
+      "pdfFilePath": "D:\\SlipStorage\\Distribution\\AY 4909\\DST4909000001.pdf",
+      "items": [
+        {
+          "id": 2,
+          "bookId": 2,
+          "bookTitle": "Book 1770659908",
+          "bookCode": "BK9908",
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/distributions",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"DST4909000001\",\"academicYearId\":2,\"academicYearName\":\"AY 4909\",\"term\":\"Term1\",\"studentId\":2,\"studentName\":\"Student 1770659908\",\"studentIndexNo\":\"IDX1770659908\",\"studentClassName\":\"G9908 - A\",\"studentNationalId\":\"SN1770659908\",\"parentId\":2,\"parentName\":\"Parent 1770659908\",\"issuedById\":1,\"issuedAt\":\"2026-02-09T17:58:28.7247465Z\",\"notes\":\"Distribution for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\Distribution\\\\AY 4909\\\\DST4909000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770659908\",\"bookCode\":\"BK9908\",\"quantity\":1}]}}",
+  "method": "POST",
+  "name": "seed-distribution-create"
+}

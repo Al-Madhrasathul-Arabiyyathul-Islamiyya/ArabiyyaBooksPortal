@@ -1,0 +1,118 @@
+{
+  "academicYearCreate": {
+    "name": "AY {{runYear}}",
+    "year": "{{runYear:int}}",
+    "startDate": "{{runYear}}-01-01T00:00:00Z",
+    "endDate": "{{runYear}}-12-31T00:00:00Z"
+  },
+  "keystageCreate": {
+    "code": "KS{{runKey}}",
+    "name": "Keystage {{runKey}}",
+    "sortOrder": 50
+  },
+  "subjectCreate": {
+    "code": "SB{{runKey}}",
+    "name": "Subject {{runKey}}"
+  },
+  "classSectionCreate": {
+    "academicYearId": "{{academicYearId:int}}",
+    "keystageId": "{{keystageId:int}}",
+    "grade": "G{{runKey}}",
+    "section": "A"
+  },
+  "parentCreate": {
+    "fullName": "Parent {{runSuffix}}",
+    "nationalId": "PN{{runSuffix}}",
+    "phone": "700000{{runKey}}",
+    "relationship": "Father"
+  },
+  "teacherCreate": {
+    "fullName": "Teacher {{runSuffix}}",
+    "nationalId": "TN{{runSuffix}}",
+    "email": "teacher{{runSuffix}}@booksportal.local",
+    "phone": "722222{{runKey}}"
+  },
+  "teacherAssignmentCreate": {
+    "subjectId": "{{subjectId:int}}",
+    "classSectionId": "{{classSectionId:int}}"
+  },
+  "studentCreate": {
+    "fullName": "Student {{runSuffix}}",
+    "indexNo": "IDX{{runSuffix}}",
+    "nationalId": "SN{{runSuffix}}",
+    "classSectionId": "{{classSectionId:int}}",
+    "parents": [
+      {
+        "parentId": "{{parentId:int}}",
+        "isPrimary": true
+      }
+    ]
+  },
+  "bookCreate": {
+    "isbn": "978-{{runKey}}",
+    "code": "BK{{runKey}}",
+    "title": "Book {{runSuffix}}",
+    "author": "Automation",
+    "edition": "1",
+    "publisher": "BooksPortal",
+    "publishedYear": "{{runYear:int}}",
+    "subjectId": "{{subjectId:int}}",
+    "grade": "G{{runKey}}"
+  },
+  "bookStockEntryCreate": {
+    "academicYearId": "{{academicYearId:int}}",
+    "quantity": 30,
+    "source": "Mock Capture",
+    "notes": "Initial stock for frontend mock capture"
+  },
+  "distributionCreate": {
+    "academicYearId": "{{academicYearId:int}}",
+    "term": "Term1",
+    "studentId": "{{studentId:int}}",
+    "parentId": "{{parentId:int}}",
+    "notes": "Distribution for frontend mock capture",
+    "items": [
+      {
+        "bookId": "{{bookId:int}}",
+        "quantity": 1
+      }
+    ]
+  },
+  "returnCreate": {
+    "academicYearId": "{{academicYearId:int}}",
+    "studentId": "{{studentId:int}}",
+    "returnedById": "{{parentId:int}}",
+    "notes": "Return for frontend mock capture",
+    "items": [
+      {
+        "bookId": "{{bookId:int}}",
+        "quantity": 1,
+        "condition": "Good",
+        "conditionNotes": "Good"
+      }
+    ]
+  },
+  "teacherIssueCreate": {
+    "academicYearId": "{{academicYearId:int}}",
+    "teacherId": "{{teacherId:int}}",
+    "expectedReturnDate": "{{runYear}}-12-31T00:00:00Z",
+    "notes": "Teacher issue for frontend mock capture",
+    "items": [
+      {
+        "bookId": "{{bookId:int}}",
+        "quantity": 1
+      }
+    ]
+  },
+  "userCreate": {
+    "userName": "apitest{{runSuffix}}",
+    "email": "apitest{{runSuffix}}@booksportal.local",
+    "password": "{{tempUserPassword}}",
+    "fullName": "API Test {{runSuffix}}",
+    "nationalId": "UN{{runSuffix}}",
+    "designation": "Automation",
+    "roles": [
+      "User"
+    ]
+  }
+}

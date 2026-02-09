@@ -1,0 +1,53 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.6595186Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 1,
+        "userName": "admin",
+        "email": "admin@booksportal.local",
+        "fullName": "System Administrator",
+        "isActive": true,
+        "roles": [
+          "SuperAdmin"
+        ],
+        "createdAt": "2026-02-09T17:57:19.5929385"
+      },
+      {
+        "id": 2,
+        "userName": "apitest1770659841",
+        "email": "apitest1770659841@booksportal.local",
+        "fullName": "API Test 1770659841 Updated",
+        "nationalId": "UN1770659841",
+        "designation": "Automation Updated",
+        "isActive": true,
+        "roles": [
+          "Admin",
+          "User"
+        ],
+        "createdAt": "2026-02-09T17:58:26.1973669"
+      },
+      {
+        "id": 3,
+        "userName": "apitest1770659908",
+        "email": "apitest1770659908@booksportal.local",
+        "fullName": "API Test 1770659908",
+        "nationalId": "UN1770659908",
+        "designation": "Automation",
+        "isActive": true,
+        "roles": [
+          "User"
+        ],
+        "createdAt": "2026-02-09T17:59:10.432683"
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/users",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"userName\":\"admin\",\"email\":\"admin@booksportal.local\",\"fullName\":\"System Administrator\",\"isActive\":true,\"roles\":[\"SuperAdmin\"],\"createdAt\":\"2026-02-09T17:57:19.5929385\"},{\"id\":2,\"userName\":\"apitest1770659841\",\"email\":\"apitest1770659841@booksportal.local\",\"fullName\":\"API Test 1770659841 Updated\",\"nationalId\":\"UN1770659841\",\"designation\":\"Automation Updated\",\"isActive\":true,\"roles\":[\"Admin\",\"User\"],\"createdAt\":\"2026-02-09T17:58:26.1973669\"},{\"id\":3,\"userName\":\"apitest1770659908\",\"email\":\"apitest1770659908@booksportal.local\",\"fullName\":\"API Test 1770659908\",\"nationalId\":\"UN1770659908\",\"designation\":\"Automation\",\"isActive\":true,\"roles\":[\"User\"],\"createdAt\":\"2026-02-09T17:59:10.432683\"}]}",
+  "method": "GET",
+  "name": "users-list"
+}

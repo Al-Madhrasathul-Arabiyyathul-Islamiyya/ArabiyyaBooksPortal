@@ -1,0 +1,330 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.9220549Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 46,
+        "category": "Common",
+        "key": "SchoolName",
+        "value": "އަލް މަދްރަސަތުލް ޢަރަބިއްޔަތުލް އިސްލާމިއްޔާ",
+        "sortOrder": 0
+      },
+      {
+        "id": 47,
+        "category": "Common",
+        "key": "SchoolSubtitle",
+        "value": "މާލެ",
+        "sortOrder": 1
+      },
+      {
+        "id": 48,
+        "category": "Common",
+        "key": "LabelName",
+        "value": "ނަން:",
+        "sortOrder": 2
+      },
+      {
+        "id": 49,
+        "category": "Common",
+        "key": "LabelIdCard",
+        "value": "އައިޑީ ކާޑު:",
+        "sortOrder": 3
+      },
+      {
+        "id": 50,
+        "category": "Common",
+        "key": "LabelPhone",
+        "value": "ފޯން:",
+        "sortOrder": 4
+      },
+      {
+        "id": 51,
+        "category": "Common",
+        "key": "LabelSignature",
+        "value": "ސޮއި:",
+        "sortOrder": 5
+      },
+      {
+        "id": 52,
+        "category": "Common",
+        "key": "LabelDate",
+        "value": "ތާރީހު:",
+        "sortOrder": 6
+      },
+      {
+        "id": 53,
+        "category": "Common",
+        "key": "LabelTime",
+        "value": "ގަޑި:",
+        "sortOrder": 7
+      },
+      {
+        "id": 54,
+        "category": "Common",
+        "key": "LabelRefNo",
+        "value": "Ref No:",
+        "sortOrder": 8
+      },
+      {
+        "id": 55,
+        "category": "Common",
+        "key": "LabelClass",
+        "value": "ކުލާސް:",
+        "sortOrder": 9
+      },
+      {
+        "id": 56,
+        "category": "Common",
+        "key": "LabelIndex",
+        "value": "އިންޑެކްސް:",
+        "sortOrder": 10
+      },
+      {
+        "id": 57,
+        "category": "Common",
+        "key": "LabelId",
+        "value": "އައިޑީ:",
+        "sortOrder": 11
+      },
+      {
+        "id": 58,
+        "category": "Common",
+        "key": "LabelPosition",
+        "value": "މަގާމު:",
+        "sortOrder": 12
+      },
+      {
+        "id": 59,
+        "category": "Distribution",
+        "key": "Title",
+        "value": "ފޮތް ދޫކުރާ ސުލިޕް",
+        "sortOrder": 0
+      },
+      {
+        "id": 60,
+        "category": "Distribution",
+        "key": "StudentInfoTitle",
+        "value": "ދަރިވަރުގެ މައުލޫމާތު",
+        "sortOrder": 1
+      },
+      {
+        "id": 61,
+        "category": "Distribution",
+        "key": "ColBookTitle",
+        "value": "ނަން",
+        "sortOrder": 2
+      },
+      {
+        "id": 62,
+        "category": "Distribution",
+        "key": "ColSubjectCode",
+        "value": "މާއްދާ ކޯޑް",
+        "sortOrder": 3
+      },
+      {
+        "id": 63,
+        "category": "Distribution",
+        "key": "ColAcademicYear",
+        "value": "އަހަރު",
+        "sortOrder": 4
+      },
+      {
+        "id": 64,
+        "category": "Distribution",
+        "key": "ColPublisher",
+        "value": "ޕަބްލިޝަރ",
+        "sortOrder": 5
+      },
+      {
+        "id": 65,
+        "category": "Distribution",
+        "key": "ColTerm",
+        "value": "ޓާރމް",
+        "sortOrder": 6
+      },
+      {
+        "id": 66,
+        "category": "Distribution",
+        "key": "SignatureReceiver",
+        "value": "ހަވާލުވި ފަރާތް",
+        "sortOrder": 7
+      },
+      {
+        "id": 67,
+        "category": "Distribution",
+        "key": "SignatureStaff",
+        "value": "ހަވާލުކުރި މުވައްޒަފު",
+        "sortOrder": 8
+      },
+      {
+        "id": 68,
+        "category": "Return",
+        "key": "Title",
+        "value": "ދަރިވަރުންގެ ފޮތް ހަވާލުކުރާ ސުލިޕް",
+        "sortOrder": 0
+      },
+      {
+        "id": 69,
+        "category": "Return",
+        "key": "StudentInfoTitle",
+        "value": "ދަރިވަރުގެ މައުލޫމާތު",
+        "sortOrder": 1
+      },
+      {
+        "id": 70,
+        "category": "Return",
+        "key": "ColBookTitle",
+        "value": "ނަން",
+        "sortOrder": 2
+      },
+      {
+        "id": 71,
+        "category": "Return",
+        "key": "ColSubjectCode",
+        "value": "މާއްދާ ކޯޑް",
+        "sortOrder": 3
+      },
+      {
+        "id": 72,
+        "category": "Return",
+        "key": "ColAcademicYear",
+        "value": "އަހަރު",
+        "sortOrder": 4
+      },
+      {
+        "id": 73,
+        "category": "Return",
+        "key": "ColPublisher",
+        "value": "ޕަބްލިޝަރ",
+        "sortOrder": 5
+      },
+      {
+        "id": 74,
+        "category": "Return",
+        "key": "ColTerm",
+        "value": "ޓާރމް",
+        "sortOrder": 6
+      },
+      {
+        "id": 75,
+        "category": "Return",
+        "key": "SignatureParent",
+        "value": "ހަވާލުކުރި ފަރާތް",
+        "sortOrder": 7
+      },
+      {
+        "id": 76,
+        "category": "Return",
+        "key": "SignatureStaff",
+        "value": "ހަވާލުވި މުވައްޒަފު",
+        "sortOrder": 8
+      },
+      {
+        "id": 77,
+        "category": "TeacherIssue",
+        "key": "Title",
+        "value": "މުދައްރިސުންނަށް ފޮތްދޫކުރާ ސުލިޕް",
+        "sortOrder": 0
+      },
+      {
+        "id": 78,
+        "category": "TeacherIssue",
+        "key": "ColBookTitle",
+        "value": "ނަން",
+        "sortOrder": 1
+      },
+      {
+        "id": 79,
+        "category": "TeacherIssue",
+        "key": "ColSubjectCode",
+        "value": "މާއްދާ ކޯޑް",
+        "sortOrder": 2
+      },
+      {
+        "id": 80,
+        "category": "TeacherIssue",
+        "key": "ColAcademicYear",
+        "value": "އަހަރު",
+        "sortOrder": 3
+      },
+      {
+        "id": 81,
+        "category": "TeacherIssue",
+        "key": "ColPublisher",
+        "value": "ޕަބްލިޝަރ",
+        "sortOrder": 4
+      },
+      {
+        "id": 82,
+        "category": "TeacherIssue",
+        "key": "SignatureTeacher",
+        "value": "ޓީޗަރު",
+        "sortOrder": 5
+      },
+      {
+        "id": 83,
+        "category": "TeacherIssue",
+        "key": "SignatureStaff",
+        "value": "ހަވާލުކުރި މުވައްޒަފު",
+        "sortOrder": 6
+      },
+      {
+        "id": 84,
+        "category": "TeacherReturn",
+        "key": "Title",
+        "value": "ޓީޗަރުން ފޮތް ހަވާލުކުރާ ސުލިޕް",
+        "sortOrder": 0
+      },
+      {
+        "id": 85,
+        "category": "TeacherReturn",
+        "key": "ColBookTitle",
+        "value": "ނަން",
+        "sortOrder": 1
+      },
+      {
+        "id": 86,
+        "category": "TeacherReturn",
+        "key": "ColSubjectCode",
+        "value": "މާއްދާ ކޯޑް",
+        "sortOrder": 2
+      },
+      {
+        "id": 87,
+        "category": "TeacherReturn",
+        "key": "ColAcademicYear",
+        "value": "އަހަރު",
+        "sortOrder": 3
+      },
+      {
+        "id": 88,
+        "category": "TeacherReturn",
+        "key": "ColPublisher",
+        "value": "ޕަބްލިޝަރ",
+        "sortOrder": 4
+      },
+      {
+        "id": 89,
+        "category": "TeacherReturn",
+        "key": "SignatureTeacher",
+        "value": "ޓީޗަރު",
+        "sortOrder": 5
+      },
+      {
+        "id": 90,
+        "category": "TeacherReturn",
+        "key": "SignatureStaff",
+        "value": "ހަވާލުވި މުވައްޒަފު",
+        "sortOrder": 6
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/SlipTemplateSettings",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":46,\"category\":\"Common\",\"key\":\"SchoolName\",\"value\":\"އަލް މަދްރަސަތުލް ޢަރަބިއްޔަތުލް އިސްލާމިއްޔާ\",\"sortOrder\":0},{\"id\":47,\"category\":\"Common\",\"key\":\"SchoolSubtitle\",\"value\":\"މާލެ\",\"sortOrder\":1},{\"id\":48,\"category\":\"Common\",\"key\":\"LabelName\",\"value\":\"ނަން:\",\"sortOrder\":2},{\"id\":49,\"category\":\"Common\",\"key\":\"LabelIdCard\",\"value\":\"އައިޑީ ކާޑު:\",\"sortOrder\":3},{\"id\":50,\"category\":\"Common\",\"key\":\"LabelPhone\",\"value\":\"ފޯން:\",\"sortOrder\":4},{\"id\":51,\"category\":\"Common\",\"key\":\"LabelSignature\",\"value\":\"ސޮއި:\",\"sortOrder\":5},{\"id\":52,\"category\":\"Common\",\"key\":\"LabelDate\",\"value\":\"ތާރީހު:\",\"sortOrder\":6},{\"id\":53,\"category\":\"Common\",\"key\":\"LabelTime\",\"value\":\"ގަޑި:\",\"sortOrder\":7},{\"id\":54,\"category\":\"Common\",\"key\":\"LabelRefNo\",\"value\":\"Ref No:\",\"sortOrder\":8},{\"id\":55,\"category\":\"Common\",\"key\":\"LabelClass\",\"value\":\"ކުލާސް:\",\"sortOrder\":9},{\"id\":56,\"category\":\"Common\",\"key\":\"LabelIndex\",\"value\":\"އިންޑެކްސް:\",\"sortOrder\":10},{\"id\":57,\"category\":\"Common\",\"key\":\"LabelId\",\"value\":\"އައިޑީ:\",\"sortOrder\":11},{\"id\":58,\"category\":\"Common\",\"key\":\"LabelPosition\",\"value\":\"މަގާމު:\",\"sortOrder\":12},{\"id\":59,\"category\":\"Distribution\",\"key\":\"Title\",\"value\":\"ފޮތް ދޫކުރާ ސުލިޕް\",\"sortOrder\":0},{\"id\":60,\"category\":\"Distribution\",\"key\":\"StudentInfoTitle\",\"value\":\"ދަރިވަރުގެ މައުލޫމާތު\",\"sortOrder\":1},{\"id\":61,\"category\":\"Distribution\",\"key\":\"ColBookTitle\",\"value\":\"ނަން\",\"sortOrder\":2},{\"id\":62,\"category\":\"Distribution\",\"key\":\"ColSubjectCode\",\"value\":\"މާއްދާ ކޯޑް\",\"sortOrder\":3},{\"id\":63,\"category\":\"Distribution\",\"key\":\"ColAcademicYear\",\"value\":\"އަހަރު\",\"sortOrder\":4},{\"id\":64,\"category\":\"Distribution\",\"key\":\"ColPublisher\",\"value\":\"ޕަބްލިޝަރ\",\"sortOrder\":5},{\"id\":65,\"category\":\"Distribution\",\"key\":\"ColTerm\",\"value\":\"ޓާރމް\",\"sortOrder\":6},{\"id\":66,\"category\":\"Distribution\",\"key\":\"SignatureReceiver\",\"value\":\"ހަވާލުވި ފަރާތް\",\"sortOrder\":7},{\"id\":67,\"category\":\"Distribution\",\"key\":\"SignatureStaff\",\"value\":\"ހަވާލުކުރި މުވައްޒަފު\",\"sortOrder\":8},{\"id\":68,\"category\":\"Return\",\"key\":\"Title\",\"value\":\"ދަރިވަރުންގެ ފޮތް ހަވާލުކުރާ ސުލިޕް\",\"sortOrder\":0},{\"id\":69,\"category\":\"Return\",\"key\":\"StudentInfoTitle\",\"value\":\"ދަރިވަރުގެ މައުލޫމާތު\",\"sortOrder\":1},{\"id\":70,\"category\":\"Return\",\"key\":\"ColBookTitle\",\"value\":\"ނަން\",\"sortOrder\":2},{\"id\":71,\"category\":\"Return\",\"key\":\"ColSubjectCode\",\"value\":\"މާއްދާ ކޯޑް\",\"sortOrder\":3},{\"id\":72,\"category\":\"Return\",\"key\":\"ColAcademicYear\",\"value\":\"އަހަރު\",\"sortOrder\":4},{\"id\":73,\"category\":\"Return\",\"key\":\"ColPublisher\",\"value\":\"ޕަބްލިޝަރ\",\"sortOrder\":5},{\"id\":74,\"category\":\"Return\",\"key\":\"ColTerm\",\"value\":\"ޓާރމް\",\"sortOrder\":6},{\"id\":75,\"category\":\"Return\",\"key\":\"SignatureParent\",\"value\":\"ހަވާލުކުރި ފަރާތް\",\"sortOrder\":7},{\"id\":76,\"category\":\"Return\",\"key\":\"SignatureStaff\",\"value\":\"ހަވާލުވި މުވައްޒަފު\",\"sortOrder\":8},{\"id\":77,\"category\":\"TeacherIssue\",\"key\":\"Title\",\"value\":\"މުދައްރިސުންނަށް ފޮތްދޫކުރާ ސުލިޕް\",\"sortOrder\":0},{\"id\":78,\"category\":\"TeacherIssue\",\"key\":\"ColBookTitle\",\"value\":\"ނަން\",\"sortOrder\":1},{\"id\":79,\"category\":\"TeacherIssue\",\"key\":\"ColSubjectCode\",\"value\":\"މާއްދާ ކޯޑް\",\"sortOrder\":2},{\"id\":80,\"category\":\"TeacherIssue\",\"key\":\"ColAcademicYear\",\"value\":\"އަހަރު\",\"sortOrder\":3},{\"id\":81,\"category\":\"TeacherIssue\",\"key\":\"ColPublisher\",\"value\":\"ޕަބްލިޝަރ\",\"sortOrder\":4},{\"id\":82,\"category\":\"TeacherIssue\",\"key\":\"SignatureTeacher\",\"value\":\"ޓީޗަރު\",\"sortOrder\":5},{\"id\":83,\"category\":\"TeacherIssue\",\"key\":\"SignatureStaff\",\"value\":\"ހަވާލުކުރި މުވައްޒަފު\",\"sortOrder\":6},{\"id\":84,\"category\":\"TeacherReturn\",\"key\":\"Title\",\"value\":\"ޓީޗަރުން ފޮތް ހަވާލުކުރާ ސުލިޕް\",\"sortOrder\":0},{\"id\":85,\"category\":\"TeacherReturn\",\"key\":\"ColBookTitle\",\"value\":\"ނަން\",\"sortOrder\":1},{\"id\":86,\"category\":\"TeacherReturn\",\"key\":\"ColSubjectCode\",\"value\":\"މާއްދާ ކޯޑް\",\"sortOrder\":2},{\"id\":87,\"category\":\"TeacherReturn\",\"key\":\"ColAcademicYear\",\"value\":\"އަހަރު\",\"sortOrder\":3},{\"id\":88,\"category\":\"TeacherReturn\",\"key\":\"ColPublisher\",\"value\":\"ޕަބްލިޝަރ\",\"sortOrder\":4},{\"id\":89,\"category\":\"TeacherReturn\",\"key\":\"SignatureTeacher\",\"value\":\"ޓީޗަރު\",\"sortOrder\":5},{\"id\":90,\"category\":\"TeacherReturn\",\"key\":\"SignatureStaff\",\"value\":\"ހަވާލުވި މުވައްޒަފު\",\"sortOrder\":6}]}",
+  "method": "GET",
+  "name": "slip-template-settings-list"
+}

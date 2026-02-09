@@ -1,0 +1,23 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.6732032Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 2,
+        "name": "AY 4909"
+      },
+      {
+        "id": 1,
+        "name": "AY 4842 Updated"
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/lookups/academic-years",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"AY 4909\"},{\"id\":1,\"name\":\"AY 4842 Updated\"}]}",
+  "method": "GET",
+  "name": "lookups-academic-years"
+}

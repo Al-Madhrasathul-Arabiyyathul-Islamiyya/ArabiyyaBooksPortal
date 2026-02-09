@@ -1,0 +1,14 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.9100124Z",
+  "body": {
+    "success": true,
+    "data": []
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/ReferenceNumberFormats?slipType=Distribution&academicYearId=2",
+  "rawBody": "{\"success\":true,\"data\":[]}",
+  "method": "GET",
+  "name": "reference-number-formats-list"
+}

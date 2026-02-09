@@ -1,0 +1,369 @@
+{
+  "runId": "bc855e13-a7be-468b-8b4f-0f221bcd3856",
+  "startedAtUtc": "2026-02-09T17:56:47.7882563Z",
+  "finishedAtUtc": "2026-02-09T17:59:11.7209942Z",
+  "source": {
+    "baseUrl": "http://localhost:5071",
+    "httpyacLog": "D:\\Stuff\\Arabiyya\\2026\\BookPortal\\BookPortal\\tools\\api-contract-tester\\logs\\httpyac-contract-log-35695585-abfe-415b-8bd3-4743fcdac509.json",
+    "runSuffix": "1770659908",
+    "runKey": "9908",
+    "runYear": 4909
+  },
+  "entities": {
+    "academicYearId": 2,
+    "keystageId": 2,
+    "subjectId": 2,
+    "classSectionId": 2,
+    "parentId": 2,
+    "teacherId": 2,
+    "studentId": 2,
+    "bookId": 2,
+    "distributionId": 2,
+    "returnId": 2,
+    "teacherIssueId": 2,
+    "tempUserId": 3
+  },
+  "summary": {
+    "totalCaptures": 56,
+    "successLike": 53,
+    "errorLike": 3
+  },
+  "files": [
+    {
+      "name": "auth-login-admin",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\auth-login-admin.json"
+    },
+    {
+      "name": "seed-academic-year-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-academic-year-create.json"
+    },
+    {
+      "name": "seed-keystage-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-keystage-create.json"
+    },
+    {
+      "name": "seed-subject-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-subject-create.json"
+    },
+    {
+      "name": "seed-class-section-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-class-section-create.json"
+    },
+    {
+      "name": "seed-parent-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-parent-create.json"
+    },
+    {
+      "name": "seed-teacher-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-teacher-create.json"
+    },
+    {
+      "name": "seed-teacher-assignment-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-teacher-assignment-create.json"
+    },
+    {
+      "name": "seed-student-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-student-create.json"
+    },
+    {
+      "name": "seed-book-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-book-create.json"
+    },
+    {
+      "name": "seed-book-stock-entry",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-book-stock-entry.json"
+    },
+    {
+      "name": "seed-distribution-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-distribution-create.json"
+    },
+    {
+      "name": "seed-return-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-return-create.json"
+    },
+    {
+      "name": "seed-teacher-issue-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-teacher-issue-create.json"
+    },
+    {
+      "name": "seed-user-create",
+      "statusCode": 201,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-user-create.json"
+    },
+    {
+      "name": "academic-years-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\academic-years-list.json"
+    },
+    {
+      "name": "keystages-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\keystages-list.json"
+    },
+    {
+      "name": "subjects-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\subjects-list.json"
+    },
+    {
+      "name": "class-sections-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\class-sections-list.json"
+    },
+    {
+      "name": "parents-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\parents-list.json"
+    },
+    {
+      "name": "teachers-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\teachers-list.json"
+    },
+    {
+      "name": "students-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\students-list.json"
+    },
+    {
+      "name": "books-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\books-list.json"
+    },
+    {
+      "name": "distributions-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\distributions-list.json"
+    },
+    {
+      "name": "returns-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\returns-list.json"
+    },
+    {
+      "name": "teacher-issues-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\teacher-issues-list.json"
+    },
+    {
+      "name": "users-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\users-list.json"
+    },
+    {
+      "name": "auth-me",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\auth-me.json"
+    },
+    {
+      "name": "lookups-academic-years",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-academic-years.json"
+    },
+    {
+      "name": "lookups-keystages",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-keystages.json"
+    },
+    {
+      "name": "lookups-subjects",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-subjects.json"
+    },
+    {
+      "name": "lookups-class-sections",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-class-sections.json"
+    },
+    {
+      "name": "lookups-terms",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-terms.json"
+    },
+    {
+      "name": "lookups-book-conditions",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-book-conditions.json"
+    },
+    {
+      "name": "lookups-movement-types",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-movement-types.json"
+    },
+    {
+      "name": "students-get-by-id",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\students-get-by-id.json"
+    },
+    {
+      "name": "books-get-by-id",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\books-get-by-id.json"
+    },
+    {
+      "name": "books-search",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\books-search.json"
+    },
+    {
+      "name": "books-stock-entries",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\books-stock-entries.json"
+    },
+    {
+      "name": "books-stock-movements",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\books-stock-movements.json"
+    },
+    {
+      "name": "distributions-get-by-id",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\distributions-get-by-id.json"
+    },
+    {
+      "name": "distributions-get-by-reference",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\distributions-get-by-reference.json"
+    },
+    {
+      "name": "returns-get-by-id",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\returns-get-by-id.json"
+    },
+    {
+      "name": "returns-get-by-reference",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\returns-get-by-reference.json"
+    },
+    {
+      "name": "teacher-issues-get-by-id",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\teacher-issues-get-by-id.json"
+    },
+    {
+      "name": "reference-number-formats-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\reference-number-formats-list.json"
+    },
+    {
+      "name": "slip-template-settings-list",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\slip-template-settings-list.json"
+    },
+    {
+      "name": "reports-stock-summary",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\reports-stock-summary.json"
+    },
+    {
+      "name": "reports-distribution-summary",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\reports-distribution-summary.json"
+    },
+    {
+      "name": "reports-teacher-outstanding",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\reports-teacher-outstanding.json"
+    },
+    {
+      "name": "reports-student-history",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\reports-student-history.json"
+    },
+    {
+      "name": "users-get-by-id",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\users-get-by-id.json"
+    },
+    {
+      "name": "users-roles-update",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\users-roles-update.json"
+    },
+    {
+      "name": "errors-superadmin-toggle-forbidden",
+      "statusCode": 409,
+      "isError": true,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\errors-superadmin-toggle-forbidden.json"
+    },
+    {
+      "name": "errors-parent-delete-referenced",
+      "statusCode": 409,
+      "isError": true,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\errors-parent-delete-referenced.json"
+    },
+    {
+      "name": "errors-academic-year-delete-referenced",
+      "statusCode": 409,
+      "isError": true,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\errors-academic-year-delete-referenced.json"
+    }
+  ]
+}

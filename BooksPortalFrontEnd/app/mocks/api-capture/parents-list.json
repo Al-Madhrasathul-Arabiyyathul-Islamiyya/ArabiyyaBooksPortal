@@ -1,0 +1,30 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.5127005Z",
+  "body": {
+    "success": true,
+    "data": {
+      "items": [
+        {
+          "id": 2,
+          "fullName": "Parent 1770659908",
+          "nationalId": "PN1770659908",
+          "phone": "7000009908",
+          "relationship": "Father"
+        }
+      ],
+      "totalCount": 1,
+      "pageNumber": 1,
+      "pageSize": 20,
+      "totalPages": 1,
+      "hasPrevious": false,
+      "hasNext": false
+    }
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/parents?pageNumber=1&pageSize=20&search=1770659908",
+  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Parent 1770659908\",\"nationalId\":\"PN1770659908\",\"phone\":\"7000009908\",\"relationship\":\"Father\"}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "method": "GET",
+  "name": "parents-list"
+}

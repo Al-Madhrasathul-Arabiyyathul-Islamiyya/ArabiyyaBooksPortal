@@ -1,0 +1,32 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.7472370Z",
+  "body": {
+    "success": true,
+    "data": {
+      "id": 2,
+      "isbn": "978-9908",
+      "code": "BK9908",
+      "title": "Book 1770659908",
+      "author": "Automation",
+      "edition": "1",
+      "publisher": "BooksPortal",
+      "publishedYear": 4909,
+      "subjectId": 2,
+      "subjectName": "Subject 9908",
+      "grade": "G9908",
+      "totalStock": 30,
+      "distributed": 0,
+      "withTeachers": 1,
+      "damaged": 0,
+      "lost": 0,
+      "available": 29
+    }
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/books/2",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-9908\",\"code\":\"BK9908\",\"title\":\"Book 1770659908\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":4909,\"subjectId\":2,\"subjectName\":\"Subject 9908\",\"grade\":\"G9908\",\"totalStock\":30,\"distributed\":0,\"withTeachers\":1,\"damaged\":0,\"lost\":0,\"available\":29}}",
+  "method": "GET",
+  "name": "books-get-by-id"
+}

@@ -90,6 +90,14 @@ When sources conflict, follow this priority order and note the conflict in your 
 - Do not work directly on `feature/module-10-frontend`.
 - Merge completed phase branches back into `feature/module-10-frontend` after build/test pass.
 
+## 8.1) Elevated Command Convention
+
+- In this Codex environment, run `git` commands with elevated sandbox permissions.
+- Run raw `dotnet` CLI commands with elevated sandbox permissions.
+- Prefer dotnet MCP tools when available, but if shelling out to `dotnet`, keep it elevated.
+- Run PowerShell scripts that invoke `dotnet` (build/test/ef/run) with elevated sandbox permissions.
+- Prefer single direct commands over long chained one-liners for `git`/`dotnet` operations to maximize approval reuse.
+
 ## 9) Verification Standard for Frontend Changes
 
 Minimum checks after each task:

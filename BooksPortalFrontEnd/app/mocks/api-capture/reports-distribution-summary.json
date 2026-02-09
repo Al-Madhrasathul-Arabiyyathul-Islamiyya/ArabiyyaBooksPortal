@@ -1,0 +1,24 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.9483530Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "slipId": 2,
+        "referenceNo": "DST4909000001",
+        "studentName": "Student 1770659908",
+        "studentIndexNo": "IDX1770659908",
+        "parentName": "Parent 1770659908",
+        "issuedAt": "2026-02-09T17:58:28.7247465",
+        "totalBooks": 1
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/reports/distribution-summary?academicYearId=2&term=Term1",
+  "rawBody": "{\"success\":true,\"data\":[{\"slipId\":2,\"referenceNo\":\"DST4909000001\",\"studentName\":\"Student 1770659908\",\"studentIndexNo\":\"IDX1770659908\",\"parentName\":\"Parent 1770659908\",\"issuedAt\":\"2026-02-09T17:58:28.7247465\",\"totalBooks\":1}]}",
+  "method": "GET",
+  "name": "reports-distribution-summary"
+}

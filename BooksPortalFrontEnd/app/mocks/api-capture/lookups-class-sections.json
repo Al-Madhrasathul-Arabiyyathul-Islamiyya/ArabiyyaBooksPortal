@@ -1,0 +1,19 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.7046605Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 2,
+        "name": "G9908 A"
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/lookups/class-sections?academicYearId=2",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"G9908 A\"}]}",
+  "method": "GET",
+  "name": "lookups-class-sections"
+}

@@ -1,0 +1,22 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.6661589Z",
+  "body": {
+    "success": true,
+    "data": {
+      "id": 1,
+      "userName": "admin",
+      "email": "admin@booksportal.local",
+      "fullName": "System Administrator",
+      "roles": [
+        "SuperAdmin"
+      ]
+    }
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/auth/me",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":1,\"userName\":\"admin\",\"email\":\"admin@booksportal.local\",\"fullName\":\"System Administrator\",\"roles\":[\"SuperAdmin\"]}}",
+  "method": "GET",
+  "name": "auth-me"
+}

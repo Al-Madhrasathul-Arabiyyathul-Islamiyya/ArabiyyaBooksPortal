@@ -1,0 +1,31 @@
+{
+  "statusCode": 201,
+  "requestBody": "{\r\n  \"fullName\": \"Student 1770659908\",\r\n  \"indexNo\": \"IDX1770659908\",\r\n  \"nationalId\": \"SN1770659908\",\r\n  \"classSectionId\": 2,\r\n  \"parents\": [\r\n    {\r\n      \"parentId\": 2,\r\n      \"isPrimary\": true\r\n    }\r\n  ]\r\n}",
+  "capturedAtUtc": "2026-02-09T17:58:28.6435407Z",
+  "body": {
+    "success": true,
+    "data": {
+      "id": 2,
+      "fullName": "Student 1770659908",
+      "indexNo": "IDX1770659908",
+      "nationalId": "SN1770659908",
+      "classSectionId": 2,
+      "classSectionDisplayName": "G9908 A",
+      "parents": [
+        {
+          "parentId": 2,
+          "fullName": "Parent 1770659908",
+          "nationalId": "PN1770659908",
+          "phone": "7000009908",
+          "relationship": "Father",
+          "isPrimary": true
+        }
+      ]
+    }
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/students",
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770659908\",\"indexNo\":\"IDX1770659908\",\"nationalId\":\"SN1770659908\",\"classSectionId\":2,\"classSectionDisplayName\":\"G9908 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770659908\",\"nationalId\":\"PN1770659908\",\"phone\":\"7000009908\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
+  "method": "POST",
+  "name": "seed-student-create"
+}

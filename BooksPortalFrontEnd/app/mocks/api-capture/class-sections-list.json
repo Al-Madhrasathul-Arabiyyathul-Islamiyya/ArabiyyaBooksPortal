@@ -1,0 +1,26 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.5018568Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 2,
+        "academicYearId": 2,
+        "academicYearName": "AY 4909",
+        "keystageId": 2,
+        "keystageName": "Keystage 9908",
+        "grade": "G9908",
+        "section": "A",
+        "displayName": "G9908 A",
+        "studentCount": 0
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/ClassSections?academicYearId=2",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"academicYearId\":2,\"academicYearName\":\"AY 4909\",\"keystageId\":2,\"keystageName\":\"Keystage 9908\",\"grade\":\"G9908\",\"section\":\"A\",\"displayName\":\"G9908 A\",\"studentCount\":0}]}",
+  "method": "GET",
+  "name": "class-sections-list"
+}

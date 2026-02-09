@@ -69,6 +69,40 @@ pwsh ./tools/api-contract-tester/run-backend-verification.ps1 -SkipPreflight
 Structured log:
 - `tools/api-contract-tester/logs/backend-verification-log-<runId>.json`
 
+## Frontend-Ready Mock Capture
+
+Generates frontend-consumable response snapshots from a real backend run.
+
+What it does:
+- optionally starts the backend,
+- optionally runs the full `httpyac` contract suite to seed deterministic data,
+- captures frontend-critical success payloads and representative business-rule error payloads,
+- writes JSON snapshots and an index file for frontend use.
+
+Run:
+
+```powershell
+pwsh ./tools/api-contract-tester/run-frontend-mock-capture.ps1
+```
+
+Output:
+- `BooksPortalFrontEnd/app/mocks/api-capture/index.json`
+- `BooksPortalFrontEnd/app/mocks/api-capture/*.json`
+
+Useful flags:
+
+```powershell
+pwsh ./tools/api-contract-tester/run-frontend-mock-capture.ps1 -SkipContractSuite
+pwsh ./tools/api-contract-tester/run-frontend-mock-capture.ps1 -SkipStartBackend
+pwsh ./tools/api-contract-tester/run-frontend-mock-capture.ps1 -KeepBackendRunning
+pwsh ./tools/api-contract-tester/run-frontend-mock-capture.ps1 -RestartBackend
+pwsh ./tools/api-contract-tester/run-frontend-mock-capture.ps1 -ForceStopOnExit
+```
+
+Notes:
+- `-RestartBackend` force-kills stale backend processes matching the API project/base URL, then starts a fresh backend for capture and kills it during cleanup.
+- `-ForceStopOnExit` always performs a final stale-backend cleanup pass before script exit.
+
 ### Optional flags
 
 ```powershell

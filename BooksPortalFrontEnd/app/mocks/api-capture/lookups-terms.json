@@ -1,0 +1,27 @@
+{
+  "statusCode": 200,
+  "requestBody": null,
+  "capturedAtUtc": "2026-02-09T17:59:10.7094917Z",
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 1,
+        "name": "Term1"
+      },
+      {
+        "id": 2,
+        "name": "Term2"
+      },
+      {
+        "id": 3,
+        "name": "Both"
+      }
+    ]
+  },
+  "isError": false,
+  "uri": "http://localhost:5071/api/lookups/terms",
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Term1\"},{\"id\":2,\"name\":\"Term2\"},{\"id\":3,\"name\":\"Both\"}]}",
+  "method": "GET",
+  "name": "lookups-terms"
+}
