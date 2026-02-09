@@ -8,3 +8,6 @@
 # Dev server logs
 backend.log
 frontend.log
+
+# API contract tester runtime logs
+tools/api-contract-tester/logs/

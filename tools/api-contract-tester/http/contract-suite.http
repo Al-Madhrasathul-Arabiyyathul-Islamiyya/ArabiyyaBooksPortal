@@ -1,0 +1,1148 @@
+@baseUrl = {{baseUrl}}
+@adminEmail = {{adminEmail}}
+@adminPassword = {{adminPassword}}
+@runSuffix = {{runSuffix}}
+@runKey = {{runKey}}
+@runYear = {{runYear}}
+@tempUserPassword = Pass@12345
+@tempUserPasswordNew = Pass@12346
+
+###
+# @name auth_login_admin
+# @covers POST /api/auth/login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+?? status == 200
+@accessToken={{response.parsedBody.data.accessToken}}
+@refreshToken={{response.parsedBody.data.refreshToken}}
+
+###
+# @name auth_refresh_admin
+# @covers POST /api/auth/refresh
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "accessToken": "{{accessToken}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+?? status == 200
+@accessToken={{response.parsedBody.data.accessToken}}
+@refreshToken={{response.parsedBody.data.refreshToken}}
+
+###
+# @name auth_me_admin
+# @covers GET /api/auth/me
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+?? status == 200
+
+###
+# @name ay_list_before
+# @covers GET /api/AcademicYears
+GET {{baseUrl}}/api/AcademicYears
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ay_create
+# @covers POST /api/AcademicYears
+POST {{baseUrl}}/api/AcademicYears
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "AY {{runYear}}",
+  "year": {{runYear}},
+  "startDate": "{{runYear}}-01-01T00:00:00Z",
+  "endDate": "{{runYear}}-12-31T00:00:00Z"
+}
+
+?? status < 500 && status != 401 && status != 403
+@academicYearId={{response.parsedBody.data.id}}
+
+###
+# @name ay_get_by_id
+# @covers GET /api/AcademicYears/{id}
+GET {{baseUrl}}/api/AcademicYears/{{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ay_update
+# @covers PUT /api/AcademicYears/{id}
+PUT {{baseUrl}}/api/AcademicYears/{{academicYearId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "AY {{runYear}} Updated",
+  "year": {{runYear}},
+  "startDate": "{{runYear}}-01-01T00:00:00Z",
+  "endDate": "{{runYear}}-12-31T00:00:00Z"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ay_activate
+# @covers POST /api/AcademicYears/{id}/activate
+POST {{baseUrl}}/api/AcademicYears/{{academicYearId}}/activate
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ay_get_active
+# @covers GET /api/AcademicYears/active
+GET {{baseUrl}}/api/AcademicYears/active
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ks_create
+# @covers POST /api/keystages
+POST {{baseUrl}}/api/keystages
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "KS{{runKey}}",
+  "name": "Keystage {{runKey}}",
+  "sortOrder": 50
+}
+
+?? status < 500 && status != 401 && status != 403
+@keystageId={{response.parsedBody.data.id}}
+
+###
+# @name ks_list
+# @covers GET /api/keystages
+GET {{baseUrl}}/api/keystages
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ks_get
+# @covers GET /api/keystages/{id}
+GET {{baseUrl}}/api/keystages/{{keystageId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ks_update
+# @covers PUT /api/keystages/{id}
+PUT {{baseUrl}}/api/keystages/{{keystageId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "KT{{runKey}}",
+  "name": "Keystage {{runKey}} Updated",
+  "sortOrder": 60
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name subj_create
+# @covers POST /api/subjects
+POST {{baseUrl}}/api/subjects
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "SB{{runKey}}",
+  "name": "Subject {{runKey}}"
+}
+
+?? status < 500 && status != 401 && status != 403
+@subjectId={{response.parsedBody.data.id}}
+
+###
+# @name subj_list
+# @covers GET /api/subjects
+GET {{baseUrl}}/api/subjects
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name subj_get
+# @covers GET /api/subjects/{id}
+GET {{baseUrl}}/api/subjects/{{subjectId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name subj_update
+# @covers PUT /api/subjects/{id}
+PUT {{baseUrl}}/api/subjects/{{subjectId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "SU{{runKey}}",
+  "name": "Subject {{runKey}} Updated"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name cs_create
+# @covers POST /api/ClassSections
+POST {{baseUrl}}/api/ClassSections
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "keystageId": {{keystageId}},
+  "grade": "G{{runKey}}",
+  "section": "A"
+}
+
+?? status < 500 && status != 401 && status != 403
+@classSectionId={{response.parsedBody.data.id}}
+
+###
+# @name cs_list
+# @covers GET /api/ClassSections
+GET {{baseUrl}}/api/ClassSections?academicYearId={{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name cs_get
+# @covers GET /api/ClassSections/{id}
+GET {{baseUrl}}/api/ClassSections/{{classSectionId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name cs_update
+# @covers PUT /api/ClassSections/{id}
+PUT {{baseUrl}}/api/ClassSections/{{classSectionId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "keystageId": {{keystageId}},
+  "grade": "G{{runKey}}",
+  "section": "B"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name parent_create
+# @covers POST /api/parents
+POST {{baseUrl}}/api/parents
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Parent {{runSuffix}}",
+  "nationalId": "PN{{runSuffix}}",
+  "phone": "700000{{runKey}}",
+  "relationship": "Father"
+}
+
+?? status < 500 && status != 401 && status != 403
+@parentId={{response.parsedBody.data.id}}
+
+###
+# @name parent_list
+# @covers GET /api/parents
+GET {{baseUrl}}/api/parents?pageNumber=1&pageSize=20&search={{runSuffix}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name parent_get
+# @covers GET /api/parents/{id}
+GET {{baseUrl}}/api/parents/{{parentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name parent_update
+# @covers PUT /api/parents/{id}
+PUT {{baseUrl}}/api/parents/{{parentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Parent {{runSuffix}} Updated",
+  "nationalId": "PN{{runSuffix}}",
+  "phone": "711111{{runKey}}",
+  "relationship": "Guardian"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_create
+# @covers POST /api/teachers
+POST {{baseUrl}}/api/teachers
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Teacher {{runSuffix}}",
+  "nationalId": "TN{{runSuffix}}",
+  "email": "teacher{{runSuffix}}@booksportal.local",
+  "phone": "722222{{runKey}}"
+}
+
+?? status < 500 && status != 401 && status != 403
+@teacherId={{response.parsedBody.data.id}}
+
+###
+# @name teacher_list
+# @covers GET /api/teachers
+GET {{baseUrl}}/api/teachers?pageNumber=1&pageSize=20&search={{runSuffix}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_get
+# @covers GET /api/teachers/{id}
+GET {{baseUrl}}/api/teachers/{{teacherId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_update
+# @covers PUT /api/teachers/{id}
+PUT {{baseUrl}}/api/teachers/{{teacherId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Teacher {{runSuffix}} Updated",
+  "nationalId": "TN{{runSuffix}}",
+  "email": "teacher{{runSuffix}}@booksportal.local",
+  "phone": "733333{{runKey}}"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_assignment_add
+# @covers POST /api/teachers/{id}/assignments
+POST {{baseUrl}}/api/teachers/{{teacherId}}/assignments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "subjectId": {{subjectId}},
+  "classSectionId": {{classSectionId}}
+}
+
+?? status < 500 && status != 401 && status != 403
+@teacherAssignmentId={{response.parsedBody.data.id}}
+
+###
+# @name student_create
+# @covers POST /api/students
+POST {{baseUrl}}/api/students
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Student {{runSuffix}}",
+  "indexNo": "IDX{{runSuffix}}",
+  "nationalId": "SN{{runSuffix}}",
+  "classSectionId": {{classSectionId}},
+  "parents": [
+    { "parentId": {{parentId}}, "isPrimary": true }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+@studentId={{response.parsedBody.data.id}}
+
+###
+# @name student_list
+# @covers GET /api/students
+GET {{baseUrl}}/api/students?pageNumber=1&pageSize=20&search={{runSuffix}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name student_get
+# @covers GET /api/students/{id}
+GET {{baseUrl}}/api/students/{{studentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name student_update
+# @covers PUT /api/students/{id}
+PUT {{baseUrl}}/api/students/{{studentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Student {{runSuffix}} Updated",
+  "nationalId": "SN{{runSuffix}}",
+  "classSectionId": {{classSectionId}},
+  "parents": [
+    { "parentId": {{parentId}}, "isPrimary": true }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_ay
+# @covers GET /api/lookups/academic-years
+GET {{baseUrl}}/api/lookups/academic-years
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_keystages
+# @covers GET /api/lookups/keystages
+GET {{baseUrl}}/api/lookups/keystages
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_subjects
+# @covers GET /api/lookups/subjects
+GET {{baseUrl}}/api/lookups/subjects
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_class_sections
+# @covers GET /api/lookups/class-sections
+GET {{baseUrl}}/api/lookups/class-sections?academicYearId={{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_terms
+# @covers GET /api/lookups/terms
+GET {{baseUrl}}/api/lookups/terms
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_book_conditions
+# @covers GET /api/lookups/book-conditions
+GET {{baseUrl}}/api/lookups/book-conditions
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_movement_types
+# @covers GET /api/lookups/movement-types
+GET {{baseUrl}}/api/lookups/movement-types
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_create
+# @covers POST /api/books
+POST {{baseUrl}}/api/books
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "isbn": "978-{{runKey}}",
+  "code": "BK{{runKey}}",
+  "title": "Book {{runSuffix}}",
+  "author": "Automation",
+  "edition": "1",
+  "publisher": "BooksPortal",
+  "publishedYear": {{runYear}},
+  "subjectId": {{subjectId}},
+  "grade": "G{{runKey}}"
+}
+
+?? status < 500 && status != 401 && status != 403
+@bookId={{response.parsedBody.data.id}}
+
+###
+# @name book_list
+# @covers GET /api/books
+GET {{baseUrl}}/api/books?pageNumber=1&pageSize=20&subjectId={{subjectId}}&search={{runKey}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_get
+# @covers GET /api/books/{id}
+GET {{baseUrl}}/api/books/{{bookId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_update
+# @covers PUT /api/books/{id}
+PUT {{baseUrl}}/api/books/{{bookId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "isbn": "978-{{runKey}}",
+  "code": "BU{{runKey}}",
+  "title": "Book {{runSuffix}} Updated",
+  "author": "Automation",
+  "edition": "2",
+  "publisher": "BooksPortal",
+  "publishedYear": {{runYear}},
+  "subjectId": {{subjectId}},
+  "grade": "G{{runKey}}"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_stock_entry
+# @covers POST /api/books/{id}/stock-entry
+POST {{baseUrl}}/api/books/{{bookId}}/stock-entry
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "quantity": 30,
+  "source": "API Contract",
+  "notes": "Initial stock"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_stock_entries
+# @covers GET /api/books/{id}/stock-entries
+GET {{baseUrl}}/api/books/{{bookId}}/stock-entries
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_stock_movements
+# @covers GET /api/books/{id}/stock-movements
+GET {{baseUrl}}/api/books/{{bookId}}/stock-movements
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_adjust_stock
+# @covers POST /api/books/{id}/adjust-stock
+POST {{baseUrl}}/api/books/{{bookId}}/adjust-stock
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "movementType": "Adjustment",
+  "quantity": 2,
+  "notes": "Adjustment test"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_search
+# @covers GET /api/books/search
+GET {{baseUrl}}/api/books/search?q={{runKey}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name distribution_create
+# @covers POST /api/distributions
+POST {{baseUrl}}/api/distributions
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "term": "Term1",
+  "studentId": {{studentId}},
+  "parentId": {{parentId}},
+  "notes": "Distribution from contract suite",
+  "items": [
+    { "bookId": {{bookId}}, "quantity": 1 }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+@distributionId={{response.parsedBody.data.id}}
+@distributionRef={{response.parsedBody.data.referenceNo}}
+
+###
+# @name distribution_list
+# @covers GET /api/distributions
+GET {{baseUrl}}/api/distributions?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}&studentId={{studentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name distribution_get
+# @covers GET /api/distributions/{id}
+GET {{baseUrl}}/api/distributions/{{distributionId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name distribution_get_by_ref
+# @covers GET /api/distributions/by-reference/{referenceNo}
+GET {{baseUrl}}/api/distributions/by-reference/{{distributionRef}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name distribution_print
+# @covers GET /api/distributions/{id}/print
+GET {{baseUrl}}/api/distributions/{{distributionId}}/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name return_create
+# @covers POST /api/returns
+POST {{baseUrl}}/api/returns
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "studentId": {{studentId}},
+  "returnedById": {{parentId}},
+  "notes": "Return from contract suite",
+  "items": [
+    {
+      "bookId": {{bookId}},
+      "quantity": 1,
+      "condition": "Good",
+      "conditionNotes": "Good"
+    }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+@returnId={{response.parsedBody.data.id}}
+@returnRef={{response.parsedBody.data.referenceNo}}
+
+###
+# @name return_list
+# @covers GET /api/returns
+GET {{baseUrl}}/api/returns?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}&studentId={{studentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name return_get
+# @covers GET /api/returns/{id}
+GET {{baseUrl}}/api/returns/{{returnId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name return_get_by_ref
+# @covers GET /api/returns/by-reference/{referenceNo}
+GET {{baseUrl}}/api/returns/by-reference/{{returnRef}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name return_print
+# @covers GET /api/returns/{id}/print
+GET {{baseUrl}}/api/returns/{{returnId}}/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_create
+# @covers POST /api/TeacherIssues
+POST {{baseUrl}}/api/TeacherIssues
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "academicYearId": {{academicYearId}},
+  "teacherId": {{teacherId}},
+  "expectedReturnDate": "{{runYear}}-12-31T00:00:00Z",
+  "notes": "Teacher issue from contract suite",
+  "items": [
+    { "bookId": {{bookId}}, "quantity": 1 }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+@teacherIssueId={{response.parsedBody.data.id}}
+@teacherIssueRef={{response.parsedBody.data.referenceNo}}
+@teacherIssueItemId={{response.parsedBody.data.items[0].id}}
+
+###
+# @name teacher_issue_list
+# @covers GET /api/TeacherIssues
+GET {{baseUrl}}/api/TeacherIssues?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}&teacherId={{teacherId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_get
+# @covers GET /api/TeacherIssues/{id}
+GET {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_return
+# @covers POST /api/TeacherIssues/{id}/return
+POST {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}/return
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "teacherIssueItemId": {{teacherIssueItemId}}, "quantity": 1 }
+  ],
+  "notes": "Teacher return from contract suite"
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_print
+# @covers GET /api/TeacherIssues/{id}/print
+GET {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_stock_summary
+# @covers GET /api/reports/stock-summary
+GET {{baseUrl}}/api/reports/stock-summary?subjectId={{subjectId}}&grade=G{{runKey}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_distribution_summary
+# @covers GET /api/reports/distribution-summary
+GET {{baseUrl}}/api/reports/distribution-summary?academicYearId={{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_teacher_outstanding
+# @covers GET /api/reports/teacher-outstanding
+GET {{baseUrl}}/api/reports/teacher-outstanding?teacherId={{teacherId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_student_history
+# @covers GET /api/reports/student-history/{studentId}
+GET {{baseUrl}}/api/reports/student-history/{{studentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_export_stock_summary
+# @covers GET /api/reports/export/stock-summary
+GET {{baseUrl}}/api/reports/export/stock-summary?subjectId={{subjectId}}&grade=G{{runKey}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_export_distribution_summary
+# @covers GET /api/reports/export/distribution-summary
+GET {{baseUrl}}/api/reports/export/distribution-summary?academicYearId={{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name report_export_teacher_outstanding
+# @covers GET /api/reports/export/teacher-outstanding
+GET {{baseUrl}}/api/reports/export/teacher-outstanding?teacherId={{teacherId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_list
+# @covers GET /api/users
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_create
+# @covers POST /api/users
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "userName": "apitest{{runSuffix}}",
+  "email": "apitest{{runSuffix}}@booksportal.local",
+  "password": "{{tempUserPassword}}",
+  "fullName": "API Test {{runSuffix}}",
+  "nationalId": "UN{{runSuffix}}",
+  "designation": "Automation",
+  "roles": ["User"]
+}
+
+?? status < 500 && status != 401 && status != 403
+@userId={{response.parsedBody.data.id}}
+
+###
+# @name users_get
+# @covers GET /api/users/{id}
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_update
+# @covers PUT /api/users/{id}
+PUT {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "apitest{{runSuffix}}@booksportal.local",
+  "fullName": "API Test {{runSuffix}} Updated",
+  "nationalId": "UN{{runSuffix}}",
+  "designation": "Automation Updated",
+  "isActive": true
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_toggle
+# @covers POST /api/users/{id}/toggle-active
+POST {{baseUrl}}/api/users/{{userId}}/toggle-active
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_toggle_back
+POST {{baseUrl}}/api/users/{{userId}}/toggle-active
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name users_roles
+# @covers PUT /api/users/{id}/roles
+PUT {{baseUrl}}/api/users/{{userId}}/roles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+["User","Admin"]
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ref_formats_create
+# @covers POST /api/ReferenceNumberFormats
+POST {{baseUrl}}/api/ReferenceNumberFormats
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "slipType": "Distribution",
+  "academicYearId": {{academicYearId}},
+  "formatTemplate": "D-YY-SEQ",
+  "paddingWidth": 6
+}
+
+?? status < 500 && status != 401 && status != 403
+@refFormatId={{response.parsedBody.data.id}}
+
+###
+# @name ref_formats_list
+# @covers GET /api/ReferenceNumberFormats
+GET {{baseUrl}}/api/ReferenceNumberFormats?slipType=Distribution&academicYearId={{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ref_formats_get
+# @covers GET /api/ReferenceNumberFormats/{id}
+GET {{baseUrl}}/api/ReferenceNumberFormats/{{refFormatId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ref_formats_update
+# @covers PUT /api/ReferenceNumberFormats/{id}
+PUT {{baseUrl}}/api/ReferenceNumberFormats/{{refFormatId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "slipType": "Distribution",
+  "academicYearId": {{academicYearId}},
+  "formatTemplate": "DX-YY-SEQ",
+  "paddingWidth": 6
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name slip_settings_list
+# @covers GET /api/SlipTemplateSettings
+GET {{baseUrl}}/api/SlipTemplateSettings
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+@slipSettingId={{response.parsedBody.data[0].id}}
+@slipSettingSortOrder={{response.parsedBody.data[0].sortOrder}}
+
+###
+# @name slip_settings_get
+# @covers GET /api/SlipTemplateSettings/{id}
+GET {{baseUrl}}/api/SlipTemplateSettings/{{slipSettingId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name slip_settings_update
+# @covers PUT /api/SlipTemplateSettings/{id}
+PUT {{baseUrl}}/api/SlipTemplateSettings/{{slipSettingId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "value": "Updated by contract suite {{runSuffix}}",
+  "sortOrder": {{slipSettingSortOrder}}
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name slip_settings_reset
+# @covers POST /api/SlipTemplateSettings/reset
+POST {{baseUrl}}/api/SlipTemplateSettings/reset
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name audit_logs
+# @covers GET /api/AuditLogs
+GET {{baseUrl}}/api/AuditLogs?pageNumber=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name auth_login_temp
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "apitest{{runSuffix}}@booksportal.local",
+  "password": "{{tempUserPassword}}"
+}
+
+?? status < 500
+@tempAccessToken={{response.parsedBody.data.accessToken}}
+
+###
+# @name auth_change_password_temp
+# @covers POST /api/auth/change-password
+POST {{baseUrl}}/api/auth/change-password
+Authorization: Bearer {{tempAccessToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "{{tempUserPassword}}",
+  "newPassword": "{{tempUserPasswordNew}}"
+}
+
+?? status < 500
+
+###
+# @name auth_login_temp_new
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "apitest{{runSuffix}}@booksportal.local",
+  "password": "{{tempUserPasswordNew}}"
+}
+
+?? status < 500
+@tempAccessToken={{response.parsedBody.data.accessToken}}
+
+###
+# @name auth_logout_temp
+# @covers POST /api/auth/logout
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{tempAccessToken}}
+
+?? status < 500
+
+###
+# @name teacher_assignment_delete
+# @covers DELETE /api/teachers/{id}/assignments/{assignmentId}
+DELETE {{baseUrl}}/api/teachers/{{teacherId}}/assignments/{{teacherAssignmentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_cancel
+# @covers DELETE /api/TeacherIssues/{id}
+DELETE {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name return_cancel
+# @covers DELETE /api/returns/{id}
+DELETE {{baseUrl}}/api/returns/{{returnId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name distribution_cancel
+# @covers DELETE /api/distributions/{id}
+DELETE {{baseUrl}}/api/distributions/{{distributionId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name book_delete
+# @covers DELETE /api/books/{id}
+DELETE {{baseUrl}}/api/books/{{bookId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ref_formats_delete
+# @covers DELETE /api/ReferenceNumberFormats/{id}
+DELETE {{baseUrl}}/api/ReferenceNumberFormats/{{refFormatId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name student_delete
+# @covers DELETE /api/students/{id}
+DELETE {{baseUrl}}/api/students/{{studentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name parent_delete
+# @covers DELETE /api/parents/{id}
+DELETE {{baseUrl}}/api/parents/{{parentId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_delete
+# @covers DELETE /api/teachers/{id}
+DELETE {{baseUrl}}/api/teachers/{{teacherId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name class_section_delete
+# @covers DELETE /api/ClassSections/{id}
+DELETE {{baseUrl}}/api/ClassSections/{{classSectionId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name subject_delete
+# @covers DELETE /api/subjects/{id}
+DELETE {{baseUrl}}/api/subjects/{{subjectId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name keystage_delete
+# @covers DELETE /api/keystages/{id}
+DELETE {{baseUrl}}/api/keystages/{{keystageId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name ay_delete
+# @covers DELETE /api/AcademicYears/{id}
+DELETE {{baseUrl}}/api/AcademicYears/{{academicYearId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403

@@ -1,0 +1,62 @@
+{
+  "backend": {
+    "projectPath": "BooksPortal/src/BooksPortal.API/BooksPortal.API.csproj",
+    "baseUrl": "http://localhost:5071",
+    "healthPath": "/health",
+    "startupTimeoutSeconds": 120
+  },
+  "documentation": {
+    "path": "documentation/api-reference.md"
+  },
+  "auth": {
+    "superAdmin": {
+      "email": "admin@booksportal.local",
+      "password": "Admin@123456",
+      "passwordCandidates": [
+        "Admin@123456",
+        "Admin@123456!"
+      ]
+    }
+  },
+  "placeholders": {
+    "id": "1",
+    "studentId": "1",
+    "teacherId": "1",
+    "assignmentId": "1",
+    "academicYearId": "1",
+    "bookId": "1",
+    "referenceNo": "DUMMY-REF-0001"
+  },
+  "test": {
+    "requestTimeoutSeconds": 30,
+    "skipDisruptiveEndpoints": true,
+    "disruptiveEndpoints": [
+      "/api/auth/logout",
+      "/api/auth/change-password",
+      "/api/users",
+      "/api/users/{id}/toggle-active",
+      "/api/users/{id}/roles"
+    ]
+  },
+  "requestTemplates": {
+    "POST /api/auth/change-password": {
+      "currentPassword": "Admin@123456",
+      "newPassword": "Admin@123456!"
+    },
+    "POST /api/AcademicYears": {
+      "name": "API Test Year",
+      "year": 2099,
+      "startDate": "2099-01-01T00:00:00Z",
+      "endDate": "2099-12-31T00:00:00Z"
+    },
+    "PUT /api/AcademicYears/{id}": {
+      "name": "API Test Year Updated",
+      "year": 2099,
+      "startDate": "2099-01-01T00:00:00Z",
+      "endDate": "2099-12-31T00:00:00Z"
+    }
+  },
+  "logging": {
+    "outputDir": "tools/api-contract-tester/logs"
+  }
+}
