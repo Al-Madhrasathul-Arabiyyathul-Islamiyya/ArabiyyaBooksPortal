@@ -21,6 +21,8 @@ Content-Type: application/json
 ?? status == 200
 @accessToken={{response.parsedBody.data.accessToken}}
 @refreshToken={{response.parsedBody.data.refreshToken}}
+?? response.parsedBody.data.accessToken != null
+?? response.parsedBody.data.refreshToken != null
 
 ###
 # @name auth_refresh_admin
@@ -36,6 +38,8 @@ Content-Type: application/json
 ?? status == 200
 @accessToken={{response.parsedBody.data.accessToken}}
 @refreshToken={{response.parsedBody.data.refreshToken}}
+?? response.parsedBody.data.accessToken != null
+?? response.parsedBody.data.refreshToken != null
 
 ###
 # @name auth_me_admin
@@ -45,6 +49,7 @@ Authorization: Bearer {{accessToken}}
 
 ?? status == 200
 @superAdminId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name ay_list_before
@@ -68,8 +73,9 @@ Content-Type: application/json
   "endDate": "{{runYear}}-12-31T00:00:00Z"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @academicYearId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name ay_get_by_id
@@ -77,7 +83,7 @@ Content-Type: application/json
 GET {{baseUrl}}/api/AcademicYears/{{academicYearId}}
 Authorization: Bearer {{accessToken}}
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 
 ###
 # @name ay_update
@@ -93,7 +99,7 @@ Content-Type: application/json
   "endDate": "{{runYear}}-12-31T00:00:00Z"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 
 ###
 # @name ay_activate
@@ -124,8 +130,9 @@ Content-Type: application/json
   "sortOrder": 50
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @keystageId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name ks_list
@@ -170,8 +177,9 @@ Content-Type: application/json
   "name": "Subject {{runKey}}"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @subjectId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name subj_list
@@ -217,8 +225,9 @@ Content-Type: application/json
   "section": "A"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @classSectionId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name cs_list
@@ -266,8 +275,9 @@ Content-Type: application/json
   "relationship": "Father"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @parentId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name parent_list
@@ -315,8 +325,9 @@ Content-Type: application/json
   "phone": "722222{{runKey}}"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @teacherId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name teacher_list
@@ -362,8 +373,9 @@ Content-Type: application/json
   "classSectionId": {{classSectionId}}
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @teacherAssignmentId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name student_create
@@ -382,8 +394,9 @@ Content-Type: application/json
   ]
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @studentId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name student_list
@@ -494,8 +507,9 @@ Content-Type: application/json
   "grade": "G{{runKey}}"
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @bookId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name book_list
@@ -503,7 +517,7 @@ Content-Type: application/json
 GET {{baseUrl}}/api/books?pageNumber=1&pageSize=20&subjectId={{subjectId}}&search={{runKey}}
 Authorization: Bearer {{accessToken}}
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 
 ###
 # @name book_get
@@ -608,9 +622,11 @@ Content-Type: application/json
   ]
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @distributionId={{response.parsedBody.data.id}}
 @distributionRef={{response.parsedBody.data.referenceNo}}
+?? response.parsedBody.data.id != null
+?? response.parsedBody.data.referenceNo != null
 
 ###
 # @name distribution_list
@@ -666,9 +682,11 @@ Content-Type: application/json
   ]
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @returnId={{response.parsedBody.data.id}}
 @returnRef={{response.parsedBody.data.referenceNo}}
+?? response.parsedBody.data.id != null
+?? response.parsedBody.data.referenceNo != null
 
 ###
 # @name return_list
@@ -719,10 +737,13 @@ Content-Type: application/json
   ]
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @teacherIssueId={{response.parsedBody.data.id}}
 @teacherIssueRef={{response.parsedBody.data.referenceNo}}
 @teacherIssueItemId={{response.parsedBody.data.items[0].id}}
+?? response.parsedBody.data.id != null
+?? response.parsedBody.data.referenceNo != null
+?? response.parsedBody.data.items[0].id != null
 
 ###
 # @name teacher_issue_list
@@ -845,8 +866,9 @@ Content-Type: application/json
   "roles": ["User"]
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @userId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name users_get
@@ -913,8 +935,9 @@ Content-Type: application/json
   "paddingWidth": 6
 }
 
-?? status < 500 && status != 401 && status != 403
+?? status >= 200 && status < 300
 @refFormatId={{response.parsedBody.data.id}}
+?? response.parsedBody.data.id != null
 
 ###
 # @name ref_formats_list
@@ -1027,8 +1050,9 @@ Content-Type: application/json
   "password": "{{tempUserPassword}}"
 }
 
-?? status < 500
+?? status >= 200 && status < 300
 @tempAccessToken={{response.parsedBody.data.accessToken}}
+?? response.parsedBody.data.accessToken != null
 
 ###
 # @name auth_change_password_temp
@@ -1042,7 +1066,7 @@ Content-Type: application/json
   "newPassword": "{{tempUserPasswordNew}}"
 }
 
-?? status < 500
+?? status >= 200 && status < 300
 
 ###
 # @name auth_login_temp_new
@@ -1054,8 +1078,9 @@ Content-Type: application/json
   "password": "{{tempUserPasswordNew}}"
 }
 
-?? status < 500
+?? status >= 200 && status < 300
 @tempAccessToken={{response.parsedBody.data.accessToken}}
+?? response.parsedBody.data.accessToken != null
 
 ###
 # @name auth_logout_temp
@@ -1063,7 +1088,7 @@ Content-Type: application/json
 POST {{baseUrl}}/api/auth/logout
 Authorization: Bearer {{tempAccessToken}}
 
-?? status < 500
+?? status >= 200 && status < 300
 
 ###
 # @name teacher_assignment_delete

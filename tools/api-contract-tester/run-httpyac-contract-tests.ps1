@@ -173,7 +173,8 @@ try {
 
     $runSuffix = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString()
     $runKey = $runSuffix.Substring($runSuffix.Length - 4)
-    $runYear = 3000 + [int]$runKey
+    # Keep generated year valid for ISO date parsing while still varying across runs.
+    $runYear = 2001 + ([int]$runKey % 7000)
 
     $httpyacArgs = @(
         "send"
