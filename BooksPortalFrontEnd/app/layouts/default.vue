@@ -25,6 +25,7 @@
         <PanelMenu
           :model="menuItems"
           class="w-full border-none"
+          :class="{ 'sidebar-panel-collapsed': sidebarCollapsed }"
         />
       </nav>
 
@@ -152,3 +153,23 @@ onMounted(() => {
   authStore.initialize()
 })
 </script>
+
+<style scoped>
+.sidebar-panel-collapsed :deep(.p-panelmenu-content),
+.sidebar-panel-collapsed :deep(.p-panelmenu-panel),
+.sidebar-panel-collapsed :deep(.p-panelmenu-header-content),
+.sidebar-panel-collapsed :deep(.p-menuitem-link) {
+  border: none;
+}
+
+.sidebar-panel-collapsed :deep(.p-menuitem-link) {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0.5rem;
+}
+
+.sidebar-panel-collapsed :deep(.p-menuitem-text),
+.sidebar-panel-collapsed :deep(.p-submenu-icon) {
+  display: none;
+}
+</style>
