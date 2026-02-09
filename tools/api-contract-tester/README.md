@@ -40,6 +40,10 @@ pwsh ./tools/api-contract-tester/run-httpyac-contract-tests.ps1
 This writes a structured log:
 - `tools/api-contract-tester/logs/httpyac-contract-log-<runId>.json`
 
+Coverage enforcement:
+- Every documented endpoint in `documentation/api-reference.md` must have a `# @covers METHOD /path` entry in the suite.
+- The runner fails before execution if documented route coverage is below 100% (except explicit entries in `coverage.ignoreDocumentedRoutes`).
+
 ### Optional flags
 
 ```powershell

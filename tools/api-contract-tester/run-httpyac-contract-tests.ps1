@@ -7,6 +7,43 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+function Normalize-Template {
+    param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $Path }
+    $normalized = $Path -replace "\{([^}:]+):[^}]+\}", '{$1}'
+    return $normalized.Trim().ToLowerInvariant()
+}
+
+function Get-DocumentedEndpointKeys {
+    param([string]$DocPath)
+
+    $lines = Get-Content -Path $DocPath
+    $keys = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($line in $lines) {
+        if ($line -match "^### (GET|POST|PUT|DELETE|PATCH)\s+(.+)$") {
+            $method = $matches[1].Trim().ToUpperInvariant()
+            $path = Normalize-Template -Path $matches[2].Trim()
+            [void]$keys.Add("$method $path")
+        }
+    }
+    return $keys
+}
+
+function Get-CoveredEndpointKeys {
+    param([string]$SuitePath)
+
+    $lines = Get-Content -Path $SuitePath
+    $keys = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($line in $lines) {
+        if ($line -match "^\s*#\s*@covers\s+(GET|POST|PUT|DELETE|PATCH)\s+(.+)$") {
+            $method = $matches[1].Trim().ToUpperInvariant()
+            $path = Normalize-Template -Path $matches[2].Trim()
+            [void]$keys.Add("$method $path")
+        }
+    }
+    return $keys
+}
+
 function Wait-ForApi {
     param(
         [string]$HealthUrl,
@@ -39,9 +76,41 @@ try {
     $baseUrl = $config.backend.baseUrl.TrimEnd("/")
     $healthUrl = "$baseUrl$($config.backend.healthPath)"
     $suitePath = $config.suite.filePath
+    $docPath = $config.documentation.path
 
     if (-not (Test-Path $suitePath)) {
         throw "Suite file not found: $suitePath"
+    }
+    if (-not (Test-Path $docPath)) {
+        throw "API reference not found: $docPath"
+    }
+
+    $documentedKeys = Get-DocumentedEndpointKeys -DocPath $docPath
+    $coveredKeys = Get-CoveredEndpointKeys -SuitePath $suitePath
+    $ignoredKeys = New-Object System.Collections.Generic.HashSet[string]
+    if ($config.coverage -and $config.coverage.ignoreDocumentedRoutes) {
+        foreach ($entry in $config.coverage.ignoreDocumentedRoutes) {
+            if ($entry -match "^(GET|POST|PUT|DELETE|PATCH)\s+(.+)$") {
+                $m = $matches[1].Trim().ToUpperInvariant()
+                $p = Normalize-Template -Path $matches[2].Trim()
+                [void]$ignoredKeys.Add("$m $p")
+            }
+        }
+    }
+
+    $missingCoverage = New-Object System.Collections.Generic.List[string]
+    foreach ($key in $documentedKeys) {
+        if ($ignoredKeys.Contains($key)) {
+            continue
+        }
+        if (-not $coveredKeys.Contains($key)) {
+            $missingCoverage.Add($key)
+        }
+    }
+
+    if ($missingCoverage.Count -gt 0) {
+        $missingText = $missingCoverage | Sort-Object | Out-String
+        throw "httpyac suite is missing documented route coverage for:`n$missingText"
     }
 
     if (-not $SkipStartBackend) {
@@ -122,11 +191,18 @@ try {
         startedAtUtc = $startedAt.ToString("o")
         finishedAtUtc = [DateTime]::UtcNow.ToString("o")
         suiteFile = $suitePath
+        documentationPath = $docPath
         baseUrl = $baseUrl
         vars = [ordered]@{
             runSuffix = $runSuffix
             runKey = $runKey
             runYear = $runYear
+        }
+        coverage = [ordered]@{
+            documentedCount = $documentedKeys.Count
+            coveredCount = $coveredKeys.Count
+            ignoredCount = $ignoredKeys.Count
+            missingCount = $missingCoverage.Count
         }
         httpyacExitCode = $httpyacExitCode
         summary = $parsed.summary
