@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BooksPortal.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(BooksPortalDbContext))]
-    [Migration("20260207030529_AddModule9Entities")]
-    partial class AddModule9Entities
+    [Migration("20260209005500_Baseline20260209")]
+    partial class Baseline20260209
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -52,9 +52,12 @@ public class SlipTemplateSettingService : ISlipTemplateSettingService
 
     public async Task ResetToDefaultsAsync()
     {
-        var existing = await _repository.GetAllAsync();
-        foreach (var item in existing)
-            _repository.SoftDelete(item);
+        // Remove all existing settings (including soft-deleted rows) so unique keys can be re-seeded safely.
+        var allSettings = await _repository.QueryIgnoringFilters()
+            .ToListAsync();
+
+        if (allSettings.Count > 0)
+            _repository.HardDeleteRange(allSettings);
 
         foreach (var setting in GetDefaultLabels())
             _repository.Add(setting);

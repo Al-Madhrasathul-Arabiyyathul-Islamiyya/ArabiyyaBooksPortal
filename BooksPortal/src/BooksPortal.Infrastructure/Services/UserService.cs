@@ -110,7 +110,8 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString())
             ?? throw new NotFoundException("Staff", id);
 
-        if (await IsMainSuperAdminAsync(user))
+        // Allow reactivation if an external action disabled it, but never allow deactivation.
+        if (await IsMainSuperAdminAsync(user) && user.IsActive)
         {
             throw new BusinessRuleException("Main SuperAdmin account cannot be deactivated.");
         }

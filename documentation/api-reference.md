@@ -181,6 +181,7 @@ Delete an academic year (soft delete).
 
 - **Auth**: Bearer + **SuperAdmin** role
 - **Response**: `string` message
+- **Behavior**: returns business-rule error if the academic year is referenced by existing records.
 
 **AcademicYearResponse**:
 
@@ -496,6 +497,7 @@ Delete a parent.
 
 - **Auth**: Bearer + **SuperAdmin** role
 - **Response**: `string` message
+- **Behavior**: returns business-rule error if the parent is referenced by existing records.
 
 **ParentResponse**:
 
@@ -1272,6 +1274,7 @@ Update a user.
 Toggle user active/inactive status.
 
 - **Response**: `bool` with message
+- **Behavior**: the configured main SuperAdmin account cannot be deactivated.
 
 ### PUT /api/users/{id}/roles
 

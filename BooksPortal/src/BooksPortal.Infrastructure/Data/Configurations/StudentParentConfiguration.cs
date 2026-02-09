@@ -24,5 +24,7 @@ public class StudentParentConfiguration : IEntityTypeConfiguration<StudentParent
             .WithMany(p => p.StudentParents)
             .HasForeignKey(sp => sp.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasQueryFilter(sp => !sp.Student.IsDeleted && !sp.Parent.IsDeleted);
     }
 }

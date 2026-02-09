@@ -23,6 +23,8 @@ public class StockMovementConfiguration : IEntityTypeConfiguration<StockMovement
             .HasForeignKey(s => s.AcademicYearId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasQueryFilter(s => !s.AcademicYear.IsDeleted && !s.Book.IsDeleted);
+
         builder.HasIndex(s => s.BookId);
         builder.HasIndex(s => s.ProcessedAt);
     }

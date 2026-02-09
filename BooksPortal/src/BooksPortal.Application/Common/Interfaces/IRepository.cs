@@ -15,5 +15,8 @@ public interface IRepository<T> where T : BaseEntity
     void Add(T entity);
     void Update(T entity);
     void SoftDelete(T entity);
+    void HardDelete(T entity);
+    void HardDeleteRange(IEnumerable<T> entities);
     IQueryable<T> Query();
+    IQueryable<T> QueryIgnoringFilters();
 }

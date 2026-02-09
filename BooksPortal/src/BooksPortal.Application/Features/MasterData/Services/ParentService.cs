@@ -12,11 +12,19 @@ namespace BooksPortal.Application.Features.MasterData.Services;
 public class ParentService : IParentService
 {
     private readonly IRepository<Parent> _repository;
+    private readonly IRepository<Student> _studentRepository;
+    private readonly IRepository<DistributionSlip> _distributionRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ParentService(IRepository<Parent> repository, IUnitOfWork unitOfWork)
+    public ParentService(
+        IRepository<Parent> repository,
+        IRepository<Student> studentRepository,
+        IRepository<DistributionSlip> distributionRepository,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _studentRepository = studentRepository;
+        _distributionRepository = distributionRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -75,6 +83,14 @@ public class ParentService : IParentService
     {
         var entity = await _repository.GetByIdAsync(id)
             ?? throw new NotFoundException(nameof(Parent), id);
+
+        var hasStudentLinks = await _studentRepository.Query()
+            .AnyAsync(s => s.StudentParents.Any(sp => sp.ParentId == id));
+        var hasDistributions = await _distributionRepository.AnyAsync(d => d.ParentId == id);
+
+        if (hasStudentLinks || hasDistributions)
+            throw new BusinessRuleException("Cannot delete parent because it is referenced by existing records.");
+
         _repository.SoftDelete(entity);
         await _unitOfWork.SaveChangesAsync();
     }

@@ -51,5 +51,11 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         _dbSet.Update(entity);
     }
 
+    public void HardDelete(T entity) => _dbSet.Remove(entity);
+
+    public void HardDeleteRange(IEnumerable<T> entities) => _dbSet.RemoveRange(entities);
+
     public IQueryable<T> Query() => _dbSet.AsQueryable();
+
+    public IQueryable<T> QueryIgnoringFilters() => _dbSet.IgnoreQueryFilters().AsQueryable();
 }

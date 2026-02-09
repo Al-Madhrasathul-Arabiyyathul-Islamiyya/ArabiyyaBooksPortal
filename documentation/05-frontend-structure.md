@@ -33,7 +33,7 @@ Primary implementation plan: `plans/frontend-plan.md`
 - Tailwind v4 uses `@tailwindcss/vite` (not `@nuxtjs/tailwindcss`).
 - `tailwindcss-primeui` is enabled to avoid PrimeVue style regressions.
 - App composables are named `useAppToast` / `useAppConfirm` to avoid PrimeVue auto-import collisions.
-- `nuxt-csurf` is currently not configured in this frontend.
+- `nuxt-csurf` is currently not configured; evaluate in Phase 3 security hardening when backend CSRF expectations are finalized.
 
 ## Project Structure (As Implemented)
 
