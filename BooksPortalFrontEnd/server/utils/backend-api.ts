@@ -47,7 +47,7 @@ export async function refreshServerSession(event: H3Event): Promise<boolean> {
   try {
     const response = await $fetch<{
       success: boolean
-      data: { accessToken: string; refreshToken: string; expiresAt: string }
+      data: { accessToken: string, refreshToken: string, expiresAt: string }
     }>(`${base}/auth/refresh`, {
       method: 'POST',
       body: { accessToken, refreshToken },
@@ -60,7 +60,8 @@ export async function refreshServerSession(event: H3Event): Promise<boolean> {
 
     setSessionTokens(event, response.data.accessToken, response.data.refreshToken, response.data.expiresAt)
     return true
-  } catch {
+  }
+  catch {
     clearSessionTokens(event)
     return false
   }
@@ -109,7 +110,8 @@ export async function proxyAuthorizedBackendRequest(event: H3Event, apiPath: str
       return send(event, new Uint8Array(response._data as ArrayBuffer))
     }
     return response._data
-  } catch (error) {
+  }
+  catch (error) {
     const fetchError = error as FetchError
     if (fetchError.statusCode !== 401) {
       throw error

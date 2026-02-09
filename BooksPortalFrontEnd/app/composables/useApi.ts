@@ -26,7 +26,8 @@ export function useApi() {
       return await csrfFetch<ApiResponse<T>>(`${baseURL}${url}`, {
         ...options,
       })
-    } catch (error: unknown) {
+    }
+    catch (error: unknown) {
       const fetchError = error as { status?: number }
 
       if (fetchError.status === 401) {
@@ -38,7 +39,8 @@ export function useApi() {
           return await csrfFetch<ApiResponse<T>>(`${baseURL}${url}`, {
             ...options,
           })
-        } catch {
+        }
+        catch {
           await navigateTo('/login')
         }
       }

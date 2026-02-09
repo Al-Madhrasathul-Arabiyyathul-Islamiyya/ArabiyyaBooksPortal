@@ -5,14 +5,24 @@
       :class="sidebarCollapsed ? 'w-16' : 'w-64'"
     >
       <div class="flex h-16 items-center gap-3 border-b border-surface-200 px-4 dark:border-surface-700">
-        <NuxtImg src="/logo.png" alt="Logo" class="h-8 w-8 shrink-0" />
-        <span v-if="!sidebarCollapsed" class="text-lg font-semibold text-surface-900 dark:text-surface-0">
+        <NuxtImg
+          src="/logo.png"
+          alt="Logo"
+          class="h-8 w-8 shrink-0"
+        />
+        <span
+          v-if="!sidebarCollapsed"
+          class="text-lg font-semibold text-surface-900 dark:text-surface-0"
+        >
           Admin
         </span>
       </div>
 
       <nav class="flex-1 overflow-y-auto p-2">
-        <PanelMenu :model="menuItems" class="w-full border-none" />
+        <PanelMenu
+          :model="menuItems"
+          class="w-full border-none"
+        />
       </nav>
 
       <div class="border-t border-surface-200 p-2 dark:border-surface-700">
@@ -58,7 +68,11 @@
             severity="secondary"
             @click="toggleUserMenu"
           />
-          <Menu ref="userMenuRef" :model="userMenuItems" :popup="true" />
+          <Menu
+            ref="userMenuRef"
+            :model="userMenuItems"
+            :popup="true"
+          />
         </div>
       </header>
 

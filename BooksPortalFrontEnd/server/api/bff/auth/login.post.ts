@@ -38,7 +38,8 @@ export default defineEventHandler(async (event) => {
 
     setSessionTokens(event, response.data.accessToken, response.data.refreshToken, response.data.expiresAt)
     return response
-  } catch (error) {
+  }
+  catch (error) {
     clearSessionTokens(event)
     throw error
   }

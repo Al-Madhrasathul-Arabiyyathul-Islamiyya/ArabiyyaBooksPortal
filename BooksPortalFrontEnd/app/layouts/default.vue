@@ -7,18 +7,31 @@
     >
       <!-- Logo -->
       <div class="flex h-16 items-center gap-3 border-b border-surface-200 px-4 dark:border-surface-700">
-        <NuxtImg src="/logo.png" alt="Logo" class="h-8 w-8 shrink-0" />
-        <span v-if="!sidebarCollapsed" class="text-lg font-semibold text-surface-900 dark:text-surface-0">
+        <NuxtImg
+          src="/logo.png"
+          alt="Logo"
+          class="h-8 w-8 shrink-0"
+        />
+        <span
+          v-if="!sidebarCollapsed"
+          class="text-lg font-semibold text-surface-900 dark:text-surface-0"
+        >
           Books Portal
         </span>
       </div>
 
       <!-- Navigation -->
       <nav class="flex-1 overflow-y-auto p-2">
-        <PanelMenu :model="menuItems" class="w-full border-none" />
+        <PanelMenu
+          :model="menuItems"
+          class="w-full border-none"
+        />
       </nav>
 
-      <div v-if="isAdmin" class="border-t border-surface-200 p-2 dark:border-surface-700">
+      <div
+        v-if="isAdmin"
+        class="border-t border-surface-200 p-2 dark:border-surface-700"
+      >
         <Button
           icon="pi pi-shield"
           :label="sidebarCollapsed ? undefined : 'Admin'"
@@ -64,7 +77,11 @@
             severity="secondary"
             @click="toggleUserMenu"
           />
-          <Menu ref="userMenuRef" :model="userMenuItems" :popup="true" />
+          <Menu
+            ref="userMenuRef"
+            :model="userMenuItems"
+            :popup="true"
+          />
         </div>
       </header>
 

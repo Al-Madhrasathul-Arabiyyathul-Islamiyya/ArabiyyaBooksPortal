@@ -7,7 +7,8 @@ export function usePrint() {
 
     try {
       await api.downloadBlob(url, filename, openInNewTab)
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to fetch PDF:', error)
       toast.showError('Failed to load PDF')
     }

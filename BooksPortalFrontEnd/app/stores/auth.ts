@@ -36,12 +36,15 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.get<UserProfile>(API.auth.me)
       if (response.success) {
         user.value = response.data
-      } else {
+      }
+      else {
         user.value = null
       }
-    } catch {
+    }
+    catch {
       user.value = null
-    } finally {
+    }
+    finally {
       initialized.value = true
     }
   }

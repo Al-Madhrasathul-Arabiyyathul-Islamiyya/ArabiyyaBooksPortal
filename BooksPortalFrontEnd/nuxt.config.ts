@@ -2,13 +2,6 @@ import Aura from '@primeuix/themes/aura'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-
-  sourcemap: {
-    server: false,
-    client: false,
-  },
 
   modules: [
     '@nuxt/eslint',
@@ -25,6 +18,17 @@ export default defineNuxtConfig({
     'dayjs-nuxt',
     'nuxt-charts',
   ],
+  devtools: { enabled: true },
+
+  css: ['./app/assets/css/main.css'],
+
+  colorMode: {
+    preference: 'system',
+    fallback: 'light',
+    classSuffix: '',
+    storage: 'cookie',
+    storageKey: 'nuxt-color-mode',
+  },
 
   runtimeConfig: {
     public: {
@@ -32,7 +36,11 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['./app/assets/css/main.css'],
+  sourcemap: {
+    server: false,
+    client: false,
+  },
+  compatibilityDate: '2025-07-15',
 
   vite: {
     plugins: [
@@ -43,14 +51,43 @@ export default defineNuxtConfig({
     },
   },
 
+  csurf: {
+    cookieKey: 'bp_csrf',
+    cookie: {
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: !import.meta.dev,
+    },
+    methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
+  },
+
+  dayjs: {
+    locales: ['en'],
+    plugins: ['relativeTime', 'utc', 'timezone'],
+    defaultLocale: 'en',
+    defaultTimezone: 'Indian/Maldives',
+  },
+
   eslint: {
     config: {
       stylistic: {
         indent: 2,
         quotes: 'single',
         semi: false,
-      }
-    }
+      },
+    },
+  },
+
+  fonts: {
+    families: [
+      { name: 'Sofia Sans', provider: 'google' },
+      { name: 'Playfair Display', provider: 'google' },
+      { name: 'Geist Mono', provider: 'google' },
+    ],
+    defaults: {
+      weights: [300, 400, 500, 600, 700],
+      styles: ['normal', 'italic'],
+    },
   },
 
   primevue: {
@@ -68,42 +105,5 @@ export default defineNuxtConfig({
       ripple: true,
     },
     autoImport: true,
-  },
-
-  colorMode: {
-    preference: 'system',
-    fallback: 'light',
-    classSuffix: '',
-    storage: 'cookie',
-    storageKey: 'nuxt-color-mode',
-  },
-
-  csurf: {
-    cookieKey: 'bp_csrf',
-    cookie: {
-      httpOnly: false,
-      sameSite: 'lax',
-      secure: !import.meta.dev,
-    },
-    methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
-  },
-
-  fonts: {
-    families: [
-      { name: 'Sofia Sans', provider: 'google' },
-      { name: 'Playfair Display', provider: 'google' },
-      { name: 'Geist Mono', provider: 'google' },
-    ],
-    defaults: {
-      weights: [300, 400, 500, 600, 700],
-      styles: ['normal', 'italic'],
-    },
-  },
-
-  dayjs: {
-    locales: ['en'],
-    plugins: ['relativeTime', 'utc', 'timezone'],
-    defaultLocale: 'en',
-    defaultTimezone: 'Indian/Maldives',
   },
 })

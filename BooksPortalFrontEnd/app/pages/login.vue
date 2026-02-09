@@ -3,14 +3,26 @@
     <Card>
       <template #title>
         <div class="flex flex-col items-center gap-3">
-          <NuxtImg src="/logo.png" alt="Logo" class="h-16 w-16" />
-          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-0">Books Portal</h1>
+          <NuxtImg
+            src="/logo.png"
+            alt="Logo"
+            class="h-16 w-16"
+          />
+          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-0">
+            Books Portal
+          </h1>
         </div>
       </template>
       <template #content>
-        <form class="flex flex-col gap-4" @submit.prevent="handleLogin">
+        <form
+          class="flex flex-col gap-4"
+          @submit.prevent="handleLogin"
+        >
           <div class="flex flex-col gap-1">
-            <label for="email" class="text-sm font-medium">Email</label>
+            <label
+              for="email"
+              class="text-sm font-medium"
+            >Email</label>
             <InputText
               id="email"
               v-model="form.email"
@@ -19,11 +31,17 @@
               :invalid="!!errors.email"
               @blur="touchField('email')"
             />
-            <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
+            <small
+              v-if="errors.email"
+              class="text-red-500"
+            >{{ errors.email }}</small>
           </div>
 
           <div class="flex flex-col gap-1">
-            <label for="password" class="text-sm font-medium">Password</label>
+            <label
+              for="password"
+              class="text-sm font-medium"
+            >Password</label>
             <Password
               id="password"
               v-model="form.password"
@@ -34,10 +52,17 @@
               :invalid="!!errors.password"
               @blur="touchField('password')"
             />
-            <small v-if="errors.password" class="text-red-500">{{ errors.password }}</small>
+            <small
+              v-if="errors.password"
+              class="text-red-500"
+            >{{ errors.password }}</small>
           </div>
 
-          <Message v-if="loginError" severity="error" :closable="false">
+          <Message
+            v-if="loginError"
+            severity="error"
+            :closable="false"
+          >
             {{ loginError }}
           </Message>
 

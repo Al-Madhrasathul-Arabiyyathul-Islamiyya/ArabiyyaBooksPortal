@@ -1,10 +1,20 @@
 <template>
-  <Breadcrumb :model="items" class="border-none bg-transparent px-0">
+  <Breadcrumb
+    :model="items"
+    class="border-none bg-transparent px-0"
+  >
     <template #item="{ item }">
-      <NuxtLink v-if="item.to" :to="item.to" class="text-surface-700 hover:text-primary dark:text-surface-300">
+      <NuxtLink
+        v-if="item.to"
+        :to="item.to"
+        class="text-surface-700 hover:text-primary dark:text-surface-300"
+      >
         {{ item.label }}
       </NuxtLink>
-      <span v-else class="text-surface-500 dark:text-surface-400">{{ item.label }}</span>
+      <span
+        v-else
+        class="text-surface-500 dark:text-surface-400"
+      >{{ item.label }}</span>
     </template>
   </Breadcrumb>
 </template>

@@ -7,7 +7,11 @@
       class="w-full"
       @input="handleInput"
     />
-    <InputIcon v-if="searchTerm" class="pi pi-times cursor-pointer" @click="clear" />
+    <InputIcon
+      v-if="searchTerm"
+      class="pi pi-times cursor-pointer"
+      @click="clear"
+    />
   </IconField>
 </template>
 

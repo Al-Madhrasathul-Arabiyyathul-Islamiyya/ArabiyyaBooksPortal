@@ -10,8 +10,7 @@ definePageMeta({
   layout: 'admin',
   middleware: ['admin'],
   breadcrumb: {
-    admin: 'Admin', settings: 'Settings', 'reference-formats': 'Reference Formats'
-  }
+    'admin': 'Admin', 'settings': 'Settings', 'reference-formats': 'Reference Formats',
+  },
 })
 </script>
-

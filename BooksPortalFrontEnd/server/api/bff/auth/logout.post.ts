@@ -20,9 +20,11 @@ export default defineEventHandler(async (event) => {
         },
       })
     }
-  } catch {
+  }
+  catch {
     // clear local session even when backend logout fails
-  } finally {
+  }
+  finally {
     clearSessionTokens(event)
   }
 

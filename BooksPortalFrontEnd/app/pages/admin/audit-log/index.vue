@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-0">Audit Log</h1>
+    <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-0">
+      Audit Log
+    </h1>
     <p class="mt-2 text-surface-600 dark:text-surface-400">
       Audit log screen will be implemented in Phase 8 under the admin area.
     </p>
@@ -12,7 +14,7 @@ definePageMeta({
   layout: 'admin',
   middleware: ['admin'],
   breadcrumb: {
-    admin: 'Admin',
+    'admin': 'Admin',
     'audit-log': 'Audit Log',
   },
 })

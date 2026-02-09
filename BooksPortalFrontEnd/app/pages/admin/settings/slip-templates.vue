@@ -10,8 +10,7 @@ definePageMeta({
   layout: 'admin',
   middleware: ['admin'],
   breadcrumb: {
-    admin: 'Admin', settings: 'Settings', 'slip-templates': 'Slip Templates'
-  }
+    'admin': 'Admin', 'settings': 'Settings', 'slip-templates': 'Slip Templates',
+  },
 })
 </script>
-

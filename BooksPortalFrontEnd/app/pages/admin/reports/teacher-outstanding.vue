@@ -10,8 +10,7 @@ definePageMeta({
   layout: 'admin',
   middleware: ['admin'],
   breadcrumb: {
-    admin: 'Admin', reports: 'Reports', 'teacher-outstanding': 'Teacher Outstanding'
-  }
+    'admin': 'Admin', 'reports': 'Reports', 'teacher-outstanding': 'Teacher Outstanding',
+  },
 })
 </script>
-

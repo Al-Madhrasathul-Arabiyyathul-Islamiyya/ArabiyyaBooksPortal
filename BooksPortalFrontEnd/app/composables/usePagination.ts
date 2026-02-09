@@ -6,7 +6,7 @@ export function usePagination(initialPageSize: number = PAGINATION.defaultPageSi
   const pageSize = ref(initialPageSize)
   const totalRecords = ref(0)
 
-  function onPage(event: { page: number; rows: number }) {
+  function onPage(event: { page: number, rows: number }) {
     page.value = event.page + 1 // PrimeVue uses 0-based, API uses 1-based
     pageSize.value = event.rows
   }
