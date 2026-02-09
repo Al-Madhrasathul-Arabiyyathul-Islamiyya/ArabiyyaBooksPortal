@@ -1,6 +1,6 @@
 # BooksPortal Frontend
 
-Nuxt 4 single-page application for the Books Portal textbook management system.
+Nuxt 4 SSR frontend for the Books Portal textbook management system.
 
 ## Tech Stack
 
@@ -49,14 +49,16 @@ BooksPortalFrontEnd/
     plugins/            # PrimeVue, auth plugins
     stores/             # Pinia stores
     utils/              # Helper functions
+  server/               # Nuxt BFF routes and server utilities
   public/               # Static assets
-  server/               # Nitro server routes (if needed)
   nuxt.config.ts        # Nuxt configuration
 ```
 
 ## Configuration
 
-The backend API base URL is configured in `nuxt.config.ts` via the `runtimeConfig` or a custom `$fetch` wrapper.
+- External backend base URL: `runtimeConfig.public.apiBase` in `nuxt.config.ts`
+- Frontend app calls internal BFF routes under `/api/bff`
+- BFF routes proxy to backend with server-managed auth cookies and refresh flow
 
 ## API Reference
 
@@ -64,6 +66,7 @@ See [documentation/api-reference.md](../documentation/api-reference.md) for the 
 
 ## Status
 
-- Project scaffolded with all dependencies installed
-- Modules registered but not yet configured
-- Frontend implementation (Module 10) has not started
+- Module 10 Phase 1: complete
+- Module 10 Phase 2: complete
+- Module 10 Phase 2.5 (BFF + CSRF alignment): complete
+- Module 10 Phase 3: next to start
