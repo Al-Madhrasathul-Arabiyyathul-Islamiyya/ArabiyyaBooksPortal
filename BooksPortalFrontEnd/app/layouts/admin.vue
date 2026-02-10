@@ -107,10 +107,10 @@ const menuItems = computed(() => ([
     label: 'Master Data',
     icon: 'pi pi-database',
     items: [
-      { label: 'Academic Years', command: () => navigateTo('/admin/master-data/academic-years') },
-      { label: 'Keystages', command: () => navigateTo('/admin/master-data/keystages') },
+      { label: 'AcademicYear', command: () => navigateTo('/admin/master-data/academic-years') },
       { label: 'Subjects', command: () => navigateTo('/admin/master-data/subjects') },
-      { label: 'Class Sections', command: () => navigateTo('/admin/master-data/class-sections') },
+      { label: 'Keystages', command: () => navigateTo('/admin/master-data/keystages') },
+      { label: 'Classes', command: () => navigateTo('/admin/master-data/class-sections') },
       { label: 'Students', command: () => navigateTo('/admin/master-data/students') },
       { label: 'Parents', command: () => navigateTo('/admin/master-data/parents') },
       { label: 'Teachers', command: () => navigateTo('/admin/master-data/teachers') },
