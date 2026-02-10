@@ -18,6 +18,7 @@ Books Portal is a web-based textbook management system for Arabiyya school. It t
 | [06-schema-addendum-unicode-timezone.md](./06-schema-addendum-unicode-timezone.md) | Schema addendums for unicode and timezone |
 | [07-reference-number-system.md](./07-reference-number-system.md) | Customizable reference number format system |
 | [08-slip-templates-and-storage.md](./08-slip-templates-and-storage.md) | Slip template settings and PDF storage |
+| [09-versioning-and-release.md](./09-versioning-and-release.md) | Versioning policy for backend/frontend and git release tags |
 | [api-reference.md](./api-reference.md) | **Live API reference** - all endpoints, DTOs, enums |
 
 ---
