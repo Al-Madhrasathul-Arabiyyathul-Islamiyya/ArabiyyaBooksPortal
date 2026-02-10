@@ -1,8 +1,7 @@
 <template>
   <div class="flex min-h-screen bg-surface-50 dark:bg-surface-950">
     <aside
-      class="fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-surface-200 bg-surface-0 transition-all duration-300 dark:border-surface-700 dark:bg-surface-900"
-      :class="sidebarCollapsed ? 'w-16' : 'w-64'"
+      class="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-surface-200 bg-surface-0 transition-all duration-300 dark:border-surface-700 dark:bg-surface-900"
     >
       <div class="flex h-16 items-center gap-3 border-b border-surface-200 px-4 dark:border-surface-700">
         <NuxtImg
@@ -10,10 +9,7 @@
           alt="Logo"
           class="h-8 w-8 shrink-0"
         />
-        <span
-          v-if="!sidebarCollapsed"
-          class="text-lg font-semibold text-surface-900 dark:text-surface-0"
-        >
+        <span class="text-lg font-semibold text-surface-900 dark:text-surface-0">
           Admin
         </span>
       </div>
@@ -22,38 +18,23 @@
         <PanelMenu
           :model="menuItems"
           class="w-full border-none"
-          :class="{ 'sidebar-panel-collapsed': sidebarCollapsed }"
         />
       </nav>
 
       <div class="border-t border-surface-200 p-2 dark:border-surface-700">
         <Button
           icon="pi pi-arrow-left"
-          :label="sidebarCollapsed ? undefined : 'Back to Operations'"
+          label="Back to Operations"
           text
           severity="secondary"
-          :class="[
-            'w-full',
-            sidebarCollapsed ? 'justify-center' : 'justify-start',
-          ]"
+          class="w-full justify-start"
           @click="navigateTo('/')"
-        />
-      </div>
-
-      <div class="border-t border-surface-200 p-2 dark:border-surface-700">
-        <Button
-          :icon="sidebarCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"
-          text
-          severity="secondary"
-          class="w-full"
-          @click="appStore.toggleSidebar()"
         />
       </div>
     </aside>
 
     <div
-      class="flex min-h-screen flex-1 flex-col transition-all duration-300"
-      :class="sidebarCollapsed ? 'ml-16' : 'ml-64'"
+      class="ml-64 flex min-h-screen flex-1 flex-col transition-all duration-300"
     >
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
         <h1 class="text-base font-semibold text-surface-900 dark:text-surface-0">
@@ -92,9 +73,6 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 const { user, logout } = useAuth()
-const appStore = useAppStore()
-
-const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
 const userMenuRef = ref()
 
 function toggleColorMode() {
@@ -170,25 +148,3 @@ const menuItems = computed(() => ([
   },
 ]))
 </script>
-
-<style scoped>
-.sidebar-panel-collapsed :deep(.p-panelmenu-content),
-.sidebar-panel-collapsed :deep(.p-panelmenu-panel),
-.sidebar-panel-collapsed :deep(.p-panelmenu-header-content),
-.sidebar-panel-collapsed :deep(.p-menuitem-link) {
-  border: none;
-}
-
-.sidebar-panel-collapsed :deep(.p-menuitem-link) {
-  justify-content: center;
-  gap: 0;
-  padding-inline: 0.5rem;
-}
-
-.sidebar-panel-collapsed :deep(.p-menuitem-text),
-.sidebar-panel-collapsed :deep(.p-panelmenu-header-label),
-.sidebar-panel-collapsed :deep(.p-panelmenu-header-chevron),
-.sidebar-panel-collapsed :deep(.p-submenu-icon) {
-  display: none;
-}
-</style>
