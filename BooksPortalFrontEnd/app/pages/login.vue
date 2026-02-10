@@ -4,7 +4,7 @@
       <template #title>
         <div class="flex flex-col items-center gap-3">
           <NuxtImg
-            src="/logo.png"
+            src="/logo.svg"
             alt="Logo"
             class="h-16 w-16"
           />

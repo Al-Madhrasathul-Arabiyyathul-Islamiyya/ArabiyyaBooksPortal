@@ -8,7 +8,7 @@
       <!-- Logo -->
       <div class="flex h-16 items-center gap-3 border-b border-surface-200 px-4 dark:border-surface-700">
         <NuxtImg
-          src="/logo.png"
+          src="/logo.svg"
           alt="Logo"
           class="h-8 w-8 shrink-0"
         />
