@@ -119,7 +119,7 @@ const userMenuItems = ref([
   {
     label: 'Profile',
     icon: 'pi pi-user',
-    command: () => navigateTo(isAdmin.value ? '/admin/settings/profile' : '/'),
+    command: () => navigateTo(isAdmin.value ? '/admin/settings/profile' : '/distribution'),
   },
   { separator: true },
   {
@@ -130,11 +130,6 @@ const userMenuItems = ref([
 ])
 
 const menuItems = computed(() => ([
-  {
-    label: 'Dashboard',
-    icon: 'pi pi-home',
-    command: () => navigateTo('/'),
-  },
   {
     label: 'Distribution',
     icon: 'pi pi-send',
