@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BooksPortal.API.Controllers;
 
 [Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
+[Route("api/import-templates")]
 public class ImportTemplatesController : ApiControllerBase
 {
     private readonly IImportTemplateService _service;

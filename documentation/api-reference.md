@@ -340,7 +340,7 @@ Create a class section.
   |-------|------|----------|
   | academicYearId | int | yes |
   | keystageId | int | yes |
-  | grade | string | yes |
+  | gradeId | int | yes |
   | section | string | yes |
 - **Response**: `ClassSectionResponse`
 
@@ -367,6 +367,7 @@ Delete a class section.
 | academicYearName | string |
 | keystageId | int |
 | keystageName | string |
+| gradeId | int |
 | grade | string |
 | section | string |
 | displayName | string (computed: "{grade} {section}") |
@@ -403,7 +404,7 @@ Create a student.
   |-------|------|----------|
   | fullName | string | yes |
   | indexNo | string | yes |
-  | nationalId | string? | no |
+  | nationalId | string | yes |
   | classSectionId | int | yes |
   | parents | StudentParentRequest[]? | no |
 
@@ -422,7 +423,7 @@ Update a student.
   | Field | Type | Required |
   |-------|------|----------|
   | fullName | string | yes |
-  | nationalId | string? | no |
+  | nationalId | string | yes |
   | classSectionId | int | yes |
   | parents | StudentParentRequest[]? | no |
 - **Response**: `StudentResponse`
@@ -433,6 +434,22 @@ Delete a student.
 
 - **Auth**: Bearer + **SuperAdmin** role
 - **Response**: `string` message
+
+### POST /api/students/bulk/validate
+
+Validate student import payload before commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+
+### POST /api/students/bulk/commit
+
+Commit student import payload in a single transaction (reject-on-conflict, no upsert).
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
 
 **StudentResponse**:
 
@@ -583,6 +600,22 @@ Remove an assignment from a teacher.
 
 - **Response**: `string` message
 
+### POST /api/teachers/bulk/validate
+
+Validate teacher import payload before commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+
+### POST /api/teachers/bulk/commit
+
+Commit teacher import payload in a single transaction (reject-on-conflict, no upsert).
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+
 **TeacherResponse**:
 
 | Field | Type |
@@ -618,6 +651,11 @@ All endpoints require **Bearer auth**. Returns lightweight id/name pairs for dro
 
 ### GET /api/lookups/keystages
 
+- **Response**: `LookupResponse[]`
+
+### GET /api/lookups/grades
+
+- **Query**: `?keystageId={int}` (optional)
 - **Response**: `LookupResponse[]`
 
 ### GET /api/lookups/subjects
@@ -682,11 +720,27 @@ Create a book.
   | title | string | yes |
   | author | string? | no |
   | edition | string? | no |
-  | publisher | string? | no |
-  | publishedYear | int? | no |
+  | publisher | string | yes (default value in domain model is `Other`) |
+  | publishedYear | int | yes |
   | subjectId | int | yes |
   | grade | string? | no |
 - **Response**: `BookResponse`
+
+### POST /api/books/bulk/validate
+
+Validate book import payload before commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+
+### POST /api/books/bulk/commit
+
+Commit book import payload in a single transaction (reject-on-conflict, no upsert).
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
 
 ### PUT /api/books/{id}
 

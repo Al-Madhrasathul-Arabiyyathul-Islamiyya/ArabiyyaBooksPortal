@@ -141,6 +141,8 @@ GET {{baseUrl}}/api/keystages
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+@seedKeystageId={{response.parsedBody.data[0].id}}
+?? response.parsedBody.data[0].id != null
 
 ###
 # @name ks_get
@@ -164,6 +166,16 @@ Content-Type: application/json
 }
 
 ?? status < 500 && status != 401 && status != 403
+
+###
+# @name lookup_grades_for_classsection
+# @covers GET /api/lookups/grades
+GET {{baseUrl}}/api/lookups/grades?keystageId={{seedKeystageId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+@gradeId={{response.parsedBody.data[0].id}}
+?? response.parsedBody.data[0].id != null
 
 ###
 # @name subj_create
@@ -220,9 +232,9 @@ Content-Type: application/json
 
 {
   "academicYearId": {{academicYearId}},
-  "keystageId": {{keystageId}},
-  "grade": "G{{runKey}}",
-  "section": "A"
+  "keystageId": {{seedKeystageId}},
+  "gradeId": {{gradeId}},
+  "section": "Z"
 }
 
 ?? status >= 200 && status < 300
@@ -254,9 +266,9 @@ Content-Type: application/json
 
 {
   "academicYearId": {{academicYearId}},
-  "keystageId": {{keystageId}},
-  "grade": "G{{runKey}}",
-  "section": "B"
+  "keystageId": {{seedKeystageId}},
+  "gradeId": {{gradeId}},
+  "section": "Y"
 }
 
 ?? status < 500 && status != 401 && status != 403
@@ -449,6 +461,14 @@ Authorization: Bearer {{accessToken}}
 ?? status < 500 && status != 401 && status != 403
 
 ###
+# @name lookup_grades
+# @covers GET /api/lookups/grades
+GET {{baseUrl}}/api/lookups/grades
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
 # @name lookup_subjects
 # @covers GET /api/lookups/subjects
 GET {{baseUrl}}/api/lookups/subjects
@@ -603,6 +623,96 @@ GET {{baseUrl}}/api/books/search?q={{runKey}}
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+
+###
+# @name books_bulk_validate_missing_file
+# @covers POST /api/books/bulk/validate
+POST {{baseUrl}}/api/books/bulk/validate
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary--
+
+?? status >= 400 && status < 500
+
+###
+# @name books_bulk_commit_missing_file
+# @covers POST /api/books/bulk/commit
+POST {{baseUrl}}/api/books/bulk/commit
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary--
+
+?? status >= 400 && status < 500
+
+###
+# @name teachers_bulk_validate_missing_file
+# @covers POST /api/teachers/bulk/validate
+POST {{baseUrl}}/api/teachers/bulk/validate
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary--
+
+?? status >= 400 && status < 500
+
+###
+# @name teachers_bulk_commit_missing_file
+# @covers POST /api/teachers/bulk/commit
+POST {{baseUrl}}/api/teachers/bulk/commit
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary--
+
+?? status >= 400 && status < 500
+
+###
+# @name students_bulk_validate_missing_file
+# @covers POST /api/students/bulk/validate
+POST {{baseUrl}}/api/students/bulk/validate
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary--
+
+?? status >= 400 && status < 500
+
+###
+# @name students_bulk_commit_missing_file
+# @covers POST /api/students/bulk/commit
+POST {{baseUrl}}/api/students/bulk/commit
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary--
+
+?? status >= 400 && status < 500
+
+###
+# @name import_template_books
+# @covers GET /api/import-templates/books
+GET {{baseUrl}}/api/import-templates/books
+Authorization: Bearer {{accessToken}}
+
+?? status >= 200 && status < 300
+
+###
+# @name import_template_teachers
+# @covers GET /api/import-templates/teachers
+GET {{baseUrl}}/api/import-templates/teachers
+Authorization: Bearer {{accessToken}}
+
+?? status >= 200 && status < 300
+
+###
+# @name import_template_students
+# @covers GET /api/import-templates/students
+GET {{baseUrl}}/api/import-templates/students
+Authorization: Bearer {{accessToken}}
+
+?? status >= 200 && status < 300
 
 ###
 # @name distribution_create
