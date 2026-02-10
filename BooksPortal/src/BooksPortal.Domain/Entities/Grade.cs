@@ -2,12 +2,13 @@ using BooksPortal.Domain.Common;
 
 namespace BooksPortal.Domain.Entities;
 
-public class Keystage : BaseEntity
+public class Grade : BaseEntity
 {
+    public int KeystageId { get; set; }
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public int SortOrder { get; set; }
 
-    public ICollection<Grade> Grades { get; set; } = new List<Grade>();
+    public Keystage Keystage { get; set; } = null!;
     public ICollection<ClassSection> ClassSections { get; set; } = new List<ClassSection>();
 }

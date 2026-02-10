@@ -38,7 +38,7 @@ public class DistributionService : IDistributionService
     {
         var query = _slipRepo.Query()
             .Include(d => d.AcademicYear)
-            .Include(d => d.Student).ThenInclude(s => s.ClassSection)
+            .Include(d => d.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(d => d.Parent)
             .Include(d => d.Items).ThenInclude(i => i.Book)
             .AsQueryable();
@@ -59,7 +59,7 @@ public class DistributionService : IDistributionService
             StudentId = d.StudentId,
             StudentName = d.Student.FullName,
             StudentIndexNo = d.Student.IndexNo,
-            StudentClassName = d.Student.ClassSection.Grade + " - " + d.Student.ClassSection.Section,
+            StudentClassName = d.Student.ClassSection.Grade.Name + " - " + d.Student.ClassSection.Section,
             StudentNationalId = d.Student.NationalId,
             ParentId = d.ParentId,
             ParentName = d.Parent.FullName,
@@ -84,7 +84,7 @@ public class DistributionService : IDistributionService
     {
         var slip = await _slipRepo.Query()
             .Include(d => d.AcademicYear)
-            .Include(d => d.Student).ThenInclude(s => s.ClassSection)
+            .Include(d => d.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(d => d.Parent)
             .Include(d => d.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(d => d.Id == id)
@@ -97,7 +97,7 @@ public class DistributionService : IDistributionService
     {
         var slip = await _slipRepo.Query()
             .Include(d => d.AcademicYear)
-            .Include(d => d.Student).ThenInclude(s => s.ClassSection)
+            .Include(d => d.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(d => d.Parent)
             .Include(d => d.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(d => d.ReferenceNo == referenceNo)
@@ -212,7 +212,7 @@ public class DistributionService : IDistributionService
             StudentId = slip.StudentId,
             StudentName = slip.Student.FullName,
             StudentIndexNo = slip.Student.IndexNo,
-            StudentClassName = $"{slip.Student.ClassSection.Grade} - {slip.Student.ClassSection.Section}",
+            StudentClassName = $"{slip.Student.ClassSection.Grade.Name} - {slip.Student.ClassSection.Section}",
             StudentNationalId = slip.Student.NationalId,
             ParentId = slip.ParentId,
             ParentName = slip.Parent.FullName,

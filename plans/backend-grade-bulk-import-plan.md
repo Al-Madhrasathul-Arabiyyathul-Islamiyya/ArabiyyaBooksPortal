@@ -12,7 +12,7 @@ This plan tracks backend work needed before frontend Phase 3 completion:
 ## Branching
 - [x] Create `refactor/grade-entity-from-dev` from `dev`
 - [x] Create `feature/bulk-import-endpoints-from-dev` from `dev`
-- [ ] Implement model/migration work on `refactor/grade-entity-from-dev`
+- [x] Implement model/migration work on `refactor/grade-entity-from-dev`
 - [ ] Merge refactor branch to `dev` after verification
 - [ ] Rebase `feature/bulk-import-endpoints-from-dev` onto updated `dev`
 
@@ -21,54 +21,55 @@ This plan tracks backend work needed before frontend Phase 3 completion:
 ## Phase 1: Grade Entity and ClassSection Refactor
 
 ### 1.1 Domain + EF Model
-- [ ] Add `Grade` entity
-  - [ ] `KeystageId`, `Code`, `Name`, `NumericValue`, `SortOrder`
-  - [ ] Navigation to `Keystage` and `ClassSections`
-- [ ] Update `Keystage` to include `Grades` navigation
-- [ ] Update `ClassSection`
-  - [ ] Replace `Grade` string with `GradeId`
-  - [ ] Keep `AcademicYearId`, `KeystageId`, `Section`
-- [ ] Add `GradeConfiguration`
-- [ ] Update `ClassSectionConfiguration`
-  - [ ] Unique index `(AcademicYearId, GradeId, Section)`
-  - [ ] FK constraints for `GradeId` and `KeystageId`
+- [x] Add `Grade` entity
+  - [x] `KeystageId`, `Code`, `Name`, `NumericValue`, `SortOrder`
+  - [x] Navigation to `Keystage` and `ClassSections`
+- [x] Update `Keystage` to include `Grades` navigation
+- [x] Update `ClassSection`
+  - [x] Replace `Grade` string with `GradeId`
+  - [x] Keep `AcademicYearId`, `KeystageId`, `Section`
+- [x] Add `GradeConfiguration`
+- [x] Update `ClassSectionConfiguration`
+  - [x] Unique index `(AcademicYearId, GradeId, Section)`
+  - [x] FK constraints for `GradeId` and `KeystageId`
 
 ### 1.2 Business Rules and Services
-- [ ] Update class-section service/validators to use `gradeId`
-- [ ] Enforce grade-keystage consistency (`Grade.KeystageId == request.KeystageId`)
-- [ ] Update class-section DTOs and response mapping (`gradeId`, `gradeName`, `gradeNumericValue`)
+- [x] Update class-section service/validators to use `gradeId`
+- [x] Enforce grade-keystage consistency (`Grade.KeystageId == request.KeystageId`)
+- [x] Update class-section DTOs and response mapping (`gradeId`, `gradeName`, `gradeNumericValue`)
 
 ### 1.3 Seed Data
-- [ ] Seed Keystages and Grades idempotently
-  - [ ] Key stage 1: Grade 1, Grade 2, Grade 3
-  - [ ] Key stage 2: Grade 4, Grade 5, Grade 6
-  - [ ] Key stage 3: Grade 7, Grade 8
-  - [ ] Key stage 4: Grade 9, Grade 10
-  - [ ] Key stage 5: Grade 11, Grade 12
+- [x] Seed Keystages and Grades idempotently
+  - [x] Key stage 1: Grade 1, Grade 2, Grade 3
+  - [x] Key stage 2: Grade 4, Grade 5, Grade 6
+  - [x] Key stage 3: Grade 7, Grade 8
+  - [x] Key stage 4: Grade 9, Grade 10
+  - [x] Key stage 5: Grade 11, Grade 12
+  - [x] Seed default classes A-D for all grades on active academic year
 
 ### 1.4 Required Field Tightening
-- [ ] Student: `nationalId` required (DTO, validator, service path)
-- [ ] Parent: keep and enforce `nationalId` required
-- [ ] Book: make `publisher` required
-- [ ] Book: make `publishedYear` required
+- [x] Student: `nationalId` required (DTO, validator, service path)
+- [x] Parent: keep and enforce `nationalId` required
+- [x] Book: make `publisher` required
+- [x] Book: make `publishedYear` required
 
 ### 1.5 Audit Actor Standardization
-- [ ] Store actor email for authenticated changes (`AuditLog.UserName`)
-- [ ] Add system tags for non-user operations
-  - [ ] `system:seed`
-  - [ ] `system:bulk-import`
+- [x] Store actor email for authenticated changes (`AuditLog.UserName`)
+- [x] Add system tags for non-user operations
+  - [x] `system:seed`
+  - [x] `system:bulk-import`
 - [ ] Keep IP tracking out of scope
 
 ### 1.6 Migration
-- [ ] Create migration for `Grade` table and `ClassSection.GradeId`
-- [ ] Backfill existing class sections from old grade values
-- [ ] Remove old string grade column
+- [x] Create migration for `Grade` table and `ClassSection.GradeId`
+- [x] Reset migrations and create fresh baseline migration
+- [x] Remove old string grade column
 
 ### Phase 1 Verification
-- [ ] `dotnet build` passes
-- [ ] `dotnet test` passes (unit + integration)
+- [x] `dotnet build` passes
+- [x] `dotnet test` passes (unit + integration)
 - [ ] Existing class-section endpoints pass with new contract
-- [ ] Seed process creates expected keystage/grade structure
+- [x] Seed process creates expected keystage/grade structure
 
 ---
 
@@ -147,5 +148,5 @@ This plan tracks backend work needed before frontend Phase 3 completion:
 ## Progress Log
 - [x] Plan initialized
 - [x] Backend working branches created from `dev`
-- [ ] Grade refactor implementation started
+- [x] Grade refactor implementation completed
 - [ ] Bulk import implementation started

@@ -9,7 +9,7 @@ public class CreateClassSectionRequestValidator : AbstractValidator<CreateClassS
     {
         RuleFor(x => x.AcademicYearId).GreaterThan(0);
         RuleFor(x => x.KeystageId).GreaterThan(0);
-        RuleFor(x => x.Grade).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.GradeId).GreaterThan(0);
         RuleFor(x => x.Section).NotEmpty().MaximumLength(10);
     }
 }

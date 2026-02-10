@@ -17,6 +17,7 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
     public DbSet<Keystage> Keystages => Set<Keystage>();
+    public DbSet<Grade> Grades => Set<Grade>();
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<ClassSection> ClassSections => Set<ClassSection>();
     public DbSet<Student> Students => Set<Student>();
@@ -74,7 +75,9 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     {
         ChangeTracker.DetectChanges();
         var userId = _currentUserService.UserId;
-        var userName = _currentUserService.UserName;
+        var actor = _currentUserService.IsAuthenticated
+            ? (_currentUserService.UserEmail ?? _currentUserService.UserName ?? "system:bulk-import")
+            : "system:seed";
         var now = DateTime.UtcNow;
         var auditEntries = new List<AuditEntry>();
 
@@ -114,7 +117,7 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
                 },
                 EntityType = entry.Entity.GetType().Name,
                 UserId = userId,
-                UserName = userName
+                UserName = actor
             };
 
             foreach (var property in entry.Properties)

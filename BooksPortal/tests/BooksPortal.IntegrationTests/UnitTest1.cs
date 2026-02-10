@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace BooksPortal.IntegrationTests;
 
-public class HealthCheckTests : IClassFixture<WebApplicationFactory<Program>>
+public class HealthCheckTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public HealthCheckTests(WebApplicationFactory<Program> factory)
+    public HealthCheckTests(IntegrationTestWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }

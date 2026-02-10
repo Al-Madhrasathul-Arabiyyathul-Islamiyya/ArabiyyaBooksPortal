@@ -12,5 +12,8 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
         RuleFor(x => x.SubjectId).GreaterThan(0);
         RuleFor(x => x.ISBN).MaximumLength(20);
         RuleFor(x => x.Author).MaximumLength(300);
+        RuleFor(x => x.Publisher).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.PublishedYear)
+            .InclusiveBetween(1900, 2100);
     }
 }

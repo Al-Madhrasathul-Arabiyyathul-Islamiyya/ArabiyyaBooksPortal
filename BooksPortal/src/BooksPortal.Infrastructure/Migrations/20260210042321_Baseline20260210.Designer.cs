@@ -4,16 +4,19 @@ using BooksPortal.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BooksPortal.Infrastructure.Data.Migrations
+namespace BooksPortal.Infrastructure.Migrations
 {
     [DbContext(typeof(BooksPortalDbContext))]
-    partial class BooksPortalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210042321_Baseline20260210")]
+    partial class Baseline20260210
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,10 +188,11 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
-                    b.Property<int?>("PublishedYear")
+                    b.Property<int>("PublishedYear")
                         .HasColumnType("int");
 
                     b.Property<string>("Publisher")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -246,10 +250,8 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Grade")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<int>("GradeId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -270,9 +272,11 @@ namespace BooksPortal.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GradeId");
+
                     b.HasIndex("KeystageId");
 
-                    b.HasIndex("AcademicYearId", "Grade", "Section")
+                    b.HasIndex("AcademicYearId", "GradeId", "Section")
                         .IsUnique();
 
                     b.ToTable("ClassSections", (string)null);
@@ -390,6 +394,56 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                     b.HasIndex("DistributionSlipId");
 
                     b.ToTable("DistributionSlipItems", (string)null);
+                });
+
+            modelBuilder.Entity("BooksPortal.Domain.Entities.Grade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KeystageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KeystageId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("Grades", (string)null);
                 });
 
             modelBuilder.Entity("BooksPortal.Domain.Entities.Keystage", b =>
@@ -867,6 +921,7 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("NationalId")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -1580,6 +1635,12 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BooksPortal.Domain.Entities.Grade", "Grade")
+                        .WithMany("ClassSections")
+                        .HasForeignKey("GradeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("BooksPortal.Domain.Entities.Keystage", "Keystage")
                         .WithMany("ClassSections")
                         .HasForeignKey("KeystageId")
@@ -1587,6 +1648,8 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("AcademicYear");
+
+                    b.Navigation("Grade");
 
                     b.Navigation("Keystage");
                 });
@@ -1635,6 +1698,17 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("DistributionSlip");
+                });
+
+            modelBuilder.Entity("BooksPortal.Domain.Entities.Grade", b =>
+                {
+                    b.HasOne("BooksPortal.Domain.Entities.Keystage", "Keystage")
+                        .WithMany("Grades")
+                        .HasForeignKey("KeystageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Keystage");
                 });
 
             modelBuilder.Entity("BooksPortal.Domain.Entities.ReferenceNumberFormat", b =>
@@ -1941,9 +2015,16 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                     b.Navigation("Items");
                 });
 
+            modelBuilder.Entity("BooksPortal.Domain.Entities.Grade", b =>
+                {
+                    b.Navigation("ClassSections");
+                });
+
             modelBuilder.Entity("BooksPortal.Domain.Entities.Keystage", b =>
                 {
                     b.Navigation("ClassSections");
+
+                    b.Navigation("Grades");
                 });
 
             modelBuilder.Entity("BooksPortal.Domain.Entities.Parent", b =>

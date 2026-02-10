@@ -29,7 +29,7 @@ public class TeacherService : ITeacherService
     {
         var query = _repository.Query()
             .Include(t => t.TeacherAssignments).ThenInclude(ta => ta.Subject)
-            .Include(t => t.TeacherAssignments).ThenInclude(ta => ta.ClassSection)
+            .Include(t => t.TeacherAssignments).ThenInclude(ta => ta.ClassSection).ThenInclude(cs => cs.Grade)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -48,7 +48,7 @@ public class TeacherService : ITeacherService
                 SubjectId = ta.SubjectId,
                 SubjectName = ta.Subject.Name,
                 ClassSectionId = ta.ClassSectionId,
-                ClassSectionDisplayName = ta.ClassSection.Grade + " " + ta.ClassSection.Section
+                ClassSectionDisplayName = ta.ClassSection.Grade.Name + " " + ta.ClassSection.Section
             }).ToList()
         });
 
@@ -59,7 +59,7 @@ public class TeacherService : ITeacherService
     {
         var entity = await _repository.Query()
             .Include(t => t.TeacherAssignments).ThenInclude(ta => ta.Subject)
-            .Include(t => t.TeacherAssignments).ThenInclude(ta => ta.ClassSection)
+            .Include(t => t.TeacherAssignments).ThenInclude(ta => ta.ClassSection).ThenInclude(cs => cs.Grade)
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException(nameof(Teacher), id);
 
@@ -76,7 +76,7 @@ public class TeacherService : ITeacherService
                 SubjectId = ta.SubjectId,
                 SubjectName = ta.Subject.Name,
                 ClassSectionId = ta.ClassSectionId,
-                ClassSectionDisplayName = ta.ClassSection.Grade + " " + ta.ClassSection.Section
+                ClassSectionDisplayName = ta.ClassSection.Grade.Name + " " + ta.ClassSection.Section
             }).ToList()
         };
     }
@@ -140,7 +140,7 @@ public class TeacherService : ITeacherService
 
         var saved = await _assignmentRepo.Query()
             .Include(ta => ta.Subject)
-            .Include(ta => ta.ClassSection)
+            .Include(ta => ta.ClassSection).ThenInclude(cs => cs.Grade)
             .FirstAsync(ta => ta.Id == assignment.Id);
 
         return new TeacherAssignmentResponse
@@ -149,7 +149,7 @@ public class TeacherService : ITeacherService
             SubjectId = saved.SubjectId,
             SubjectName = saved.Subject.Name,
             ClassSectionId = saved.ClassSectionId,
-            ClassSectionDisplayName = saved.ClassSection.Grade + " " + saved.ClassSection.Section
+            ClassSectionDisplayName = saved.ClassSection.Grade.Name + " " + saved.ClassSection.Section
         };
     }
 

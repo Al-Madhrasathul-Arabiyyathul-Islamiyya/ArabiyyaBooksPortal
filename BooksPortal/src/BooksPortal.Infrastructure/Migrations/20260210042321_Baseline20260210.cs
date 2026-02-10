@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BooksPortal.Infrastructure.Data.Migrations
+namespace BooksPortal.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Baseline20260209 : Migration
+    public partial class Baseline20260210 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -384,15 +384,15 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClassSections",
+                name: "Grades",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AcademicYearId = table.Column<int>(type: "int", nullable: false),
                     KeystageId = table.Column<int>(type: "int", nullable: false),
-                    Grade = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Section = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -402,15 +402,9 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClassSections", x => x.Id);
+                    table.PrimaryKey("PK_Grades", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ClassSections_AcademicYears_AcademicYearId",
-                        column: x => x.AcademicYearId,
-                        principalTable: "AcademicYears",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ClassSections_Keystages_KeystageId",
+                        name: "FK_Grades_Keystages_KeystageId",
                         column: x => x.KeystageId,
                         principalTable: "Keystages",
                         principalColumn: "Id",
@@ -428,8 +422,8 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                     Title = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Author = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     Edition = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Publisher = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    PublishedYear = table.Column<int>(type: "int", nullable: true),
+                    Publisher = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    PublishedYear = table.Column<int>(type: "int", nullable: false),
                     SubjectId = table.Column<int>(type: "int", nullable: false),
                     Grade = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     TotalStock = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
@@ -495,15 +489,15 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "ClassSections",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    IndexNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    NationalId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ClassSectionId = table.Column<int>(type: "int", nullable: false),
+                    AcademicYearId = table.Column<int>(type: "int", nullable: false),
+                    KeystageId = table.Column<int>(type: "int", nullable: false),
+                    GradeId = table.Column<int>(type: "int", nullable: false),
+                    Section = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -513,50 +507,23 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.PrimaryKey("PK_ClassSections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Students_ClassSections_ClassSectionId",
-                        column: x => x.ClassSectionId,
-                        principalTable: "ClassSections",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TeacherAssignments",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TeacherId = table.Column<int>(type: "int", nullable: false),
-                    SubjectId = table.Column<int>(type: "int", nullable: false),
-                    ClassSectionId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeacherAssignments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TeacherAssignments_ClassSections_ClassSectionId",
-                        column: x => x.ClassSectionId,
-                        principalTable: "ClassSections",
+                        name: "FK_ClassSections_AcademicYears_AcademicYearId",
+                        column: x => x.AcademicYearId,
+                        principalTable: "AcademicYears",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_TeacherAssignments_Subjects_SubjectId",
-                        column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        name: "FK_ClassSections_Grades_GradeId",
+                        column: x => x.GradeId,
+                        principalTable: "Grades",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_TeacherAssignments_Teachers_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "Teachers",
+                        name: "FK_ClassSections_Keystages_KeystageId",
+                        column: x => x.KeystageId,
+                        principalTable: "Keystages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -698,6 +665,113 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    IndexNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    NationalId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ClassSectionId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Students_ClassSections_ClassSectionId",
+                        column: x => x.ClassSectionId,
+                        principalTable: "ClassSections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TeacherAssignments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    SubjectId = table.Column<int>(type: "int", nullable: false),
+                    ClassSectionId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeacherAssignments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeacherAssignments_ClassSections_ClassSectionId",
+                        column: x => x.ClassSectionId,
+                        principalTable: "ClassSections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeacherAssignments_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeacherAssignments_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TeacherReturnSlipItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TeacherReturnSlipId = table.Column<int>(type: "int", nullable: false),
+                    TeacherIssueItemId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeacherReturnSlipItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeacherReturnSlipItems_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeacherReturnSlipItems_TeacherIssueItems_TeacherIssueItemId",
+                        column: x => x.TeacherIssueItemId,
+                        principalTable: "TeacherIssueItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeacherReturnSlipItems_TeacherReturnSlips_TeacherReturnSlipId",
+                        column: x => x.TeacherReturnSlipId,
+                        principalTable: "TeacherReturnSlips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DistributionSlips",
                 columns: table => new
                 {
@@ -803,46 +877,6 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                         principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TeacherReturnSlipItems",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TeacherReturnSlipId = table.Column<int>(type: "int", nullable: false),
-                    TeacherIssueItemId = table.Column<int>(type: "int", nullable: false),
-                    BookId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeacherReturnSlipItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TeacherReturnSlipItems_Books_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_TeacherReturnSlipItems_TeacherIssueItems_TeacherIssueItemId",
-                        column: x => x.TeacherIssueItemId,
-                        principalTable: "TeacherIssueItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_TeacherReturnSlipItems_TeacherReturnSlips_TeacherReturnSlipId",
-                        column: x => x.TeacherReturnSlipId,
-                        principalTable: "TeacherReturnSlips",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -992,10 +1026,15 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassSections_AcademicYearId_Grade_Section",
+                name: "IX_ClassSections_AcademicYearId_GradeId_Section",
                 table: "ClassSections",
-                columns: new[] { "AcademicYearId", "Grade", "Section" },
+                columns: new[] { "AcademicYearId", "GradeId", "Section" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClassSections_GradeId",
+                table: "ClassSections",
+                column: "GradeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClassSections_KeystageId",
@@ -1032,6 +1071,12 @@ namespace BooksPortal.Infrastructure.Data.Migrations
                 name: "IX_DistributionSlips_StudentId",
                 table: "DistributionSlips",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Grades_KeystageId_Code",
+                table: "Grades",
+                columns: new[] { "KeystageId", "Code" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Keystages_Code",
@@ -1326,6 +1371,9 @@ namespace BooksPortal.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AcademicYears");
+
+            migrationBuilder.DropTable(
+                name: "Grades");
 
             migrationBuilder.DropTable(
                 name: "Keystages");

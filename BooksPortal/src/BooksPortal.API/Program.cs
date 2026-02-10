@@ -7,6 +7,7 @@ using BooksPortal.Application.Common.Models;
 using BooksPortal.Infrastructure;
 using BooksPortal.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Infrastructure;
 using Serilog;
@@ -95,6 +96,8 @@ var app = builder.Build();
 // Seed data
 using (var scope = app.Services.CreateScope())
 {
+    var dbContext = scope.ServiceProvider.GetRequiredService<BooksPortalDbContext>();
+    await dbContext.Database.MigrateAsync();
     await SeedData.SeedAsync(scope.ServiceProvider);
 }
 

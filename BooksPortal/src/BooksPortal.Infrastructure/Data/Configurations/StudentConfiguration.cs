@@ -22,6 +22,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .IsUnique();
 
         builder.Property(s => s.NationalId)
+            .IsRequired()
             .HasMaxLength(50);
 
         builder.HasOne(s => s.ClassSection)

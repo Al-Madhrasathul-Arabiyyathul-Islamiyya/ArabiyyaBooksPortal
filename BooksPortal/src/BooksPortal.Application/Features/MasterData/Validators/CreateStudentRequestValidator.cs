@@ -9,6 +9,7 @@ public class CreateStudentRequestValidator : AbstractValidator<CreateStudentRequ
     {
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(200);
         RuleFor(x => x.IndexNo).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.NationalId).NotEmpty().MaximumLength(50);
         RuleFor(x => x.ClassSectionId).GreaterThan(0);
     }
 }

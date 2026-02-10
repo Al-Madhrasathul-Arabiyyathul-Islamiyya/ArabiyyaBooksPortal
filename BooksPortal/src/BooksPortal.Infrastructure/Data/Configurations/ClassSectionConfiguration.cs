@@ -10,15 +10,11 @@ public class ClassSectionConfiguration : IEntityTypeConfiguration<ClassSection>
     {
         builder.ToTable("ClassSections");
 
-        builder.Property(c => c.Grade)
-            .IsRequired()
-            .HasMaxLength(20);
-
         builder.Property(c => c.Section)
             .IsRequired()
             .HasMaxLength(10);
 
-        builder.HasIndex(c => new { c.AcademicYearId, c.Grade, c.Section })
+        builder.HasIndex(c => new { c.AcademicYearId, c.GradeId, c.Section })
             .IsUnique();
 
         builder.HasOne(c => c.AcademicYear)
@@ -29,6 +25,11 @@ public class ClassSectionConfiguration : IEntityTypeConfiguration<ClassSection>
         builder.HasOne(c => c.Keystage)
             .WithMany(k => k.ClassSections)
             .HasForeignKey(c => c.KeystageId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(c => c.Grade)
+            .WithMany(g => g.ClassSections)
+            .HasForeignKey(c => c.GradeId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

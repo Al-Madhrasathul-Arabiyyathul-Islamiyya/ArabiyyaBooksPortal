@@ -19,6 +19,10 @@ public class LookupsController : ApiControllerBase
     public async Task<IActionResult> GetKeystages()
         => OkResponse(await _service.GetKeystagesAsync());
 
+    [HttpGet("grades")]
+    public async Task<IActionResult> GetGrades([FromQuery] int? keystageId)
+        => OkResponse(await _service.GetGradesAsync(keystageId));
+
     [HttpGet("subjects")]
     public async Task<IActionResult> GetSubjects()
         => OkResponse(await _service.GetSubjectsAsync());

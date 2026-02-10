@@ -24,7 +24,7 @@ public class StudentService : IStudentService
     public async Task<PaginatedList<StudentResponse>> GetPagedAsync(int pageNumber, int pageSize, int? classSectionId = null, string? search = null)
     {
         var query = _repository.Query()
-            .Include(s => s.ClassSection)
+            .Include(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(s => s.StudentParents).ThenInclude(sp => sp.Parent)
             .AsQueryable();
 
@@ -41,7 +41,7 @@ public class StudentService : IStudentService
             IndexNo = s.IndexNo,
             NationalId = s.NationalId,
             ClassSectionId = s.ClassSectionId,
-            ClassSectionDisplayName = s.ClassSection.Grade + " " + s.ClassSection.Section,
+            ClassSectionDisplayName = s.ClassSection.Grade.Name + " " + s.ClassSection.Section,
             Parents = s.StudentParents.Select(sp => new StudentParentResponse
             {
                 ParentId = sp.ParentId,
@@ -59,7 +59,7 @@ public class StudentService : IStudentService
     public async Task<StudentResponse> GetByIdAsync(int id)
     {
         var entity = await _repository.Query()
-            .Include(s => s.ClassSection)
+            .Include(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(s => s.StudentParents).ThenInclude(sp => sp.Parent)
             .FirstOrDefaultAsync(s => s.Id == id)
             ?? throw new NotFoundException(nameof(Student), id);
@@ -71,7 +71,7 @@ public class StudentService : IStudentService
             IndexNo = entity.IndexNo,
             NationalId = entity.NationalId,
             ClassSectionId = entity.ClassSectionId,
-            ClassSectionDisplayName = entity.ClassSection.Grade + " " + entity.ClassSection.Section,
+            ClassSectionDisplayName = entity.ClassSection.Grade.Name + " " + entity.ClassSection.Section,
             Parents = entity.StudentParents.Select(sp => new StudentParentResponse
             {
                 ParentId = sp.ParentId,

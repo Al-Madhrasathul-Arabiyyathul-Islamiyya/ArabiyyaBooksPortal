@@ -38,7 +38,7 @@ public class ReturnService : IReturnService
     {
         var query = _slipRepo.Query()
             .Include(r => r.AcademicYear)
-            .Include(r => r.Student).ThenInclude(s => s.ClassSection)
+            .Include(r => r.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(r => r.Items).ThenInclude(i => i.Book)
             .AsQueryable();
 
@@ -57,7 +57,7 @@ public class ReturnService : IReturnService
             StudentId = r.StudentId,
             StudentName = r.Student.FullName,
             StudentIndexNo = r.Student.IndexNo,
-            StudentClassName = r.Student.ClassSection.Grade + " - " + r.Student.ClassSection.Section,
+            StudentClassName = r.Student.ClassSection.Grade.Name + " - " + r.Student.ClassSection.Section,
             StudentNationalId = r.Student.NationalId,
             ReturnedById = r.ReturnedById,
             ReceivedById = r.ReceivedById,
@@ -83,7 +83,7 @@ public class ReturnService : IReturnService
     {
         var slip = await _slipRepo.Query()
             .Include(r => r.AcademicYear)
-            .Include(r => r.Student).ThenInclude(s => s.ClassSection)
+            .Include(r => r.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(r => r.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(r => r.Id == id)
             ?? throw new NotFoundException(nameof(ReturnSlip), id);
@@ -95,7 +95,7 @@ public class ReturnService : IReturnService
     {
         var slip = await _slipRepo.Query()
             .Include(r => r.AcademicYear)
-            .Include(r => r.Student).ThenInclude(s => s.ClassSection)
+            .Include(r => r.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
             .Include(r => r.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(r => r.ReferenceNo == referenceNo)
             ?? throw new NotFoundException(nameof(ReturnSlip), referenceNo);
@@ -245,7 +245,7 @@ public class ReturnService : IReturnService
             StudentId = slip.StudentId,
             StudentName = slip.Student.FullName,
             StudentIndexNo = slip.Student.IndexNo,
-            StudentClassName = $"{slip.Student.ClassSection.Grade} - {slip.Student.ClassSection.Section}",
+            StudentClassName = $"{slip.Student.ClassSection.Grade.Name} - {slip.Student.ClassSection.Section}",
             StudentNationalId = slip.Student.NationalId,
             ReturnedById = slip.ReturnedById,
             ReceivedById = slip.ReceivedById,
