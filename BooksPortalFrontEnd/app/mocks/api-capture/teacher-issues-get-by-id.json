@@ -1,32 +1,32 @@
 {
-  "uri": "http://localhost:5071/api/TeacherIssues/2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "teacher-issues-get-by-id",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"TIS2249000001\",\"academicYearId\":2,\"academicYearName\":\"AY 2249\",\"teacherId\":2,\"teacherName\":\"Teacher 1770660248\",\"issuedById\":1,\"issuedAt\":\"2026-02-09T18:04:31.6690185\",\"expectedReturnDate\":\"2249-12-31T00:00:00\",\"status\":\"Active\",\"notes\":\"Teacher issue for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\TeacherIssue\\\\AY 2249\\\\TIS2249000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1,\"returnedQuantity\":0,\"outstandingQuantity\":1}]}}",
+  "capturedAtUtc": "2026-02-10T11:55:49.4664186Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"TIS6515000001\",\"academicYearId\":3,\"academicYearName\":\"AY 6515\",\"teacherId\":2,\"teacherName\":\"Teacher 1770724514\",\"issuedById\":1,\"issuedAt\":\"2026-02-10T11:55:37.8059012\",\"expectedReturnDate\":\"6515-12-31T00:00:00\",\"status\":\"Active\",\"notes\":\"Teacher issue for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\TeacherIssue\\\\AY 6515\\\\TIS6515000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770724514\",\"bookCode\":\"BK4514\",\"quantity\":1,\"returnedQuantity\":0,\"outstandingQuantity\":1}]}}",
+  "uri": "http://localhost:5071/api/TeacherIssues/2",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "referenceNo": "TIS2249000001",
-      "academicYearId": 2,
-      "academicYearName": "AY 2249",
+      "referenceNo": "TIS6515000001",
+      "academicYearId": 3,
+      "academicYearName": "AY 6515",
       "teacherId": 2,
-      "teacherName": "Teacher 1770660248",
+      "teacherName": "Teacher 1770724514",
       "issuedById": 1,
-      "issuedAt": "2026-02-09T18:04:31.6690185",
-      "expectedReturnDate": "2249-12-31T00:00:00",
+      "issuedAt": "2026-02-10T11:55:37.8059012",
+      "expectedReturnDate": "6515-12-31T00:00:00",
       "status": "Active",
       "notes": "Teacher issue for frontend mock capture",
-      "pdfFilePath": "D:\\SlipStorage\\TeacherIssue\\AY 2249\\TIS2249000001.pdf",
+      "pdfFilePath": "D:\\SlipStorage\\TeacherIssue\\AY 6515\\TIS6515000001.pdf",
       "items": [
         {
           "id": 2,
           "bookId": 2,
-          "bookTitle": "Book 1770660248",
-          "bookCode": "BK0248",
+          "bookTitle": "Book 1770724514",
+          "bookCode": "BK4514",
           "quantity": 1,
           "returnedQuantity": 0,
           "outstandingQuantity": 1
@@ -34,5 +34,5 @@
       ]
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.2633264Z"
+  "name": "teacher-issues-get-by-id"
 }

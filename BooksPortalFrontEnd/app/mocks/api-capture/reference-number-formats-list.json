@@ -1,14 +1,14 @@
 {
-  "uri": "http://localhost:5071/api/ReferenceNumberFormats?slipType=Distribution&academicYearId=2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "reference-number-formats-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.4724077Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[]}",
+  "uri": "http://localhost:5071/api/ReferenceNumberFormats?slipType=Distribution&academicYearId=3",
+  "isError": false,
   "body": {
     "success": true,
     "data": []
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.2703021Z"
+  "name": "reference-number-formats-list"
 }

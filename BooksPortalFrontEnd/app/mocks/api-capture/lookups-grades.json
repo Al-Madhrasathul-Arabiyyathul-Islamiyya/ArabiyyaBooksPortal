@@ -1,0 +1,27 @@
+{
+  "capturedAtUtc": "2026-02-10T11:55:49.3205882Z",
+  "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Grade 1\"},{\"id\":2,\"name\":\"Grade 2\"},{\"id\":3,\"name\":\"Grade 3\"}]}",
+  "uri": "http://localhost:5071/api/lookups/grades?keystageId=1",
+  "isError": false,
+  "body": {
+    "success": true,
+    "data": [
+      {
+        "id": 1,
+        "name": "Grade 1"
+      },
+      {
+        "id": 2,
+        "name": "Grade 2"
+      },
+      {
+        "id": 3,
+        "name": "Grade 3"
+      }
+    ]
+  },
+  "name": "lookups-grades"
+}

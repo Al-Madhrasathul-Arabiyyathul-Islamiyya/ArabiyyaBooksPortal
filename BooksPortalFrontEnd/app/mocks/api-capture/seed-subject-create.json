@@ -1,18 +1,18 @@
 {
-  "uri": "http://localhost:5071/api/subjects",
-  "statusCode": 201,
-  "isError": false,
-  "name": "seed-subject-create",
-  "requestBody": "{\r\n  \"code\": \"SB0248\",\r\n  \"name\": \"Subject 0248\"\r\n}",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"code\":\"SB0248\",\"name\":\"Subject 0248\"}}",
+  "capturedAtUtc": "2026-02-10T11:55:15.1474556Z",
   "method": "POST",
+  "requestBody": "{\r\n  \"code\": \"SB4514\",\r\n  \"name\": \"Subject 4514\"\r\n}",
+  "statusCode": 201,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"code\":\"SB4514\",\"name\":\"Subject 4514\"}}",
+  "uri": "http://localhost:5071/api/subjects",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "code": "SB0248",
-      "name": "Subject 0248"
+      "code": "SB4514",
+      "name": "Subject 4514"
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:08.9787050Z"
+  "name": "seed-subject-create"
 }

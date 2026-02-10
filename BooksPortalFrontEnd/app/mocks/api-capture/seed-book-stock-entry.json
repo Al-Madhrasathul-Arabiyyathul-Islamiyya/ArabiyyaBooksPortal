@@ -1,23 +1,23 @@
 {
-  "uri": "http://localhost:5071/api/books/2/stock-entry",
-  "statusCode": 201,
-  "isError": false,
-  "name": "seed-book-stock-entry",
-  "requestBody": "{\r\n  \"academicYearId\": 2,\r\n  \"quantity\": 30,\r\n  \"source\": \"Mock Capture\",\r\n  \"notes\": \"Initial stock for frontend mock capture\"\r\n}",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"bookId\":2,\"academicYearId\":2,\"quantity\":30,\"source\":\"Mock Capture\",\"notes\":\"Initial stock for frontend mock capture\",\"enteredById\":1,\"enteredAt\":\"2026-02-09T18:04:09.1221941Z\"}}",
+  "capturedAtUtc": "2026-02-10T11:55:15.2867684Z",
   "method": "POST",
+  "requestBody": "{\r\n  \"academicYearId\": 3,\r\n  \"quantity\": 30,\r\n  \"source\": \"Mock Capture\",\r\n  \"notes\": \"Initial stock for frontend mock capture\"\r\n}",
+  "statusCode": 201,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"bookId\":2,\"academicYearId\":3,\"quantity\":30,\"source\":\"Mock Capture\",\"notes\":\"Initial stock for frontend mock capture\",\"enteredById\":1,\"enteredAt\":\"2026-02-10T11:55:15.277216Z\"}}",
+  "uri": "http://localhost:5071/api/books/2/stock-entry",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
       "bookId": 2,
-      "academicYearId": 2,
+      "academicYearId": 3,
       "quantity": 30,
       "source": "Mock Capture",
       "notes": "Initial stock for frontend mock capture",
       "enteredById": 1,
-      "enteredAt": "2026-02-09T18:04:09.1221941Z"
+      "enteredAt": "2026-02-10T11:55:15.277216Z"
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:09.1321176Z"
+  "name": "seed-book-stock-entry"
 }

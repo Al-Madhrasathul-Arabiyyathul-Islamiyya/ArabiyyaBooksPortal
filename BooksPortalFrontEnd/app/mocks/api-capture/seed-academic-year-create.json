@@ -1,21 +1,21 @@
 {
-  "uri": "http://localhost:5071/api/AcademicYears",
-  "statusCode": 201,
-  "isError": false,
-  "name": "seed-academic-year-create",
-  "requestBody": "{\r\n  \"name\": \"AY 2249\",\r\n  \"year\": 2249,\r\n  \"startDate\": \"2249-01-01T00:00:00Z\",\r\n  \"endDate\": \"2249-12-31T00:00:00Z\"\r\n}",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"name\":\"AY 2249\",\"year\":2249,\"startDate\":\"2249-01-01T00:00:00Z\",\"endDate\":\"2249-12-31T00:00:00Z\",\"isActive\":false}}",
+  "capturedAtUtc": "2026-02-10T11:55:15.0947511Z",
   "method": "POST",
+  "requestBody": "{\r\n  \"name\": \"AY 6515\",\r\n  \"year\": 6515,\r\n  \"startDate\": \"6515-01-01T00:00:00Z\",\r\n  \"endDate\": \"6515-12-31T00:00:00Z\"\r\n}",
+  "statusCode": 201,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":3,\"name\":\"AY 6515\",\"year\":6515,\"startDate\":\"6515-01-01T00:00:00Z\",\"endDate\":\"6515-12-31T00:00:00Z\",\"isActive\":false}}",
+  "uri": "http://localhost:5071/api/AcademicYears",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
-      "id": 2,
-      "name": "AY 2249",
-      "year": 2249,
-      "startDate": "2249-01-01T00:00:00Z",
-      "endDate": "2249-12-31T00:00:00Z",
+      "id": 3,
+      "name": "AY 6515",
+      "year": 6515,
+      "startDate": "6515-01-01T00:00:00Z",
+      "endDate": "6515-12-31T00:00:00Z",
       "isActive": false
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:08.9504966Z"
+  "name": "seed-academic-year-create"
 }

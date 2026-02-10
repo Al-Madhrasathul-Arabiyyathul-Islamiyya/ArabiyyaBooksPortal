@@ -1,28 +1,28 @@
 {
-  "uri": "http://localhost:5071/api/teachers?pageNumber=1&pageSize=20&search=1770660248",
-  "statusCode": 200,
-  "isError": false,
-  "name": "teachers-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Teacher 1770660248\",\"nationalId\":\"TN1770660248\",\"email\":\"teacher1770660248@booksportal.local\",\"phone\":\"7222220248\",\"assignments\":[{\"id\":2,\"subjectId\":2,\"subjectName\":\"Subject 0248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\"}]}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "capturedAtUtc": "2026-02-10T11:55:49.1576746Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Teacher 1770724514\",\"nationalId\":\"TN1770724514\",\"email\":\"teacher1770724514@booksportal.local\",\"phone\":\"7222224514\",\"assignments\":[{\"id\":2,\"subjectId\":2,\"subjectName\":\"Subject 4514\",\"classSectionId\":50,\"classSectionDisplayName\":\"Grade 1 A\"}]}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "uri": "http://localhost:5071/api/teachers?pageNumber=1&pageSize=20&search=1770724514",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "items": [
         {
           "id": 2,
-          "fullName": "Teacher 1770660248",
-          "nationalId": "TN1770660248",
-          "email": "teacher1770660248@booksportal.local",
-          "phone": "7222220248",
+          "fullName": "Teacher 1770724514",
+          "nationalId": "TN1770724514",
+          "email": "teacher1770724514@booksportal.local",
+          "phone": "7222224514",
           "assignments": [
             {
               "id": 2,
               "subjectId": 2,
-              "subjectName": "Subject 0248",
-              "classSectionId": 2,
-              "classSectionDisplayName": "G0248 A"
+              "subjectName": "Subject 4514",
+              "classSectionId": 50,
+              "classSectionDisplayName": "Grade 1 A"
             }
           ]
         }
@@ -35,5 +35,5 @@
       "hasNext": false
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.0185724Z"
+  "name": "teachers-list"
 }

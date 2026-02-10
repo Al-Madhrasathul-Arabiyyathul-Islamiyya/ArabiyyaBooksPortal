@@ -1,11 +1,11 @@
 {
-  "uri": "http://localhost:5071/api/users",
-  "statusCode": 200,
-  "isError": false,
-  "name": "users-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"userName\":\"admin\",\"email\":\"admin@booksportal.local\",\"fullName\":\"System Administrator\",\"isActive\":true,\"roles\":[\"SuperAdmin\"],\"createdAt\":\"2026-02-09T18:03:03.1160653\"},{\"id\":2,\"userName\":\"apitest1770660185\",\"email\":\"apitest1770660185@booksportal.local\",\"fullName\":\"API Test 1770660185 Updated\",\"nationalId\":\"UN1770660185\",\"designation\":\"Automation Updated\",\"isActive\":true,\"roles\":[\"Admin\",\"User\"],\"createdAt\":\"2026-02-09T18:04:07.1876537\"},{\"id\":3,\"userName\":\"apitest1770660248\",\"email\":\"apitest1770660248@booksportal.local\",\"fullName\":\"API Test 1770660248\",\"nationalId\":\"UN1770660248\",\"designation\":\"Automation\",\"isActive\":true,\"roles\":[\"User\"],\"createdAt\":\"2026-02-09T18:04:42.9364407\"}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.2964175Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"userName\":\"admin\",\"email\":\"admin@booksportal.local\",\"fullName\":\"System Administrator\",\"isActive\":true,\"roles\":[\"SuperAdmin\"],\"createdAt\":\"2026-02-10T11:54:08.1842566\"},{\"id\":2,\"userName\":\"apitest1770724449\",\"email\":\"apitest1770724449@booksportal.local\",\"fullName\":\"API Test 1770724449 Updated\",\"nationalId\":\"UN1770724449\",\"designation\":\"Automation Updated\",\"isActive\":true,\"roles\":[\"Admin\",\"User\"],\"createdAt\":\"2026-02-10T11:55:13.2989102\"},{\"id\":3,\"userName\":\"apitest1770724514\",\"email\":\"apitest1770724514@booksportal.local\",\"fullName\":\"API Test 1770724514\",\"nationalId\":\"UN1770724514\",\"designation\":\"Automation\",\"isActive\":true,\"roles\":[\"User\"],\"createdAt\":\"2026-02-10T11:55:49.0714717\"}]}",
+  "uri": "http://localhost:5071/api/users",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
@@ -18,36 +18,36 @@
         "roles": [
           "SuperAdmin"
         ],
-        "createdAt": "2026-02-09T18:03:03.1160653"
+        "createdAt": "2026-02-10T11:54:08.1842566"
       },
       {
         "id": 2,
-        "userName": "apitest1770660185",
-        "email": "apitest1770660185@booksportal.local",
-        "fullName": "API Test 1770660185 Updated",
-        "nationalId": "UN1770660185",
+        "userName": "apitest1770724449",
+        "email": "apitest1770724449@booksportal.local",
+        "fullName": "API Test 1770724449 Updated",
+        "nationalId": "UN1770724449",
         "designation": "Automation Updated",
         "isActive": true,
         "roles": [
           "Admin",
           "User"
         ],
-        "createdAt": "2026-02-09T18:04:07.1876537"
+        "createdAt": "2026-02-10T11:55:13.2989102"
       },
       {
         "id": 3,
-        "userName": "apitest1770660248",
-        "email": "apitest1770660248@booksportal.local",
-        "fullName": "API Test 1770660248",
-        "nationalId": "UN1770660248",
+        "userName": "apitest1770724514",
+        "email": "apitest1770724514@booksportal.local",
+        "fullName": "API Test 1770724514",
+        "nationalId": "UN1770724514",
         "designation": "Automation",
         "isActive": true,
         "roles": [
           "User"
         ],
-        "createdAt": "2026-02-09T18:04:42.9364407"
+        "createdAt": "2026-02-10T11:55:49.0714717"
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.1135965Z"
+  "name": "users-list"
 }

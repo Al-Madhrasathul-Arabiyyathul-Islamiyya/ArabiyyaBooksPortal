@@ -1,32 +1,32 @@
 {
-  "uri": "http://localhost:5071/api/reports/student-history/2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "reports-student-history",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"type\":\"Return\",\"referenceNo\":\"RTN2249000001\",\"date\":\"2026-02-09T18:04:20.4115189\",\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1,\"condition\":\"Good\"},{\"type\":\"Distribution\",\"referenceNo\":\"DST2249000001\",\"date\":\"2026-02-09T18:04:09.1479967\",\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.5558366Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"type\":\"Return\",\"referenceNo\":\"RTN6515000001\",\"date\":\"2026-02-10T11:55:26.5807602\",\"bookTitle\":\"Book 1770724514\",\"bookCode\":\"BK4514\",\"quantity\":1,\"condition\":\"Good\"},{\"type\":\"Distribution\",\"referenceNo\":\"DST6515000001\",\"date\":\"2026-02-10T11:55:15.3029854\",\"bookTitle\":\"Book 1770724514\",\"bookCode\":\"BK4514\",\"quantity\":1}]}",
+  "uri": "http://localhost:5071/api/reports/student-history/2",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
       {
         "type": "Return",
-        "referenceNo": "RTN2249000001",
-        "date": "2026-02-09T18:04:20.4115189",
-        "bookTitle": "Book 1770660248",
-        "bookCode": "BK0248",
+        "referenceNo": "RTN6515000001",
+        "date": "2026-02-10T11:55:26.5807602",
+        "bookTitle": "Book 1770724514",
+        "bookCode": "BK4514",
         "quantity": 1,
         "condition": "Good"
       },
       {
         "type": "Distribution",
-        "referenceNo": "DST2249000001",
-        "date": "2026-02-09T18:04:09.1479967",
-        "bookTitle": "Book 1770660248",
-        "bookCode": "BK0248",
+        "referenceNo": "DST6515000001",
+        "date": "2026-02-10T11:55:15.3029854",
+        "bookTitle": "Book 1770724514",
+        "bookCode": "BK4514",
         "quantity": 1
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.3511889Z"
+  "name": "reports-student-history"
 }

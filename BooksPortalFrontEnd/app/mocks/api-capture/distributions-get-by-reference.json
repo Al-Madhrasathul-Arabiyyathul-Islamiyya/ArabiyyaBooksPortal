@@ -1,40 +1,40 @@
 {
-  "uri": "http://localhost:5071/api/distributions/by-reference/DST2249000001",
-  "statusCode": 200,
-  "isError": false,
-  "name": "distributions-get-by-reference",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"DST2249000001\",\"academicYearId\":2,\"academicYearName\":\"AY 2249\",\"term\":\"Term1\",\"studentId\":2,\"studentName\":\"Student 1770660248\",\"studentIndexNo\":\"IDX1770660248\",\"studentClassName\":\"G0248 - A\",\"studentNationalId\":\"SN1770660248\",\"parentId\":2,\"parentName\":\"Parent 1770660248\",\"issuedById\":1,\"issuedAt\":\"2026-02-09T18:04:09.1479967\",\"notes\":\"Distribution for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\Distribution\\\\AY 2249\\\\DST2249000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770660248\",\"bookCode\":\"BK0248\",\"quantity\":1}]}}",
+  "capturedAtUtc": "2026-02-10T11:55:49.4251205Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"referenceNo\":\"DST6515000001\",\"academicYearId\":3,\"academicYearName\":\"AY 6515\",\"term\":\"Term1\",\"studentId\":2,\"studentName\":\"Student 1770724514\",\"studentIndexNo\":\"IDX1770724514\",\"studentClassName\":\"Grade 1 - A\",\"studentNationalId\":\"SN1770724514\",\"parentId\":2,\"parentName\":\"Parent 1770724514\",\"issuedById\":1,\"issuedAt\":\"2026-02-10T11:55:15.3029854\",\"notes\":\"Distribution for frontend mock capture\",\"pdfFilePath\":\"D:\\\\SlipStorage\\\\Distribution\\\\AY 6515\\\\DST6515000001.pdf\",\"items\":[{\"id\":2,\"bookId\":2,\"bookTitle\":\"Book 1770724514\",\"bookCode\":\"BK4514\",\"quantity\":1}]}}",
+  "uri": "http://localhost:5071/api/distributions/by-reference/DST6515000001",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "referenceNo": "DST2249000001",
-      "academicYearId": 2,
-      "academicYearName": "AY 2249",
+      "referenceNo": "DST6515000001",
+      "academicYearId": 3,
+      "academicYearName": "AY 6515",
       "term": "Term1",
       "studentId": 2,
-      "studentName": "Student 1770660248",
-      "studentIndexNo": "IDX1770660248",
-      "studentClassName": "G0248 - A",
-      "studentNationalId": "SN1770660248",
+      "studentName": "Student 1770724514",
+      "studentIndexNo": "IDX1770724514",
+      "studentClassName": "Grade 1 - A",
+      "studentNationalId": "SN1770724514",
       "parentId": 2,
-      "parentName": "Parent 1770660248",
+      "parentName": "Parent 1770724514",
       "issuedById": 1,
-      "issuedAt": "2026-02-09T18:04:09.1479967",
+      "issuedAt": "2026-02-10T11:55:15.3029854",
       "notes": "Distribution for frontend mock capture",
-      "pdfFilePath": "D:\\SlipStorage\\Distribution\\AY 2249\\DST2249000001.pdf",
+      "pdfFilePath": "D:\\SlipStorage\\Distribution\\AY 6515\\DST6515000001.pdf",
       "items": [
         {
           "id": 2,
           "bookId": 2,
-          "bookTitle": "Book 1770660248",
-          "bookCode": "BK0248",
+          "bookTitle": "Book 1770724514",
+          "bookCode": "BK4514",
           "quantity": 1
         }
       ]
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.2336393Z"
+  "name": "distributions-get-by-reference"
 }

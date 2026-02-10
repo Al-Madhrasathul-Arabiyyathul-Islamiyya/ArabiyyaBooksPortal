@@ -1,25 +1,25 @@
 {
-  "uri": "http://localhost:5071/api/books/2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "books-get-by-id",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-0248\",\"code\":\"BK0248\",\"title\":\"Book 1770660248\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":2249,\"subjectId\":2,\"subjectName\":\"Subject 0248\",\"grade\":\"G0248\",\"totalStock\":30,\"distributed\":0,\"withTeachers\":1,\"damaged\":0,\"lost\":0,\"available\":29}}",
+  "capturedAtUtc": "2026-02-10T11:55:49.3607169Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-4514\",\"code\":\"BK4514\",\"title\":\"Book 1770724514\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":6515,\"subjectId\":2,\"subjectName\":\"Subject 4514\",\"grade\":\"G4514\",\"totalStock\":30,\"distributed\":0,\"withTeachers\":1,\"damaged\":0,\"lost\":0,\"available\":29}}",
+  "uri": "http://localhost:5071/api/books/2",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "isbn": "978-0248",
-      "code": "BK0248",
-      "title": "Book 1770660248",
+      "isbn": "978-4514",
+      "code": "BK4514",
+      "title": "Book 1770724514",
       "author": "Automation",
       "edition": "1",
       "publisher": "BooksPortal",
-      "publishedYear": 2249,
+      "publishedYear": 6515,
       "subjectId": 2,
-      "subjectName": "Subject 0248",
-      "grade": "G0248",
+      "subjectName": "Subject 4514",
+      "grade": "G4514",
       "totalStock": 30,
       "distributed": 0,
       "withTeachers": 1,
@@ -28,5 +28,5 @@
       "available": 29
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.1683499Z"
+  "name": "books-get-by-id"
 }

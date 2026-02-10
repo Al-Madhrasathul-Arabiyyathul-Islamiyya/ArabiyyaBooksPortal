@@ -1,31 +1,39 @@
 {
-  "uri": "http://localhost:5071/api/AcademicYears",
-  "statusCode": 200,
-  "isError": false,
-  "name": "academic-years-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"AY 2249\",\"year\":2249,\"startDate\":\"2249-01-01T00:00:00\",\"endDate\":\"2249-12-31T00:00:00\",\"isActive\":false},{\"id\":1,\"name\":\"AY 2186 Updated\",\"year\":2186,\"startDate\":\"2186-01-01T00:00:00\",\"endDate\":\"2186-12-31T00:00:00\",\"isActive\":true}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.1023879Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":3,\"name\":\"AY 6515\",\"year\":6515,\"startDate\":\"6515-01-01T00:00:00\",\"endDate\":\"6515-12-31T00:00:00\",\"isActive\":false},{\"id\":2,\"name\":\"AY 6450 Updated\",\"year\":6450,\"startDate\":\"6450-01-01T00:00:00\",\"endDate\":\"6450-12-31T00:00:00\",\"isActive\":true},{\"id\":1,\"name\":\"AY 2026\",\"year\":2026,\"startDate\":\"2026-01-01T00:00:00\",\"endDate\":\"2026-12-31T00:00:00\",\"isActive\":false}]}",
+  "uri": "http://localhost:5071/api/AcademicYears",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
       {
-        "id": 2,
-        "name": "AY 2249",
-        "year": 2249,
-        "startDate": "2249-01-01T00:00:00",
-        "endDate": "2249-12-31T00:00:00",
+        "id": 3,
+        "name": "AY 6515",
+        "year": 6515,
+        "startDate": "6515-01-01T00:00:00",
+        "endDate": "6515-12-31T00:00:00",
         "isActive": false
       },
       {
-        "id": 1,
-        "name": "AY 2186 Updated",
-        "year": 2186,
-        "startDate": "2186-01-01T00:00:00",
-        "endDate": "2186-12-31T00:00:00",
+        "id": 2,
+        "name": "AY 6450 Updated",
+        "year": 6450,
+        "startDate": "6450-01-01T00:00:00",
+        "endDate": "6450-12-31T00:00:00",
         "isActive": true
+      },
+      {
+        "id": 1,
+        "name": "AY 2026",
+        "year": 2026,
+        "startDate": "2026-01-01T00:00:00",
+        "endDate": "2026-12-31T00:00:00",
+        "isActive": false
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:42.9650985Z"
+  "name": "academic-years-list"
 }

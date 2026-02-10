@@ -1,19 +1,19 @@
 {
-  "uri": "http://localhost:5071/api/lookups/class-sections?academicYearId=2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "lookups-class-sections",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"G0248 A\"}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.3319937Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":50,\"name\":\"Grade 1 A\"}]}",
+  "uri": "http://localhost:5071/api/lookups/class-sections?academicYearId=3",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
       {
-        "id": 2,
-        "name": "G0248 A"
+        "id": 50,
+        "name": "Grade 1 A"
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.1397226Z"
+  "name": "lookups-class-sections"
 }

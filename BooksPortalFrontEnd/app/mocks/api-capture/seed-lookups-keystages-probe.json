@@ -1,5 +1,5 @@
 {
-  "capturedAtUtc": "2026-02-10T11:55:49.3139268Z",
+  "capturedAtUtc": "2026-02-10T11:55:15.1201944Z",
   "method": "GET",
   "requestBody": null,
   "statusCode": 200,
@@ -35,5 +35,5 @@
       }
     ]
   },
-  "name": "lookups-keystages"
+  "name": "seed-lookups-keystages-probe"
 }

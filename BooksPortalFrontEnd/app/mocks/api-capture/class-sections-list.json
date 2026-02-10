@@ -1,26 +1,27 @@
 {
-  "uri": "http://localhost:5071/api/ClassSections?academicYearId=2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "class-sections-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"academicYearId\":2,\"academicYearName\":\"AY 2249\",\"keystageId\":2,\"keystageName\":\"Keystage 0248\",\"grade\":\"G0248\",\"section\":\"A\",\"displayName\":\"G0248 A\",\"studentCount\":0}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.1277427Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":50,\"academicYearId\":3,\"academicYearName\":\"AY 6515\",\"keystageId\":1,\"keystageName\":\"Key stage 1\",\"gradeId\":1,\"grade\":\"Grade 1\",\"section\":\"A\",\"displayName\":\"Grade 1 A\",\"studentCount\":1}]}",
+  "uri": "http://localhost:5071/api/ClassSections?academicYearId=3",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
       {
-        "id": 2,
-        "academicYearId": 2,
-        "academicYearName": "AY 2249",
-        "keystageId": 2,
-        "keystageName": "Keystage 0248",
-        "grade": "G0248",
+        "id": 50,
+        "academicYearId": 3,
+        "academicYearName": "AY 6515",
+        "keystageId": 1,
+        "keystageName": "Key stage 1",
+        "gradeId": 1,
+        "grade": "Grade 1",
         "section": "A",
-        "displayName": "G0248 A",
-        "studentCount": 0
+        "displayName": "Grade 1 A",
+        "studentCount": 1
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:42.9944765Z"
+  "name": "class-sections-list"
 }

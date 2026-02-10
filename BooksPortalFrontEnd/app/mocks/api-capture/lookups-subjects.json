@@ -1,19 +1,19 @@
 {
-  "uri": "http://localhost:5071/api/lookups/subjects",
-  "statusCode": 200,
-  "isError": false,
-  "name": "lookups-subjects",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"Subject 0248\"}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.3255047Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"name\":\"Subject 4514\"}]}",
+  "uri": "http://localhost:5071/api/lookups/subjects",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
       {
         "id": 2,
-        "name": "Subject 0248"
+        "name": "Subject 4514"
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.1344076Z"
+  "name": "lookups-subjects"
 }

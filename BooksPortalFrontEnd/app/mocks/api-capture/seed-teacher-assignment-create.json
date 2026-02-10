@@ -1,20 +1,20 @@
 {
-  "uri": "http://localhost:5071/api/teachers/2/assignments",
-  "statusCode": 201,
-  "isError": false,
-  "name": "seed-teacher-assignment-create",
-  "requestBody": "{\r\n  \"subjectId\": 2,\r\n  \"classSectionId\": 2\r\n}",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"subjectId\":2,\"subjectName\":\"Subject 0248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\"}}",
+  "capturedAtUtc": "2026-02-10T11:55:15.2178166Z",
   "method": "POST",
+  "requestBody": "{\r\n  \"subjectId\": 2,\r\n  \"classSectionId\": 50\r\n}",
+  "statusCode": 201,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"subjectId\":2,\"subjectName\":\"Subject 4514\",\"classSectionId\":50,\"classSectionDisplayName\":\"Grade 1 A\"}}",
+  "uri": "http://localhost:5071/api/teachers/2/assignments",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
       "subjectId": 2,
-      "subjectName": "Subject 0248",
-      "classSectionId": 2,
-      "classSectionDisplayName": "G0248 A"
+      "subjectName": "Subject 4514",
+      "classSectionId": 50,
+      "classSectionDisplayName": "Grade 1 A"
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:09.0467719Z"
+  "name": "seed-teacher-assignment-create"
 }

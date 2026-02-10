@@ -1,25 +1,25 @@
 {
-  "uri": "http://localhost:5071/api/books",
-  "statusCode": 201,
-  "isError": false,
-  "name": "seed-book-create",
-  "requestBody": "{\r\n  \"isbn\": \"978-0248\",\r\n  \"code\": \"BK0248\",\r\n  \"title\": \"Book 1770660248\",\r\n  \"author\": \"Automation\",\r\n  \"edition\": \"1\",\r\n  \"publisher\": \"BooksPortal\",\r\n  \"publishedYear\": 2249,\r\n  \"subjectId\": 2,\r\n  \"grade\": \"G0248\"\r\n}",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-0248\",\"code\":\"BK0248\",\"title\":\"Book 1770660248\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":2249,\"subjectId\":2,\"subjectName\":\"Subject 0248\",\"grade\":\"G0248\",\"totalStock\":0,\"distributed\":0,\"withTeachers\":0,\"damaged\":0,\"lost\":0,\"available\":0}}",
+  "capturedAtUtc": "2026-02-10T11:55:15.2711076Z",
   "method": "POST",
+  "requestBody": "{\r\n  \"isbn\": \"978-4514\",\r\n  \"code\": \"BK4514\",\r\n  \"title\": \"Book 1770724514\",\r\n  \"author\": \"Automation\",\r\n  \"edition\": \"1\",\r\n  \"publisher\": \"BooksPortal\",\r\n  \"publishedYear\": 6515,\r\n  \"subjectId\": 2,\r\n  \"grade\": \"G4514\"\r\n}",
+  "statusCode": 201,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"isbn\":\"978-4514\",\"code\":\"BK4514\",\"title\":\"Book 1770724514\",\"author\":\"Automation\",\"edition\":\"1\",\"publisher\":\"BooksPortal\",\"publishedYear\":6515,\"subjectId\":2,\"subjectName\":\"Subject 4514\",\"grade\":\"G4514\",\"totalStock\":0,\"distributed\":0,\"withTeachers\":0,\"damaged\":0,\"lost\":0,\"available\":0}}",
+  "uri": "http://localhost:5071/api/books",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "isbn": "978-0248",
-      "code": "BK0248",
-      "title": "Book 1770660248",
+      "isbn": "978-4514",
+      "code": "BK4514",
+      "title": "Book 1770724514",
       "author": "Automation",
       "edition": "1",
       "publisher": "BooksPortal",
-      "publishedYear": 2249,
+      "publishedYear": 6515,
       "subjectId": 2,
-      "subjectName": "Subject 0248",
-      "grade": "G0248",
+      "subjectName": "Subject 4514",
+      "grade": "G4514",
       "totalStock": 0,
       "distributed": 0,
       "withTeachers": 0,
@@ -28,5 +28,5 @@
       "available": 0
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:09.1155879Z"
+  "name": "seed-book-create"
 }

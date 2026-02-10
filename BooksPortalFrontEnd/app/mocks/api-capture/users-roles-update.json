@@ -1,15 +1,15 @@
 {
-  "uri": "http://localhost:5071/api/users/3/roles",
-  "statusCode": 200,
-  "isError": false,
-  "name": "users-roles-update",
-  "requestBody": "[\r\n  \"User\",\r\n  \"Admin\"\r\n]",
-  "rawBody": "{\"success\":true,\"data\":true,\"message\":\"Roles assigned successfully.\"}",
+  "capturedAtUtc": "2026-02-10T11:55:49.5928322Z",
   "method": "PUT",
+  "requestBody": "[\r\n  \"User\",\r\n  \"Admin\"\r\n]",
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":true,\"message\":\"Roles assigned successfully.\"}",
+  "uri": "http://localhost:5071/api/users/3/roles",
+  "isError": false,
   "body": {
     "success": true,
     "data": true,
     "message": "Roles assigned successfully."
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.3869619Z"
+  "name": "users-roles-update"
 }

@@ -1,31 +1,31 @@
 {
-  "uri": "http://localhost:5071/api/students",
-  "statusCode": 201,
-  "isError": false,
-  "name": "seed-student-create",
-  "requestBody": "{\r\n  \"fullName\": \"Student 1770660248\",\r\n  \"indexNo\": \"IDX1770660248\",\r\n  \"nationalId\": \"SN1770660248\",\r\n  \"classSectionId\": 2,\r\n  \"parents\": [\r\n    {\r\n      \"parentId\": 2,\r\n      \"isPrimary\": true\r\n    }\r\n  ]\r\n}",
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770660248\",\"indexNo\":\"IDX1770660248\",\"nationalId\":\"SN1770660248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770660248\",\"nationalId\":\"PN1770660248\",\"phone\":\"7000000248\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
+  "capturedAtUtc": "2026-02-10T11:55:15.2547147Z",
   "method": "POST",
+  "requestBody": "{\r\n  \"fullName\": \"Student 1770724514\",\r\n  \"indexNo\": \"IDX1770724514\",\r\n  \"nationalId\": \"SN1770724514\",\r\n  \"classSectionId\": 50,\r\n  \"parents\": [\r\n    {\r\n      \"parentId\": 2,\r\n      \"isPrimary\": true\r\n    }\r\n  ]\r\n}",
+  "statusCode": 201,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770724514\",\"indexNo\":\"IDX1770724514\",\"nationalId\":\"SN1770724514\",\"classSectionId\":50,\"classSectionDisplayName\":\"Grade 1 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770724514\",\"nationalId\":\"PN1770724514\",\"phone\":\"7000004514\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
+  "uri": "http://localhost:5071/api/students",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "fullName": "Student 1770660248",
-      "indexNo": "IDX1770660248",
-      "nationalId": "SN1770660248",
-      "classSectionId": 2,
-      "classSectionDisplayName": "G0248 A",
+      "fullName": "Student 1770724514",
+      "indexNo": "IDX1770724514",
+      "nationalId": "SN1770724514",
+      "classSectionId": 50,
+      "classSectionDisplayName": "Grade 1 A",
       "parents": [
         {
           "parentId": 2,
-          "fullName": "Parent 1770660248",
-          "nationalId": "PN1770660248",
-          "phone": "7000000248",
+          "fullName": "Parent 1770724514",
+          "nationalId": "PN1770724514",
+          "phone": "7000004514",
           "relationship": "Father",
           "isPrimary": true
         }
       ]
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:09.0897838Z"
+  "name": "seed-student-create"
 }

@@ -1,16 +1,16 @@
 {
-  "uri": "http://localhost:5071/api/parents/2",
-  "statusCode": 409,
-  "isError": true,
-  "name": "errors-parent-delete-referenced",
-  "requestBody": null,
-  "rawBody": "\r\n{\r\n  \"success\": false,\r\n  \"data\": null,\r\n  \"message\": \"Cannot delete parent because it is referenced by existing records.\",\r\n  \"errors\": null\r\n}",
+  "capturedAtUtc": "2026-02-10T11:55:49.6903584Z",
   "method": "DELETE",
+  "requestBody": null,
+  "statusCode": 409,
+  "rawBody": "\r\n{\r\n  \"success\": false,\r\n  \"data\": null,\r\n  \"message\": \"Cannot delete parent because it is referenced by existing records.\",\r\n  \"errors\": null\r\n}",
+  "uri": "http://localhost:5071/api/parents/2",
+  "isError": true,
   "body": {
     "success": false,
     "data": null,
     "message": "Cannot delete parent because it is referenced by existing records.",
     "errors": null
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.4869683Z"
+  "name": "errors-parent-delete-referenced"
 }

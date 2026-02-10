@@ -1,21 +1,51 @@
 {
-  "uri": "http://localhost:5071/api/keystages",
-  "statusCode": 200,
-  "isError": false,
-  "name": "keystages-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":[{\"id\":2,\"code\":\"KS0248\",\"name\":\"Keystage 0248\",\"sortOrder\":50}]}",
+  "capturedAtUtc": "2026-02-10T11:55:49.1083303Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":[{\"id\":1,\"code\":\"KS1\",\"name\":\"Key stage 1\",\"sortOrder\":1},{\"id\":2,\"code\":\"KS2\",\"name\":\"Key stage 2\",\"sortOrder\":2},{\"id\":3,\"code\":\"KS3\",\"name\":\"Key stage 3\",\"sortOrder\":3},{\"id\":4,\"code\":\"KS4\",\"name\":\"Key stage 4\",\"sortOrder\":4},{\"id\":5,\"code\":\"KS5\",\"name\":\"Key stage 5\",\"sortOrder\":5},{\"id\":7,\"code\":\"KS4514\",\"name\":\"Keystage 4514\",\"sortOrder\":50}]}",
+  "uri": "http://localhost:5071/api/keystages",
+  "isError": false,
   "body": {
     "success": true,
     "data": [
       {
+        "id": 1,
+        "code": "KS1",
+        "name": "Key stage 1",
+        "sortOrder": 1
+      },
+      {
         "id": 2,
-        "code": "KS0248",
-        "name": "Keystage 0248",
+        "code": "KS2",
+        "name": "Key stage 2",
+        "sortOrder": 2
+      },
+      {
+        "id": 3,
+        "code": "KS3",
+        "name": "Key stage 3",
+        "sortOrder": 3
+      },
+      {
+        "id": 4,
+        "code": "KS4",
+        "name": "Key stage 4",
+        "sortOrder": 4
+      },
+      {
+        "id": 5,
+        "code": "KS5",
+        "name": "Key stage 5",
+        "sortOrder": 5
+      },
+      {
+        "id": 7,
+        "code": "KS4514",
+        "name": "Keystage 4514",
         "sortOrder": 50
       }
     ]
   },
-  "capturedAtUtc": "2026-02-09T18:04:42.9702272Z"
+  "name": "keystages-list"
 }

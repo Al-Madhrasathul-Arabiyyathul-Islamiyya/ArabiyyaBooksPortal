@@ -17,7 +17,7 @@
   "classSectionCreate": {
     "academicYearId": "{{academicYearId:int}}",
     "keystageId": "{{keystageId:int}}",
-    "grade": "G{{runKey}}",
+    "gradeId": "{{gradeId:int}}",
     "section": "A"
   },
   "parentCreate": {

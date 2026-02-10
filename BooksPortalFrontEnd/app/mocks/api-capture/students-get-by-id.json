@@ -1,31 +1,31 @@
 {
-  "uri": "http://localhost:5071/api/students/2",
-  "statusCode": 200,
-  "isError": false,
-  "name": "students-get-by-id",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770660248\",\"indexNo\":\"IDX1770660248\",\"nationalId\":\"SN1770660248\",\"classSectionId\":2,\"classSectionDisplayName\":\"G0248 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770660248\",\"nationalId\":\"PN1770660248\",\"phone\":\"7000000248\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
+  "capturedAtUtc": "2026-02-10T11:55:49.3549685Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":{\"id\":2,\"fullName\":\"Student 1770724514\",\"indexNo\":\"IDX1770724514\",\"nationalId\":\"SN1770724514\",\"classSectionId\":50,\"classSectionDisplayName\":\"Grade 1 A\",\"parents\":[{\"parentId\":2,\"fullName\":\"Parent 1770724514\",\"nationalId\":\"PN1770724514\",\"phone\":\"7000004514\",\"relationship\":\"Father\",\"isPrimary\":true}]}}",
+  "uri": "http://localhost:5071/api/students/2",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "id": 2,
-      "fullName": "Student 1770660248",
-      "indexNo": "IDX1770660248",
-      "nationalId": "SN1770660248",
-      "classSectionId": 2,
-      "classSectionDisplayName": "G0248 A",
+      "fullName": "Student 1770724514",
+      "indexNo": "IDX1770724514",
+      "nationalId": "SN1770724514",
+      "classSectionId": 50,
+      "classSectionDisplayName": "Grade 1 A",
       "parents": [
         {
           "parentId": 2,
-          "fullName": "Parent 1770660248",
-          "nationalId": "PN1770660248",
-          "phone": "7000000248",
+          "fullName": "Parent 1770724514",
+          "nationalId": "PN1770724514",
+          "phone": "7000004514",
           "relationship": "Father",
           "isPrimary": true
         }
       ]
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.1618325Z"
+  "name": "students-get-by-id"
 }

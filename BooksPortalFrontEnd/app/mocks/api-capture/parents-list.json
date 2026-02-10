@@ -1,20 +1,20 @@
 {
-  "uri": "http://localhost:5071/api/parents?pageNumber=1&pageSize=20&search=1770660248",
-  "statusCode": 200,
-  "isError": false,
-  "name": "parents-list",
-  "requestBody": null,
-  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Parent 1770660248\",\"nationalId\":\"PN1770660248\",\"phone\":\"7000000248\",\"relationship\":\"Father\"}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "capturedAtUtc": "2026-02-10T11:55:49.1360929Z",
   "method": "GET",
+  "requestBody": null,
+  "statusCode": 200,
+  "rawBody": "{\"success\":true,\"data\":{\"items\":[{\"id\":2,\"fullName\":\"Parent 1770724514\",\"nationalId\":\"PN1770724514\",\"phone\":\"7000004514\",\"relationship\":\"Father\"}],\"totalCount\":1,\"pageNumber\":1,\"pageSize\":20,\"totalPages\":1,\"hasPrevious\":false,\"hasNext\":false}}",
+  "uri": "http://localhost:5071/api/parents?pageNumber=1&pageSize=20&search=1770724514",
+  "isError": false,
   "body": {
     "success": true,
     "data": {
       "items": [
         {
           "id": 2,
-          "fullName": "Parent 1770660248",
-          "nationalId": "PN1770660248",
-          "phone": "7000000248",
+          "fullName": "Parent 1770724514",
+          "nationalId": "PN1770724514",
+          "phone": "7000004514",
           "relationship": "Father"
         }
       ],
@@ -26,5 +26,5 @@
       "hasNext": false
     }
   },
-  "capturedAtUtc": "2026-02-09T18:04:43.0024573Z"
+  "name": "parents-list"
 }

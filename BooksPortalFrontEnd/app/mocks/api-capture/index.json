@@ -1,19 +1,19 @@
 {
-  "runId": "52150f8d-b8a8-47e7-86c1-225ed609caf2",
-  "startedAtUtc": "2026-02-09T18:02:08.4298962Z",
-  "finishedAtUtc": "2026-02-09T18:04:43.6345196Z",
+  "runId": "1665e4b6-a751-45f1-9eec-a4488c50ea13",
+  "startedAtUtc": "2026-02-10T11:53:47.6210927Z",
+  "finishedAtUtc": "2026-02-10T11:55:49.8725581Z",
   "source": {
     "baseUrl": "http://localhost:5071",
-    "httpyacLog": "D:\\Stuff\\Arabiyya\\2026\\BookPortal\\BookPortal\\tools\\api-contract-tester\\logs\\httpyac-contract-log-f9a60158-1ef7-48c3-aab9-128b6a737503.json",
-    "runSuffix": "1770660248",
-    "runKey": "0248",
-    "runYear": 2249
+    "httpyacLog": "D:\\Stuff\\Arabiyya\\2026\\BookPortal\\BookPortal\\tools\\api-contract-tester\\logs\\httpyac-contract-log-6da0c3fc-facd-4dc7-9625-4b079c911b4a.json",
+    "runSuffix": "1770724514",
+    "runKey": "4514",
+    "runYear": 6515
   },
   "entities": {
-    "academicYearId": 2,
-    "keystageId": 2,
+    "academicYearId": 3,
+    "keystageId": 1,
     "subjectId": 2,
-    "classSectionId": 2,
+    "classSectionId": 50,
     "parentId": 2,
     "teacherId": 2,
     "studentId": 2,
@@ -24,8 +24,8 @@
     "tempUserId": 3
   },
   "summary": {
-    "totalCaptures": 56,
-    "successLike": 53,
+    "totalCaptures": 59,
+    "successLike": 56,
     "errorLike": 3
   },
   "files": [
@@ -46,6 +46,18 @@
       "statusCode": 201,
       "isError": false,
       "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-keystage-create.json"
+    },
+    {
+      "name": "seed-lookups-keystages-probe",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-lookups-keystages-probe.json"
+    },
+    {
+      "name": "seed-lookups-grades-probe",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\seed-lookups-grades-probe.json"
     },
     {
       "name": "seed-subject-create",
@@ -208,6 +220,12 @@
       "statusCode": 200,
       "isError": false,
       "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-keystages.json"
+    },
+    {
+      "name": "lookups-grades",
+      "statusCode": 200,
+      "isError": false,
+      "file": "BooksPortalFrontEnd\\app\\mocks\\api-capture\\lookups-grades.json"
     },
     {
       "name": "lookups-subjects",

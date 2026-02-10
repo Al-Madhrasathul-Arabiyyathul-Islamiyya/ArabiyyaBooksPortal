@@ -458,6 +458,30 @@ try {
     $keystageId = [int]$ksCreate.body.data.id
     $templateVars["keystageId"] = $keystageId
 
+    # Resolve a valid existing keystage+grade pair for class section creation.
+    # Grades are seeded system data and are not created through the keystage create endpoint.
+    $lookupKeystagesProbe = Invoke-CaptureRequest -Name "seed-lookups-keystages-probe" -Method "GET" -Uri "$baseUrl/api/lookups/keystages" -Headers $authHeader
+    $captures.Add($lookupKeystagesProbe)
+    Assert-CaptureSuccess -Capture $lookupKeystagesProbe -Name "seed-lookups-keystages-probe"
+    $probeKeystages = @($lookupKeystagesProbe.body.data)
+    if ($probeKeystages.Count -eq 0) {
+        throw "No keystages available in lookup data for class section seed capture."
+    }
+
+    $selectedKeystageId = [int]$probeKeystages[0].id
+    $lookupGradesProbe = Invoke-CaptureRequest -Name "seed-lookups-grades-probe" -Method "GET" -Uri "$baseUrl/api/lookups/grades?keystageId=$selectedKeystageId" -Headers $authHeader
+    $captures.Add($lookupGradesProbe)
+    Assert-CaptureSuccess -Capture $lookupGradesProbe -Name "seed-lookups-grades-probe"
+    $probeGrades = @($lookupGradesProbe.body.data)
+    if ($probeGrades.Count -eq 0) {
+        throw "No grades available for keystageId=$selectedKeystageId in lookup data."
+    }
+
+    $keystageId = $selectedKeystageId
+    $gradeId = [int]$probeGrades[0].id
+    $templateVars["keystageId"] = $keystageId
+    $templateVars["gradeId"] = $gradeId
+
     $subjectCreatePayload = Get-ResolvedFixture -Fixtures $fixtures -Name "subjectCreate" -Vars $templateVars
     $subjectCreate = Invoke-CaptureRequest -Name "seed-subject-create" -Method "POST" -Uri "$baseUrl/api/subjects" -Headers $authHeader -Body $subjectCreatePayload
     $captures.Add($subjectCreate)
@@ -567,6 +591,7 @@ try {
     $captures.Add((Invoke-CaptureRequest -Name "auth-me" -Method "GET" -Uri "$baseUrl/api/auth/me" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "lookups-academic-years" -Method "GET" -Uri "$baseUrl/api/lookups/academic-years" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "lookups-keystages" -Method "GET" -Uri "$baseUrl/api/lookups/keystages" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "lookups-grades" -Method "GET" -Uri "$baseUrl/api/lookups/grades?keystageId=$keystageId" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "lookups-subjects" -Method "GET" -Uri "$baseUrl/api/lookups/subjects" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "lookups-class-sections" -Method "GET" -Uri "$baseUrl/api/lookups/class-sections?academicYearId=$academicYearId" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "lookups-terms" -Method "GET" -Uri "$baseUrl/api/lookups/terms" -Headers $authHeader))
