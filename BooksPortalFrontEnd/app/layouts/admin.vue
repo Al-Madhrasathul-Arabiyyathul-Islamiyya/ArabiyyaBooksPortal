@@ -16,7 +16,7 @@
 
       <nav class="flex-1 overflow-y-auto p-2">
         <PanelMenu
-          v-model:expandedKeys="expandedKeys"
+          v-model:expanded-keys="expandedKeys"
           :model="menuItems"
           class="w-full border-none"
         />
@@ -72,6 +72,8 @@
 </template>
 
 <script setup lang="ts">
+import type { MenuItem } from 'primevue/menuitem'
+
 const colorMode = useColorMode()
 const { user, logout } = useAuth()
 const route = useRoute()
@@ -104,13 +106,15 @@ function isActive(path: string) {
   return route.path === path || route.path.startsWith(`${path}/`)
 }
 
-const menuItems = computed(() => ([
+
+
+const menuItems = computed<MenuItem[]>(() => ([
   {
     key: 'admin-dashboard',
     label: 'Admin Dashboard',
     icon: 'pi pi-home',
     command: () => navigateTo('/admin'),
-    styleClass: route.path === '/admin' ? 'app-menu-item-active' : undefined,
+    class: route.path === '/admin' ? 'app-menu-item-active' : undefined,
   },
   {
     key: 'master-data',
@@ -121,43 +125,43 @@ const menuItems = computed(() => ([
         key: 'master-data-academic-years',
         label: 'AcademicYear',
         command: () => navigateTo('/admin/master-data/academic-years'),
-        styleClass: isActive('/admin/master-data/academic-years') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/academic-years') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-subjects',
         label: 'Subjects',
         command: () => navigateTo('/admin/master-data/subjects'),
-        styleClass: isActive('/admin/master-data/subjects') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/subjects') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-keystages',
         label: 'Keystages',
         command: () => navigateTo('/admin/master-data/keystages'),
-        styleClass: isActive('/admin/master-data/keystages') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/keystages') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-class-sections',
         label: 'Classes',
         command: () => navigateTo('/admin/master-data/class-sections'),
-        styleClass: isActive('/admin/master-data/class-sections') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/class-sections') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-students',
         label: 'Students',
         command: () => navigateTo('/admin/master-data/students'),
-        styleClass: isActive('/admin/master-data/students') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/students') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-parents',
         label: 'Parents',
         command: () => navigateTo('/admin/master-data/parents'),
-        styleClass: isActive('/admin/master-data/parents') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/parents') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-teachers',
         label: 'Teachers',
         command: () => navigateTo('/admin/master-data/teachers'),
-        styleClass: isActive('/admin/master-data/teachers') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/master-data/teachers') ? 'app-menu-item-active' : undefined,
       },
     ],
   },
@@ -166,7 +170,7 @@ const menuItems = computed(() => ([
     label: 'Books',
     icon: 'pi pi-book',
     command: () => navigateTo('/admin/books'),
-    styleClass: isActive('/admin/books') ? 'app-menu-item-active' : undefined,
+    class: isActive('/admin/books') ? 'app-menu-item-active' : undefined,
   },
   {
     key: 'reports',
@@ -177,25 +181,25 @@ const menuItems = computed(() => ([
         key: 'reports-stock-summary',
         label: 'Stock Summary',
         command: () => navigateTo('/admin/reports/stock-summary'),
-        styleClass: isActive('/admin/reports/stock-summary') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/reports/stock-summary') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'reports-distributions',
         label: 'Distributions',
         command: () => navigateTo('/admin/reports/distributions'),
-        styleClass: isActive('/admin/reports/distributions') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/reports/distributions') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'reports-teacher-outstanding',
         label: 'Teacher Outstanding',
         command: () => navigateTo('/admin/reports/teacher-outstanding'),
-        styleClass: isActive('/admin/reports/teacher-outstanding') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/reports/teacher-outstanding') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'reports-student-history',
         label: 'Student History',
         command: () => navigateTo('/admin/reports/student-history'),
-        styleClass: isActive('/admin/reports/student-history') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/reports/student-history') ? 'app-menu-item-active' : undefined,
       },
     ],
   },
@@ -208,25 +212,25 @@ const menuItems = computed(() => ([
         key: 'settings-users',
         label: 'Users',
         command: () => navigateTo('/admin/settings/users'),
-        styleClass: isActive('/admin/settings/users') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/settings/users') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'settings-reference-formats',
         label: 'Reference Formats',
         command: () => navigateTo('/admin/settings/reference-formats'),
-        styleClass: isActive('/admin/settings/reference-formats') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/settings/reference-formats') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'settings-slip-templates',
         label: 'Slip Templates',
         command: () => navigateTo('/admin/settings/slip-templates'),
-        styleClass: isActive('/admin/settings/slip-templates') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/settings/slip-templates') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'settings-profile',
         label: 'Profile',
         command: () => navigateTo('/admin/settings/profile'),
-        styleClass: isActive('/admin/settings/profile') ? 'app-menu-item-active' : undefined,
+        class: isActive('/admin/settings/profile') ? 'app-menu-item-active' : undefined,
       },
     ],
   },
@@ -235,7 +239,7 @@ const menuItems = computed(() => ([
     label: 'Audit Log',
     icon: 'pi pi-history',
     command: () => navigateTo('/admin/audit-log'),
-    styleClass: isActive('/admin/audit-log') ? 'app-menu-item-active' : undefined,
+    class: isActive('/admin/audit-log') ? 'app-menu-item-active' : undefined,
   },
 ]))
 
@@ -252,13 +256,13 @@ watch(() => route.path, syncExpandedKeys, { immediate: true })
 
 <style scoped>
 :deep(.app-menu-item-active > .p-panelmenu-header > .p-panelmenu-header-content),
-:deep(.app-menu-item-active > .p-menuitem-content) {
+:deep(.app-menu-item-active > .p-panelmenu-item-content) {
   background: color-mix(in srgb, var(--p-primary-color) 18%, transparent);
   border-radius: 0.5rem;
 }
 
 :deep(.app-menu-item-active .p-panelmenu-header-label),
-:deep(.app-menu-item-active .p-menuitem-text) {
+:deep(.app-menu-item-active .p-panelmenu-item-label) {
   color: var(--p-primary-color);
   font-weight: 600;
 }

@@ -139,19 +139,19 @@ const menuItems = computed(() => ([
     label: 'Distribution',
     icon: 'pi pi-send',
     command: () => navigateTo('/distribution'),
-    styleClass: isRouteActive('/distribution') ? 'app-menu-item-active' : undefined,
+    class: isRouteActive('/distribution') ? 'app-menu-item-active' : undefined,
   },
   {
     label: 'Returns',
     icon: 'pi pi-replay',
     command: () => navigateTo('/returns'),
-    styleClass: isRouteActive('/returns') ? 'app-menu-item-active' : undefined,
+    class: isRouteActive('/returns') ? 'app-menu-item-active' : undefined,
   },
   {
     label: 'Teacher Issues',
     icon: 'pi pi-users',
     command: () => navigateTo('/teacher-issues'),
-    styleClass: isRouteActive('/teacher-issues') ? 'app-menu-item-active' : undefined,
+    class: isRouteActive('/teacher-issues') ? 'app-menu-item-active' : undefined,
   },
 ]))
 
@@ -184,13 +184,13 @@ onMounted(() => {
 }
 
 :deep(.app-menu-item-active > .p-panelmenu-header > .p-panelmenu-header-content),
-:deep(.app-menu-item-active > .p-menuitem-content) {
+:deep(.app-menu-item-active > .p-panelmenu-item-content) {
   background: color-mix(in srgb, var(--p-primary-color) 18%, transparent);
   border-radius: 0.5rem;
 }
 
 :deep(.app-menu-item-active .p-panelmenu-header-label),
-:deep(.app-menu-item-active .p-menuitem-text) {
+:deep(.app-menu-item-active .p-panelmenu-item-label) {
   color: var(--p-primary-color);
   font-weight: 600;
 }
