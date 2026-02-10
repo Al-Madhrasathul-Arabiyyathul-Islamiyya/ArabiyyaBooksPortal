@@ -139,19 +139,19 @@ const menuItems = computed(() => ([
     label: 'Distribution',
     icon: 'pi pi-send',
     command: () => navigateTo('/distribution'),
-    class: isRouteActive('/distribution') ? 'app-menu-item-active' : undefined,
+    styleClass: isRouteActive('/distribution') ? 'app-menu-item-active' : undefined,
   },
   {
     label: 'Returns',
     icon: 'pi pi-replay',
     command: () => navigateTo('/returns'),
-    class: isRouteActive('/returns') ? 'app-menu-item-active' : undefined,
+    styleClass: isRouteActive('/returns') ? 'app-menu-item-active' : undefined,
   },
   {
     label: 'Teacher Issues',
     icon: 'pi pi-users',
     command: () => navigateTo('/teacher-issues'),
-    class: isRouteActive('/teacher-issues') ? 'app-menu-item-active' : undefined,
+    styleClass: isRouteActive('/teacher-issues') ? 'app-menu-item-active' : undefined,
   },
 ]))
 
