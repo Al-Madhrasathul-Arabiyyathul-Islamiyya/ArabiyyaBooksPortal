@@ -23,7 +23,6 @@
           :loading="isLoading"
           data-key="id"
           size="small"
-          striped-rows
         >
           <Column
             field="name"
