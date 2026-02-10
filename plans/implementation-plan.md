@@ -57,12 +57,6 @@ School book distribution management system built with .NET 10 Clean Architecture
 - [x] Create validators for auth DTOs
 - [x] Seed default SuperAdmin user
 
-### Frontend (Phase 2 - Later)
-- [ ] Setup Nuxt 4 project with PrimeVue
-- [ ] Create auth store
-- [ ] Create login page
-- [ ] Create auth middleware
-
 ---
 
 ## Module 3: Master Data
@@ -302,9 +296,19 @@ Branch: `feature/module-9-print` → merged to dev → merged to master (v0.9.0)
 ---
 
 ## Module 10: Frontend (Nuxt 4)
-> Feature-based modular implementation — see `plans/frontend-plan.md`
+> Nuxt 4 SPA with PrimeVue + Tailwind — 8 phases, detailed plan in `plans/frontend-plan.md`
 
-### Status: Planning
+### Status: Phase 1 (Foundation) — Not Started
+
+### Phases
+1. Foundation & Configuration (types, API client, auth, layouts, login)
+2. Common Components & Composables (sidebar, header, toast, pagination, lookups)
+3. Master Data (7 CRUD pages: academic years, keystages, subjects, class sections, students, parents, teachers)
+4. Book Management (catalog, stock entries, stock movements, adjust stock)
+5. Distribution & Returns (create slips, print PDFs, cancel with stock reversal)
+6. Teacher Issues (issue books, process partial/full returns)
+7. Reports & Dashboard (stock summary, distributions, teacher outstanding, student history, Excel export)
+8. Admin & Settings (users, reference formats, slip templates, audit log, profile)
 
 ---
 
