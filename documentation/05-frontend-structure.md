@@ -8,8 +8,10 @@ Current status:
 - Module 10 Phase 1: complete
 - Module 10 Phase 2: complete
 - Module 10 Phase 2.5: complete
-- Module 10 Phase 2.6: in progress (routing/layout split)
-- Module 10 Phase 3: next to start (after 2.6)
+- Module 10 Phase 2.6: complete (routing/layout split)
+- Module 10 Phase 2.7: complete (backend contract alignment)
+- Module 10 Phase 3: complete (master data screens)
+- Module 10 Phase 4: next to start (books)
 
 Primary implementation plan: `plans/frontend-plan.md`
 
