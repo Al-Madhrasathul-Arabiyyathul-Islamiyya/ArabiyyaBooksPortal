@@ -9,7 +9,7 @@
             class="h-16 w-16"
           />
           <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-0">
-            Books Portal
+            {{ appTitle }}
           </h1>
         </div>
       </template>
@@ -87,6 +87,7 @@ definePageMeta({
 })
 
 const { login } = useAuth()
+const { public: { appTitle } } = useRuntimeConfig()
 
 const form = reactive({
   email: '',

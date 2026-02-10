@@ -39,7 +39,7 @@
     >
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
         <h1 class="text-base font-semibold text-surface-900 dark:text-surface-0">
-          Arabiyya Books Portal
+          {{ appTitle }}
         </h1>
         <div class="flex items-center gap-3">
           <Button
@@ -77,6 +77,7 @@ import type { MenuItem } from 'primevue/menuitem'
 const colorMode = useColorMode()
 const { user, logout } = useAuth()
 const route = useRoute()
+const { public: { appTitle } } = useRuntimeConfig()
 const userMenuRef = ref()
 const expandedKeys = ref<Record<string, boolean>>({})
 

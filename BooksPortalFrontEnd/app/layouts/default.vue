@@ -12,12 +12,6 @@
           alt="Logo"
           class="h-8 w-8 shrink-0"
         />
-        <span
-          v-if="!sidebarCollapsed"
-          class="text-lg font-semibold text-surface-900 dark:text-surface-0"
-        >
-          Books Portal
-        </span>
       </div>
 
       <!-- Navigation -->
@@ -66,7 +60,7 @@
       <!-- Header -->
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-surface-200 bg-surface-0 px-6 dark:border-surface-700 dark:bg-surface-900">
         <h1 class="text-base font-semibold text-surface-900 dark:text-surface-0">
-          Arabiyya Books Portal
+          {{ appTitle }}
         </h1>
         <div class="flex items-center gap-3">
           <Button
@@ -104,6 +98,7 @@ const colorMode = useColorMode()
 const { user, isAdmin, logout } = useAuth()
 const appStore = useAppStore()
 const route = useRoute()
+const { public: { appTitle } } = useRuntimeConfig()
 
 const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
 const userMenuRef = ref()

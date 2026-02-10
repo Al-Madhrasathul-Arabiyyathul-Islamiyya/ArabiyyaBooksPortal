@@ -33,6 +33,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: 'http://localhost:5071/api',
+      appTitle: 'Arabiyya Books Portal',
     },
   },
 
