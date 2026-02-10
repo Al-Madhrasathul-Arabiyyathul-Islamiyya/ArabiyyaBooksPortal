@@ -103,6 +103,7 @@
 const colorMode = useColorMode()
 const { user, isAdmin, logout } = useAuth()
 const appStore = useAppStore()
+const route = useRoute()
 
 const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
 const userMenuRef = ref()
@@ -113,6 +114,10 @@ function toggleColorMode() {
 
 function toggleUserMenu(event: Event) {
   userMenuRef.value.toggle(event)
+}
+
+function isRouteActive(path: string) {
+  return route.path === path || route.path.startsWith(`${path}/`)
 }
 
 const userMenuItems = ref([
@@ -134,16 +139,19 @@ const menuItems = computed(() => ([
     label: 'Distribution',
     icon: 'pi pi-send',
     command: () => navigateTo('/distribution'),
+    class: isRouteActive('/distribution') ? 'app-menu-item-active' : undefined,
   },
   {
     label: 'Returns',
     icon: 'pi pi-replay',
     command: () => navigateTo('/returns'),
+    class: isRouteActive('/returns') ? 'app-menu-item-active' : undefined,
   },
   {
     label: 'Teacher Issues',
     icon: 'pi pi-users',
     command: () => navigateTo('/teacher-issues'),
+    class: isRouteActive('/teacher-issues') ? 'app-menu-item-active' : undefined,
   },
 ]))
 
@@ -173,5 +181,17 @@ onMounted(() => {
 .sidebar-panel-collapsed :deep(.p-panelmenu-header-chevron),
 .sidebar-panel-collapsed :deep(.p-submenu-icon) {
   display: none;
+}
+
+:deep(.app-menu-item-active > .p-panelmenu-header > .p-panelmenu-header-content),
+:deep(.app-menu-item-active > .p-menuitem-content) {
+  background: color-mix(in srgb, var(--p-primary-color) 18%, transparent);
+  border-radius: 0.5rem;
+}
+
+:deep(.app-menu-item-active .p-panelmenu-header-label),
+:deep(.app-menu-item-active .p-menuitem-text) {
+  color: var(--p-primary-color);
+  font-weight: 600;
 }
 </style>

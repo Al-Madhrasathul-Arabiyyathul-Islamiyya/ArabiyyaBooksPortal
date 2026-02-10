@@ -101,7 +101,7 @@ const userMenuItems = ref([
 ])
 
 function isActive(path: string) {
-  return route.path === path
+  return route.path === path || route.path.startsWith(`${path}/`)
 }
 
 const menuItems = computed(() => ([
@@ -110,7 +110,7 @@ const menuItems = computed(() => ([
     label: 'Admin Dashboard',
     icon: 'pi pi-home',
     command: () => navigateTo('/admin'),
-    class: isActive('/admin') ? 'app-menu-item-active' : undefined,
+    class: route.path === '/admin' ? 'app-menu-item-active' : undefined,
   },
   {
     key: 'master-data',
@@ -252,13 +252,13 @@ watch(() => route.path, syncExpandedKeys, { immediate: true })
 
 <style scoped>
 :deep(.app-menu-item-active > .p-panelmenu-header > .p-panelmenu-header-content),
-:deep(.app-menu-item-active > .p-panelmenu-content-container > .p-panelmenu-content > .p-menu-list > .p-menuitem > .p-menuitem-content) {
+:deep(.app-menu-item-active > .p-menuitem-content) {
   background: color-mix(in srgb, var(--p-primary-color) 18%, transparent);
   border-radius: 0.5rem;
 }
 
-:deep(.app-menu-item-active > .p-panelmenu-header > .p-panelmenu-header-content .p-panelmenu-header-label),
-:deep(.app-menu-item-active > .p-panelmenu-content-container > .p-panelmenu-content > .p-menu-list > .p-menuitem > .p-menuitem-content .p-menuitem-text) {
+:deep(.app-menu-item-active .p-panelmenu-header-label),
+:deep(.app-menu-item-active .p-menuitem-text) {
   color: var(--p-primary-color);
   font-weight: 600;
 }
