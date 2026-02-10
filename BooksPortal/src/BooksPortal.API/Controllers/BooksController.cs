@@ -1,5 +1,6 @@
 using BooksPortal.Application.Features.Books.DTOs;
 using BooksPortal.Application.Features.Books.Interfaces;
+using BooksPortal.Application.Features.BulkImport.Interfaces;
 using BooksPortal.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,13 @@ namespace BooksPortal.API.Controllers;
 public class BooksController : ApiControllerBase
 {
     private readonly IBookService _service;
+    private readonly IBookBulkImportService _bulkImportService;
 
-    public BooksController(IBookService service) => _service = service;
+    public BooksController(IBookService service, IBookBulkImportService bulkImportService)
+    {
+        _service = service;
+        _bulkImportService = bulkImportService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetPaged(int pageNumber = 1, int pageSize = 20, int? subjectId = null, string? search = null)
@@ -60,4 +66,28 @@ public class BooksController : ApiControllerBase
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string q)
         => OkResponse(await _service.SearchAsync(q));
+
+    [HttpPost("bulk/validate")]
+    [Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
+    public async Task<IActionResult> ValidateBulk([FromForm] IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file.Length == 0)
+            return FailResponse("File is required.");
+
+        await using var stream = file.OpenReadStream();
+        var report = await _bulkImportService.ValidateAsync(stream, cancellationToken);
+        return OkResponse(report);
+    }
+
+    [HttpPost("bulk/commit")]
+    [Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
+    public async Task<IActionResult> CommitBulk([FromForm] IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file.Length == 0)
+            return FailResponse("File is required.");
+
+        await using var stream = file.OpenReadStream();
+        var report = await _bulkImportService.CommitAsync(stream, CurrentUserId, cancellationToken);
+        return OkResponse(report);
+    }
 }

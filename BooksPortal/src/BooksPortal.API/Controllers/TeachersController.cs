@@ -1,5 +1,6 @@
 using BooksPortal.Application.Features.MasterData.DTOs;
 using BooksPortal.Application.Features.MasterData.Interfaces;
+using BooksPortal.Application.Features.BulkImport.Interfaces;
 using BooksPortal.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,13 @@ namespace BooksPortal.API.Controllers;
 public class TeachersController : ApiControllerBase
 {
     private readonly ITeacherService _service;
+    private readonly ITeacherBulkImportService _bulkImportService;
 
-    public TeachersController(ITeacherService service) => _service = service;
+    public TeachersController(ITeacherService service, ITeacherBulkImportService bulkImportService)
+    {
+        _service = service;
+        _bulkImportService = bulkImportService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetPaged(
@@ -49,5 +55,29 @@ public class TeachersController : ApiControllerBase
     {
         await _service.RemoveAssignmentAsync(id, assignmentId);
         return OkResponse("Assignment removed.");
+    }
+
+    [HttpPost("bulk/validate")]
+    [Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
+    public async Task<IActionResult> ValidateBulk([FromForm] IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file.Length == 0)
+            return FailResponse("File is required.");
+
+        await using var stream = file.OpenReadStream();
+        var report = await _bulkImportService.ValidateAsync(stream, cancellationToken);
+        return OkResponse(report);
+    }
+
+    [HttpPost("bulk/commit")]
+    [Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
+    public async Task<IActionResult> CommitBulk([FromForm] IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file.Length == 0)
+            return FailResponse("File is required.");
+
+        await using var stream = file.OpenReadStream();
+        var report = await _bulkImportService.CommitAsync(stream, cancellationToken);
+        return OkResponse(report);
     }
 }

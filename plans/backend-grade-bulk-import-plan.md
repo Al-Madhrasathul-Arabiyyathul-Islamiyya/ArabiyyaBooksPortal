@@ -13,8 +13,8 @@ This plan tracks backend work needed before frontend Phase 3 completion:
 - [x] Create `refactor/grade-entity-from-dev` from `dev`
 - [x] Create `feature/bulk-import-endpoints-from-dev` from `dev`
 - [x] Implement model/migration work on `refactor/grade-entity-from-dev`
-- [ ] Merge refactor branch to `dev` after verification
-- [ ] Rebase `feature/bulk-import-endpoints-from-dev` onto updated `dev`
+- [x] Merge refactor branch to `dev` after verification
+- [x] Rebase `feature/bulk-import-endpoints-from-dev` onto updated `dev`
 
 ---
 
@@ -58,7 +58,7 @@ This plan tracks backend work needed before frontend Phase 3 completion:
 - [x] Add system tags for non-user operations
   - [x] `system:seed`
   - [x] `system:bulk-import`
-- [ ] Keep IP tracking out of scope
+- [x] Keep IP tracking out of scope
 
 ### 1.6 Migration
 - [x] Create migration for `Grade` table and `ClassSection.GradeId`
@@ -149,4 +149,4 @@ This plan tracks backend work needed before frontend Phase 3 completion:
 - [x] Plan initialized
 - [x] Backend working branches created from `dev`
 - [x] Grade refactor implementation completed
-- [ ] Bulk import implementation started
+- [x] Bulk import implementation started
