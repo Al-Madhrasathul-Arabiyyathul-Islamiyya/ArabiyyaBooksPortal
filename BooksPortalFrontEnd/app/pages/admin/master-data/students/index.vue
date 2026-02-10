@@ -9,11 +9,20 @@
           Manage students and link parents to each student.
         </p>
       </div>
-      <Button
-        label="New Student"
-        icon="pi pi-plus"
-        @click="openCreateDialog"
-      />
+      <div class="flex items-center gap-2">
+        <Button
+          label="Bulk Import"
+          icon="pi pi-file-import"
+          severity="secondary"
+          outlined
+          @click="isBulkDialogVisible = true"
+        />
+        <Button
+          label="New Student"
+          icon="pi pi-plus"
+          @click="openCreateDialog"
+        />
+      </div>
     </div>
 
     <Card>
@@ -163,6 +172,7 @@
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormsFormField
             label="National ID"
+            required
             field-id="nationalId"
             :error="errors.nationalId"
           >
@@ -304,12 +314,24 @@
         </div>
       </form>
     </Dialog>
+
+    <FormsBulkImportDialog
+      v-model:visible="isBulkDialogVisible"
+      entity-label="Students"
+      :report="bulkReport"
+      :error-message="bulkError"
+      :is-validating="isBulkValidating"
+      :is-committing="isBulkCommitting"
+      @template="downloadStudentTemplate"
+      @validate="validateStudentBulk"
+      @commit="commitStudentBulk"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { z } from 'zod/v4'
-import type { PaginatedList } from '~/types/api'
+import type { BulkImportReport, PaginatedList } from '~/types/api'
 import type {
   ClassSection,
   Parent,
@@ -347,6 +369,7 @@ definePageMeta({
 })
 
 const api = useApi()
+const bulkImport = useBulkImport()
 const { showError, showSuccess, showInfo } = useAppToast()
 const { confirmDelete } = useAppConfirm()
 const { isSuperAdmin } = useAuth()
@@ -363,9 +386,14 @@ const selectedParentCandidate = ref<Parent | null>(null)
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
+const isBulkDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
 const formError = ref('')
+const isBulkValidating = ref(false)
+const isBulkCommitting = ref(false)
+const bulkError = ref('')
+const bulkReport = ref<BulkImportReport | null>(null)
 
 const form = reactive({
   fullName: '',
@@ -401,13 +429,13 @@ const classSectionOptions = computed<OptionItem[]>(() =>
 const CreateSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
   indexNo: z.string().min(1, 'Index number is required'),
-  nationalId: z.string().optional(),
+  nationalId: z.string().min(1, 'National ID is required'),
   classSectionId: z.number().int().min(1, 'Class is required'),
 })
 
 const UpdateSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
-  nationalId: z.string().optional(),
+  nationalId: z.string().min(1, 'National ID is required'),
   classSectionId: z.number().int().min(1, 'Class is required'),
 })
 
@@ -428,11 +456,6 @@ function resetForm() {
   selectedParentCandidate.value = null
   selectedId.value = null
   clearErrors()
-}
-
-function normalizeNullable(value: string) {
-  const trimmed = value.trim()
-  return trimmed.length ? trimmed : null
 }
 
 async function loadClassSections() {
@@ -553,6 +576,68 @@ async function handleFilterChange() {
   await loadStudents()
 }
 
+async function downloadStudentTemplate() {
+  await bulkImport.downloadTemplate({
+    validate: API.students.bulkValidate,
+    commit: API.students.bulkCommit,
+    template: API.importTemplates.students,
+    templateFileName: 'students-import-template.xlsx',
+  })
+}
+
+async function validateStudentBulk(file: File) {
+  bulkError.value = ''
+  isBulkValidating.value = true
+  try {
+    const response = await bulkImport.validateFile(file, {
+      validate: API.students.bulkValidate,
+      commit: API.students.bulkCommit,
+      template: API.importTemplates.students,
+      templateFileName: 'students-import-template.xlsx',
+    })
+    if (response.success) {
+      bulkReport.value = response.data
+      showSuccess('Student import validation complete')
+      return
+    }
+    bulkError.value = response.message ?? 'Validation failed'
+  }
+  catch (error: unknown) {
+    const fetchError = error as { data?: { message?: string } }
+    bulkError.value = fetchError.data?.message ?? 'Validation failed'
+  }
+  finally {
+    isBulkValidating.value = false
+  }
+}
+
+async function commitStudentBulk(file: File) {
+  bulkError.value = ''
+  isBulkCommitting.value = true
+  try {
+    const response = await bulkImport.commitFile(file, {
+      validate: API.students.bulkValidate,
+      commit: API.students.bulkCommit,
+      template: API.importTemplates.students,
+      templateFileName: 'students-import-template.xlsx',
+    })
+    if (response.success) {
+      bulkReport.value = response.data
+      showSuccess('Student import committed')
+      await loadStudents()
+      return
+    }
+    bulkError.value = response.message ?? 'Commit failed'
+  }
+  catch (error: unknown) {
+    const fetchError = error as { data?: { message?: string } }
+    bulkError.value = fetchError.data?.message ?? 'Commit failed'
+  }
+  finally {
+    isBulkCommitting.value = false
+  }
+}
+
 function openCreateDialog() {
   isEditing.value = false
   resetForm()
@@ -581,6 +666,7 @@ function mapCreateErrors(result: Extract<ReturnType<typeof CreateSchema.safePars
   for (const issue of result.error.issues) {
     const field = issue.path[0]
     if (field === 'fullName') errors.fullName = issue.message
+    if (field === 'nationalId') errors.nationalId = issue.message
     if (field === 'indexNo') errors.indexNo = issue.message
     if (field === 'classSectionId') errors.classSectionId = issue.message
   }
@@ -591,6 +677,7 @@ function mapUpdateErrors(result: Extract<ReturnType<typeof UpdateSchema.safePars
   for (const issue of result.error.issues) {
     const field = issue.path[0]
     if (field === 'fullName') errors.fullName = issue.message
+    if (field === 'nationalId') errors.nationalId = issue.message
     if (field === 'classSectionId') errors.classSectionId = issue.message
   }
 }
@@ -611,7 +698,6 @@ async function handleSubmit() {
 
     const requestCheck = UpdateStudentRequestSchema.safeParse({
       ...parsed.data,
-      nationalId: normalizeNullable(parsed.data.nationalId ?? ''),
       parents: linkedParents.value.map(parent => ({
         parentId: parent.parentId,
         isPrimary: parent.isPrimary,
@@ -657,7 +743,6 @@ async function handleSubmit() {
 
   const requestCheck = CreateStudentRequestSchema.safeParse({
     ...parsed.data,
-    nationalId: normalizeNullable(parsed.data.nationalId ?? ''),
     parents: linkedParents.value.map(parent => ({
       parentId: parent.parentId,
       isPrimary: parent.isPrimary,

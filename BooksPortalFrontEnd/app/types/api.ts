@@ -44,3 +44,29 @@ export interface PaginationParams {
   pageNumber?: number
   pageSize?: number
 }
+
+export interface BulkImportRowResult {
+  rowNumber: number
+  key: string
+  success: boolean
+  note: string | null
+}
+
+export interface BulkImportRowIssue {
+  rowNumber: number
+  field: string
+  code: string
+  message: string
+}
+
+export interface BulkImportReport {
+  entity: string
+  totalRows: number
+  validRows: number
+  invalidRows: number
+  insertedRows: number
+  failedRows: number
+  canCommit: boolean
+  rows: BulkImportRowResult[]
+  issues: BulkImportRowIssue[]
+}

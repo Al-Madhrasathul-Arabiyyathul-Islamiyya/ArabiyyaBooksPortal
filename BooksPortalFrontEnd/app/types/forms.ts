@@ -49,7 +49,7 @@ export type CreateSubjectRequest = z.infer<typeof CreateSubjectRequestSchema>
 export const CreateClassSectionRequestSchema = z.object({
   academicYearId: z.number().int().min(1, 'Academic year is required'),
   keystageId: z.number().int().min(1, 'Keystage is required'),
-  grade: z.string().min(1, 'Grade is required'),
+  gradeId: z.number().int().min(1, 'Grade is required'),
   section: z.string().min(1, 'Section is required'),
 })
 export type CreateClassSectionRequest = z.infer<typeof CreateClassSectionRequestSchema>
@@ -63,7 +63,7 @@ export type StudentParentRequest = z.infer<typeof StudentParentRequestSchema>
 export const CreateStudentRequestSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
   indexNo: z.string().min(1, 'Index number is required'),
-  nationalId: z.string().nullable().optional(),
+  nationalId: z.string().min(1, 'National ID is required'),
   classSectionId: z.number().int().min(1, 'Class section is required'),
   parents: z.array(StudentParentRequestSchema).optional(),
 })
@@ -71,7 +71,7 @@ export type CreateStudentRequest = z.infer<typeof CreateStudentRequestSchema>
 
 export const UpdateStudentRequestSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
-  nationalId: z.string().nullable().optional(),
+  nationalId: z.string().min(1, 'National ID is required'),
   classSectionId: z.number().int().min(1, 'Class section is required'),
   parents: z.array(StudentParentRequestSchema).optional(),
 })
@@ -107,8 +107,8 @@ export const CreateBookRequestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   author: z.string().nullable().optional(),
   edition: z.string().nullable().optional(),
-  publisher: z.string().nullable().optional(),
-  publishedYear: z.number().int().nullable().optional(),
+  publisher: z.string().min(1, 'Publisher is required'),
+  publishedYear: z.number().int().min(1, 'Published year is required'),
   subjectId: z.number().int().min(1, 'Subject is required'),
   grade: z.string().nullable().optional(),
 })

@@ -9,11 +9,20 @@
           Manage teachers and their subject/class assignments.
         </p>
       </div>
-      <Button
-        label="New Teacher"
-        icon="pi pi-plus"
-        @click="openCreateDialog"
-      />
+      <div class="flex items-center gap-2">
+        <Button
+          label="Bulk Import"
+          icon="pi pi-file-import"
+          severity="secondary"
+          outlined
+          @click="isBulkDialogVisible = true"
+        />
+        <Button
+          label="New Teacher"
+          icon="pi pi-plus"
+          @click="openCreateDialog"
+        />
+      </div>
     </div>
 
     <Card>
@@ -280,12 +289,24 @@
         </DataTable>
       </div>
     </Dialog>
+
+    <FormsBulkImportDialog
+      v-model:visible="isBulkDialogVisible"
+      entity-label="Teachers"
+      :report="bulkReport"
+      :error-message="bulkError"
+      :is-validating="isBulkValidating"
+      :is-committing="isBulkCommitting"
+      @template="downloadTeacherTemplate"
+      @validate="validateTeacherBulk"
+      @commit="commitTeacherBulk"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { z } from 'zod/v4'
-import type { PaginatedList } from '~/types/api'
+import type { BulkImportReport, PaginatedList } from '~/types/api'
 import type {
   ClassSection,
   Subject,
@@ -314,6 +335,7 @@ definePageMeta({
 })
 
 const api = useApi()
+const bulkImport = useBulkImport()
 const { showError, showSuccess, showInfo } = useAppToast()
 const { confirmDelete } = useAppConfirm()
 const { isSuperAdmin } = useAuth()
@@ -327,9 +349,14 @@ const searchTerm = ref('')
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
+const isBulkDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
 const formError = ref('')
+const isBulkValidating = ref(false)
+const isBulkCommitting = ref(false)
+const bulkError = ref('')
+const bulkReport = ref<BulkImportReport | null>(null)
 
 const form = reactive({
   fullName: '',
@@ -474,6 +501,68 @@ async function onPageAndLoad(event: { page: number, rows: number }) {
 async function handleSearch() {
   reset()
   await loadTeachers()
+}
+
+async function downloadTeacherTemplate() {
+  await bulkImport.downloadTemplate({
+    validate: API.teachers.bulkValidate,
+    commit: API.teachers.bulkCommit,
+    template: API.importTemplates.teachers,
+    templateFileName: 'teachers-import-template.xlsx',
+  })
+}
+
+async function validateTeacherBulk(file: File) {
+  bulkError.value = ''
+  isBulkValidating.value = true
+  try {
+    const response = await bulkImport.validateFile(file, {
+      validate: API.teachers.bulkValidate,
+      commit: API.teachers.bulkCommit,
+      template: API.importTemplates.teachers,
+      templateFileName: 'teachers-import-template.xlsx',
+    })
+    if (response.success) {
+      bulkReport.value = response.data
+      showSuccess('Teacher import validation complete')
+      return
+    }
+    bulkError.value = response.message ?? 'Validation failed'
+  }
+  catch (error: unknown) {
+    const fetchError = error as { data?: { message?: string } }
+    bulkError.value = fetchError.data?.message ?? 'Validation failed'
+  }
+  finally {
+    isBulkValidating.value = false
+  }
+}
+
+async function commitTeacherBulk(file: File) {
+  bulkError.value = ''
+  isBulkCommitting.value = true
+  try {
+    const response = await bulkImport.commitFile(file, {
+      validate: API.teachers.bulkValidate,
+      commit: API.teachers.bulkCommit,
+      template: API.importTemplates.teachers,
+      templateFileName: 'teachers-import-template.xlsx',
+    })
+    if (response.success) {
+      bulkReport.value = response.data
+      showSuccess('Teacher import committed')
+      await loadTeachers()
+      return
+    }
+    bulkError.value = response.message ?? 'Commit failed'
+  }
+  catch (error: unknown) {
+    const fetchError = error as { data?: { message?: string } }
+    bulkError.value = fetchError.data?.message ?? 'Commit failed'
+  }
+  finally {
+    isBulkCommitting.value = false
+  }
 }
 
 function openCreateDialog() {

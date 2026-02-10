@@ -28,6 +28,8 @@ export const API = {
   students: {
     base: '/students',
     byId: (id: number) => `/students/${id}`,
+    bulkValidate: '/students/bulk/validate',
+    bulkCommit: '/students/bulk/commit',
   },
   parents: {
     base: '/parents',
@@ -36,6 +38,8 @@ export const API = {
   teachers: {
     base: '/teachers',
     byId: (id: number) => `/teachers/${id}`,
+    bulkValidate: '/teachers/bulk/validate',
+    bulkCommit: '/teachers/bulk/commit',
     assignments: (id: number) => `/teachers/${id}/assignments`,
     assignmentById: (teacherId: number, assignmentId: number) =>
       `/teachers/${teacherId}/assignments/${assignmentId}`,
@@ -43,16 +47,24 @@ export const API = {
   lookups: {
     academicYears: '/lookups/academic-years',
     keystages: '/lookups/keystages',
+    grades: '/lookups/grades',
     subjects: '/lookups/subjects',
     classSections: '/lookups/class-sections',
     terms: '/lookups/terms',
     bookConditions: '/lookups/book-conditions',
     movementTypes: '/lookups/movement-types',
   },
+  importTemplates: {
+    books: '/import-templates/books',
+    teachers: '/import-templates/teachers',
+    students: '/import-templates/students',
+  },
   books: {
     base: '/books',
     byId: (id: number) => `/books/${id}`,
     search: '/books/search',
+    bulkValidate: '/books/bulk/validate',
+    bulkCommit: '/books/bulk/commit',
     stockEntry: (id: number) => `/books/${id}/stock-entry`,
     adjustStock: (id: number) => `/books/${id}/adjust-stock`,
     stockEntries: (id: number) => `/books/${id}/stock-entries`,

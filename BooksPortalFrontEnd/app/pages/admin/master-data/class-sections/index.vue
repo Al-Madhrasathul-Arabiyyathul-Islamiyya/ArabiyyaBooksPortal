@@ -146,14 +146,19 @@
           <FormsFormField
             label="Grade"
             required
-            field-id="grade"
-            :error="errors.grade"
+            field-id="gradeId"
+            :error="errors.gradeId"
           >
-            <InputText
-              id="grade"
-              v-model.trim="form.grade"
+            <Select
+              id="gradeId"
+              v-model="form.gradeId"
+              :options="gradeOptions"
+              option-label="label"
+              option-value="value"
+              placeholder="Select grade"
               fluid
-              :invalid="!!errors.grade"
+              :disabled="!form.keystageId"
+              :invalid="!!errors.gradeId"
             />
           </FormsFormField>
 
@@ -204,6 +209,7 @@ import { z } from 'zod/v4'
 import type {
   AcademicYear,
   ClassSection,
+  Grade,
   Keystage,
 } from '~/types/entities'
 import { CreateClassSectionRequestSchema } from '~/types/forms'
@@ -237,6 +243,7 @@ const { isSuperAdmin } = useAuth()
 const classSections = ref<ClassSection[]>([])
 const academicYears = ref<AcademicYear[]>([])
 const keystages = ref<Keystage[]>([])
+const grades = ref<Grade[]>([])
 const selectedAcademicYearFilter = ref<number | null>(null)
 
 const isLoading = ref(false)
@@ -249,21 +256,21 @@ const formError = ref('')
 const form = reactive({
   academicYearId: null as number | null,
   keystageId: null as number | null,
-  grade: '',
+  gradeId: null as number | null,
   section: '',
 })
 
 const errors = reactive({
   academicYearId: '',
   keystageId: '',
-  grade: '',
+  gradeId: '',
   section: '',
 })
 
 const FormSchema = z.object({
   academicYearId: z.number().int().min(1, 'Academic year is required'),
   keystageId: z.number().int().min(1, 'Keystage is required'),
-  grade: z.string().min(1, 'Grade is required'),
+  gradeId: z.number().int().min(1, 'Grade is required'),
   section: z.string().min(1, 'Section is required'),
 })
 
@@ -291,10 +298,17 @@ const keystageOptions = computed<SelectOption[]>(() => {
   }))
 })
 
+const gradeOptions = computed<SelectOption[]>(() => {
+  return grades.value.map(grade => ({
+    label: grade.name,
+    value: grade.id,
+  }))
+})
+
 function clearErrors() {
   errors.academicYearId = ''
   errors.keystageId = ''
-  errors.grade = ''
+  errors.gradeId = ''
   errors.section = ''
   formError.value = ''
 }
@@ -302,7 +316,7 @@ function clearErrors() {
 function resetForm() {
   form.academicYearId = null
   form.keystageId = null
-  form.grade = ''
+  form.gradeId = null
   form.section = ''
   selectedId.value = null
   clearErrors()
@@ -310,9 +324,10 @@ function resetForm() {
 
 async function loadLookups() {
   try {
-    const [yearsResponse, keystagesResponse] = await Promise.all([
+    const [yearsResponse, keystagesResponse, gradesResponse] = await Promise.all([
       api.get<AcademicYear[]>(API.academicYears.base),
       api.get<Keystage[]>(API.keystages.base),
+      api.get<Grade[]>(API.lookups.grades),
     ])
 
     if (yearsResponse.success) {
@@ -327,6 +342,13 @@ async function loadLookups() {
     }
     else {
       showError(keystagesResponse.message ?? 'Failed to load keystages')
+    }
+
+    if (gradesResponse.success) {
+      grades.value = gradesResponse.data
+    }
+    else {
+      showError(gradesResponse.message ?? 'Failed to load grades')
     }
   }
   catch (error: unknown) {
@@ -369,7 +391,7 @@ function openEditDialog(item: ClassSection) {
   clearErrors()
   form.academicYearId = item.academicYearId
   form.keystageId = item.keystageId
-  form.grade = item.grade
+  form.gradeId = item.gradeId
   form.section = item.section
   isDialogVisible.value = true
 }
@@ -385,7 +407,7 @@ function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safePa
     const field = issue.path[0]
     if (field === 'academicYearId') errors.academicYearId = issue.message
     if (field === 'keystageId') errors.keystageId = issue.message
-    if (field === 'grade') errors.grade = issue.message
+    if (field === 'gradeId') errors.gradeId = issue.message
     if (field === 'section') errors.section = issue.message
   }
 }
@@ -395,7 +417,7 @@ async function handleSubmit() {
   const parsed = FormSchema.safeParse({
     academicYearId: form.academicYearId,
     keystageId: form.keystageId,
-    grade: form.grade,
+    gradeId: form.gradeId,
     section: form.section,
   })
 
@@ -469,6 +491,32 @@ function handleDelete(item: ClassSection) {
 async function handleFilterChange() {
   await loadClassSections()
 }
+
+watch(
+  () => form.keystageId,
+  async (keystageId) => {
+    if (!keystageId) {
+      form.gradeId = null
+      return
+    }
+
+    try {
+      const response = await api.get<Grade[]>(API.lookups.grades, { keystageId })
+      if (response.success) {
+        grades.value = response.data
+        if (!grades.value.some(grade => grade.id === form.gradeId)) {
+          form.gradeId = null
+        }
+        return
+      }
+      showError(response.message ?? 'Failed to load grades')
+    }
+    catch (error: unknown) {
+      const fetchError = error as { data?: { message?: string } }
+      showError(fetchError.data?.message ?? 'Failed to load grades')
+    }
+  },
+)
 
 onMounted(async () => {
   await loadLookups()

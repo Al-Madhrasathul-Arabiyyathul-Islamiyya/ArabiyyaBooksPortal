@@ -14,6 +14,7 @@ export const useLookupsStore = defineStore('lookups', () => {
   // Cached lookup data
   const academicYears = ref<Lookup[]>([])
   const keystages = ref<Lookup[]>([])
+  const grades = ref<Lookup[]>([])
   const subjects = ref<Lookup[]>([])
   const classSections = ref<Lookup[]>([])
   const terms = ref<Lookup[]>([])
@@ -82,6 +83,20 @@ export const useLookupsStore = defineStore('lookups', () => {
     }
   }
 
+  async function fetchGrades(keystageId?: number) {
+    try {
+      const response = await api.get<Lookup[]>(API.lookups.grades, {
+        keystageId: keystageId || undefined,
+      })
+      if (response.success) {
+        grades.value = response.data
+      }
+    }
+    catch (error) {
+      console.error('Failed to fetch grades lookup:', error)
+    }
+  }
+
   async function fetchBookConditions() {
     try {
       const response = await api.get<Lookup[]>(API.lookups.bookConditions)
@@ -110,6 +125,7 @@ export const useLookupsStore = defineStore('lookups', () => {
     await Promise.all([
       fetchAcademicYears(),
       fetchKeystages(),
+      fetchGrades(),
       fetchSubjects(),
       fetchClassSections(),
       fetchTerms(),
@@ -137,6 +153,7 @@ export const useLookupsStore = defineStore('lookups', () => {
   return {
     academicYears,
     keystages,
+    grades,
     subjects,
     classSections,
     terms,
@@ -147,6 +164,7 @@ export const useLookupsStore = defineStore('lookups', () => {
     fetchAcademicYears,
     fetchKeystages,
     fetchSubjects,
+    fetchGrades,
     fetchClassSections,
     fetchTerms,
     fetchBookConditions,

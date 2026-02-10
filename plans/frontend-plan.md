@@ -232,42 +232,42 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 ## Phase 2.7: Backend Contract Alignment (Post-Refactor)
 > Bring frontend foundation/composables/server routes in line with backend `Grade` + bulk-import changes before completing remaining Phase 3+ screens
 - [x] Alignment branch created: `feature/module-10-backend-contract-alignment`
-- [~] Implementation started (plan + app title config done; contract/type/store alignment pending)
+- [x] Implementation completed (contract/type/store alignment + bulk-import UI readiness)
 
 ### 2.7.1 Route and BFF Contract Sync
-- [ ] Verify BFF catch-all/proxy supports new backend routes:
-  - [ ] `GET /lookups/grades`
-  - [ ] `POST /books/bulk/validate`, `POST /books/bulk/commit`
-  - [ ] `POST /teachers/bulk/validate`, `POST /teachers/bulk/commit`
-  - [ ] `POST /students/bulk/validate`, `POST /students/bulk/commit`
-  - [ ] `GET /import-templates/books|teachers|students`
-- [ ] Add explicit typed API helpers/composables for bulk validate/commit + template download flows
+- [x] Verify BFF catch-all/proxy supports new backend routes:
+  - [x] `GET /lookups/grades`
+  - [x] `POST /books/bulk/validate`, `POST /books/bulk/commit`
+  - [x] `POST /teachers/bulk/validate`, `POST /teachers/bulk/commit`
+  - [x] `POST /students/bulk/validate`, `POST /students/bulk/commit`
+  - [x] `GET /import-templates/books|teachers|students`
+- [x] Add explicit typed API helpers/composables for bulk validate/commit + template download flows
 
 ### 2.7.2 DTO/Form Type Alignment
-- [ ] Update frontend schemas/types for backend changes:
-  - [ ] ClassSection create/update uses `gradeId` (not free-text `grade`)
-  - [ ] ClassSection response includes `gradeId`
-  - [ ] Student create/update requires `nationalId`
-  - [ ] Book create/update requires `publisher` + `publishedYear`
+- [x] Update frontend schemas/types for backend changes:
+  - [x] ClassSection create/update uses `gradeId` (not free-text `grade`)
+  - [x] ClassSection response includes `gradeId`
+  - [x] Student create/update requires `nationalId`
+  - [x] Book create/update requires `publisher` + `publishedYear`
 - [ ] Regenerate/refresh local API mock captures for changed request/response shapes
 
 ### 2.7.3 Lookup and Store Alignment
-- [ ] Add grade lookups to lookup store (`GET /lookups/grades`, optional `keystageId`)
-- [ ] Cascade dropdown behavior in class-section forms: keystage -> grades
-- [ ] Keep existing role/route constants aligned with backend route casing and path conventions
+- [x] Add grade lookups to lookup store (`GET /lookups/grades`, optional `keystageId`)
+- [x] Cascade dropdown behavior in class-section forms: keystage -> grades
+- [x] Keep existing role/route constants aligned with backend route casing and path conventions
 
 ### 2.7.4 UI Readiness for Bulk Import
-- [ ] Add admin UI placeholders/actions for bulk import in:
-  - [ ] Books
-  - [ ] Teachers
-  - [ ] Students
-- [ ] Add template download actions and validation-report rendering design
-- [ ] Ensure commit flow reflects backend all-or-nothing transaction semantics
+- [x] Add admin UI placeholders/actions for bulk import in:
+  - [x] Books
+  - [x] Teachers
+  - [x] Students
+- [x] Add template download actions and validation-report rendering design
+- [x] Ensure commit flow reflects backend all-or-nothing transaction semantics
 
 ### Phase 2.7 Verification
 - [ ] Contract calls against updated backend succeed for grades and bulk endpoints
-- [ ] No frontend usage remains on removed/legacy payload fields (`grade` string in class-section requests)
-- [ ] Typecheck/build pass after schema/store/composable updates
+- [x] No frontend usage remains on removed/legacy payload fields (`grade` string in class-section requests)
+- [~] Typecheck/lint pass after schema/store/composable updates (full build verification to confirm locally)
 
 ---
 

@@ -40,6 +40,15 @@ export const KeystageSchema = z.object({
 })
 export type Keystage = z.infer<typeof KeystageSchema>
 
+export const GradeSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  sortOrder: z.number(),
+  keystageId: z.number(),
+  keystageName: z.string(),
+})
+export type Grade = z.infer<typeof GradeSchema>
+
 export const SubjectSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -53,6 +62,7 @@ export const ClassSectionSchema = z.object({
   academicYearName: z.string(),
   keystageId: z.number(),
   keystageName: z.string(),
+  gradeId: z.number(),
   grade: z.string(),
   section: z.string(),
   displayName: z.string(),
@@ -74,7 +84,7 @@ export const StudentSchema = z.object({
   id: z.number(),
   fullName: z.string(),
   indexNo: z.string(),
-  nationalId: z.string().nullable(),
+  nationalId: z.string(),
   classSectionId: z.number(),
   classSectionDisplayName: z.string(),
   parents: z.array(StudentParentSchema),
@@ -124,8 +134,8 @@ export const BookSchema = z.object({
   title: z.string(),
   author: z.string().nullable(),
   edition: z.string().nullable(),
-  publisher: z.string().nullable(),
-  publishedYear: z.number().nullable(),
+  publisher: z.string(),
+  publishedYear: z.number().int(),
   subjectId: z.number(),
   subjectName: z.string(),
   grade: z.string().nullable(),
