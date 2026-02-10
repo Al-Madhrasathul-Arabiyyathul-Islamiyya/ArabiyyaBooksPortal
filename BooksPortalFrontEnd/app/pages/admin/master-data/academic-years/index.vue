@@ -101,7 +101,7 @@
         class="flex flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
-        <FormField
+        <FormsFormField
           label="Name"
           required
           field-id="name"
@@ -113,9 +113,9 @@
             fluid
             :invalid="!!errors.name"
           />
-        </FormField>
+        </FormsFormField>
 
-        <FormField
+        <FormsFormField
           label="Year"
           required
           field-id="year"
@@ -129,10 +129,10 @@
             fluid
             :invalid="!!errors.year"
           />
-        </FormField>
+        </FormsFormField>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
+          <FormsFormField
             label="Start Date"
             required
             field-id="startDate"
@@ -145,9 +145,9 @@
               fluid
               :invalid="!!errors.startDate"
             />
-          </FormField>
+          </FormsFormField>
 
-          <FormField
+          <FormsFormField
             label="End Date"
             required
             field-id="endDate"
@@ -160,7 +160,7 @@
               fluid
               :invalid="!!errors.endDate"
             />
-          </FormField>
+          </FormsFormField>
         </div>
 
         <Message

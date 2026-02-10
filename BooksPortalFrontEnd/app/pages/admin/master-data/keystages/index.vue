@@ -78,7 +78,7 @@
         class="flex flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
-        <FormField
+        <FormsFormField
           label="Code"
           required
           field-id="code"
@@ -90,9 +90,9 @@
             fluid
             :invalid="!!errors.code"
           />
-        </FormField>
+        </FormsFormField>
 
-        <FormField
+        <FormsFormField
           label="Name"
           required
           field-id="name"
@@ -104,9 +104,9 @@
             fluid
             :invalid="!!errors.name"
           />
-        </FormField>
+        </FormsFormField>
 
-        <FormField
+        <FormsFormField
           label="Sort Order"
           required
           field-id="sortOrder"
@@ -119,7 +119,7 @@
             fluid
             :invalid="!!errors.sortOrder"
           />
-        </FormField>
+        </FormsFormField>
 
         <Message
           v-if="formError"

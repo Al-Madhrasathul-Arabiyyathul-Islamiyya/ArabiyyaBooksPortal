@@ -74,7 +74,7 @@
         class="flex flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
-        <FormField
+        <FormsFormField
           label="Code"
           required
           field-id="code"
@@ -86,9 +86,9 @@
             fluid
             :invalid="!!errors.code"
           />
-        </FormField>
+        </FormsFormField>
 
-        <FormField
+        <FormsFormField
           label="Name"
           required
           field-id="name"
@@ -100,7 +100,7 @@
             fluid
             :invalid="!!errors.name"
           />
-        </FormField>
+        </FormsFormField>
 
         <Message
           v-if="formError"
