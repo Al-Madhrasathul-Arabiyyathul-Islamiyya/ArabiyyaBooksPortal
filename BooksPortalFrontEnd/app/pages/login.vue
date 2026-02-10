@@ -106,7 +106,7 @@ const touched = reactive({
 const loginError = ref('')
 const isLoading = ref(false)
 
-function toFriendlyLoginError(message?: string) {
+function toFriendlyLoginError(message?: string | null) {
   if (!message) {
     return 'Unable to sign in right now. Please try again.'
   }

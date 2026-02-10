@@ -36,6 +36,13 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    // Nuxt hydration internals perform POSTs; do not apply CSRF checks there.
+    '/__nuxt_hydration__/**': {
+      ...({ csurf: false } as Record<string, unknown>),
+    },
+  },
+
   sourcemap: {
     server: false,
     client: false,
@@ -59,13 +66,6 @@ export default defineNuxtConfig({
       secure: !import.meta.dev,
     },
     methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
-  },
-
-  routeRules: {
-    // Nuxt hydration internals perform POSTs; do not apply CSRF checks there.
-    '/__nuxt_hydration__/**': {
-      ...({ csurf: false } as Record<string, unknown>),
-    },
   },
 
   dayjs: {

@@ -138,9 +138,9 @@ definePageMeta({
   layout: 'admin',
   middleware: ['admin'],
   breadcrumb: {
-    admin: 'Admin',
+    'admin': 'Admin',
     'master-data': 'Master Data',
-    subjects: 'Subjects',
+    'subjects': 'Subjects',
   },
 })
 
@@ -224,7 +224,7 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: z.SafeParseError<z.infer<typeof FormSchema>>) {
+function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
   clearErrors()
   for (const issue of result.error.issues) {
     const field = issue.path[0]

@@ -106,8 +106,6 @@ function isActive(path: string) {
   return route.path === path || route.path.startsWith(`${path}/`)
 }
 
-
-
 const menuItems = computed<MenuItem[]>(() => ([
   {
     key: 'admin-dashboard',
@@ -246,8 +244,8 @@ const menuItems = computed<MenuItem[]>(() => ([
 function syncExpandedKeys(path: string) {
   expandedKeys.value = {
     'master-data': path.startsWith('/admin/master-data'),
-    reports: path.startsWith('/admin/reports'),
-    settings: path.startsWith('/admin/settings'),
+    'reports': path.startsWith('/admin/reports'),
+    'settings': path.startsWith('/admin/settings'),
   }
 }
 

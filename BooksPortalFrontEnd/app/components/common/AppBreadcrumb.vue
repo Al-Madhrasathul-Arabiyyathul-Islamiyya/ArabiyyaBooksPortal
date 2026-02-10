@@ -22,9 +22,14 @@
 <script setup lang="ts">
 const route = useRoute()
 
+interface BreadcrumbItem {
+  label: string
+  to?: string
+}
+
 const items = computed(() => {
   const pathSegments = route.path.split('/').filter(Boolean)
-  const breadcrumbs = [{ label: 'Home', to: '/' }]
+  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', to: '/' }]
   const breadcrumbMeta = (route.meta.breadcrumb ?? {}) as Record<string, string>
 
   let currentPath = ''
