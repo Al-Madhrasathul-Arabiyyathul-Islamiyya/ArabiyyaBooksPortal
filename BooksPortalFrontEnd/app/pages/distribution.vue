@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <PhasePlaceholder
+    <CommonPhasePlaceholder
       title="Distribution Interface"
       description="Distribution workflows (create slip, add items, print) are the next operational implementation slice."
     />

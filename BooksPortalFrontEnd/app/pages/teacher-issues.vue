@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <PhasePlaceholder
+    <CommonPhasePlaceholder
       title="Teacher Issue Interface"
       description="Teacher issue workflows (issue, track, and return handling) are planned for the operations implementation phase."
     />

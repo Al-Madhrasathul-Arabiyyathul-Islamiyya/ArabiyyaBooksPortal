@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <PhasePlaceholder
+    <CommonPhasePlaceholder
       title="Returns Interface"
       description="Returns workflows will include both student textbook returns and teacher-issued textbook returns."
     />
