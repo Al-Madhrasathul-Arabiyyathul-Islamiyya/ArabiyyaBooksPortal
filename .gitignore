@@ -5,8 +5,7 @@
 **/AGENTS.md
 .codex/
 
-**/designs/.ignore
-
+**/.ignore/
 
 # Dev server logs
 backend.log
