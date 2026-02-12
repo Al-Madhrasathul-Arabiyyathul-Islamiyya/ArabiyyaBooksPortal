@@ -16,6 +16,7 @@
       <template #content>
         <form
           class="flex flex-col gap-4"
+          autocomplete="on"
           @submit.prevent="handleLogin"
         >
           <div class="flex flex-col gap-1">
@@ -26,7 +27,9 @@
             <InputText
               id="email"
               v-model="form.email"
+              name="email"
               type="email"
+              autocomplete="username email"
               placeholder="Enter your email"
               :invalid="!!errors.email"
               @blur="touchField('email')"
@@ -49,6 +52,7 @@
               :feedback="false"
               toggle-mask
               fluid
+              :input-props="{ autocomplete: 'current-password', name: 'password' }"
               :invalid="!!errors.password"
               @blur="touchField('password')"
             />
@@ -88,24 +92,23 @@ definePageMeta({
 
 const { login } = useAuth()
 const { public: { appTitle } } = useRuntimeConfig()
+const {
+  state: form,
+  errors,
+  globalError: loginError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+} = useAppValidation(
+  {
+    email: '',
+    password: '',
+  },
+  LoginRequestSchema,
+)
 
-const form = reactive({
-  email: '',
-  password: '',
-})
-
-const errors = reactive({
-  email: '',
-  password: '',
-})
-
-const touched = reactive({
-  email: false,
-  password: false,
-})
-
-const loginError = ref('')
 const isLoading = ref(false)
+const savedEmailKey = 'bp.login.email'
 
 function toFriendlyLoginError(message?: string | null) {
   if (!message) {
@@ -128,45 +131,40 @@ function toFriendlyLoginError(message?: string | null) {
   return message
 }
 
-function touchField(field: 'email' | 'password') {
-  touched[field] = true
-  validateField(field)
-}
-
-function validateField(field: 'email' | 'password') {
-  const result = LoginRequestSchema.shape[field].safeParse(form[field])
-  errors[field] = result.success ? '' : result.error.issues[0]?.message ?? 'Invalid'
-}
-
-function validateForm(): boolean {
-  touched.email = true
-  touched.password = true
-  validateField('email')
-  validateField('password')
-  return !errors.email && !errors.password
-}
-
 async function handleLogin() {
-  if (!validateForm()) return
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
 
   isLoading.value = true
-  loginError.value = ''
+  setGlobalError('')
 
   try {
-    const response = await login(form)
+    const response = await login(parsed.data)
     if (response.success) {
+      if (import.meta.client) {
+        localStorage.setItem(savedEmailKey, form.email)
+      }
       navigateTo('/')
     }
     else {
-      loginError.value = toFriendlyLoginError(response.message) || 'Login failed'
+      setGlobalError(toFriendlyLoginError(response.message) || 'Login failed')
     }
   }
   catch (error: unknown) {
     const fetchError = error as { data?: { message?: string }, message?: string }
-    loginError.value = toFriendlyLoginError(fetchError.data?.message || fetchError.message)
+    setGlobalError(toFriendlyLoginError(fetchError.data?.message || fetchError.message))
   }
   finally {
     isLoading.value = false
   }
 }
+
+onMounted(() => {
+  if (!import.meta.client) return
+  if (form.email) return
+  const savedEmail = localStorage.getItem(savedEmailKey)
+  if (savedEmail) {
+    form.email = savedEmail
+  }
+})
 </script>

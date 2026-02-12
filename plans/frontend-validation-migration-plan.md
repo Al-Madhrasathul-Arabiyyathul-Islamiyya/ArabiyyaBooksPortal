@@ -20,33 +20,38 @@ Standardize form validation across the Nuxt frontend by introducing a shared val
 ## Phased Migration
 
 ### Phase V1 - Foundation
-- [ ] Add validation message catalog with rule/key mapping.
-- [ ] Add shared validation types for field/global errors.
-- [ ] Add backend-error normalizer (`ApiResponse.errors` + fallback `message`).
-- [ ] Add `useAppValidation` composable with:
-  - [ ] `errors`
-  - [ ] `globalError`
-  - [ ] `isValid`
-  - [ ] `touchField`
-  - [ ] `touchAll`
-  - [ ] `resetValidation`
-  - [ ] `applyBackendErrors`
+- [x] Add validation message catalog with rule/key mapping.
+- [x] Add shared validation types for field/global errors.
+- [x] Add backend-error normalizer (`ApiResponse.errors` + fallback `message`).
+- [x] Add `useAppValidation` composable with:
+  - [x] `errors`
+  - [x] `globalError`
+  - [x] `isValid`
+  - [x] `touchField`
+  - [x] `touchAll`
+  - [x] `resetValidation`
+  - [x] `applyBackendErrors`
 
 ### Phase V2 - First Migration Slice
-- [ ] Migrate `app/pages/login.vue`.
-- [ ] Migrate Phase 3 modal forms:
-  - [ ] Academic Years
-  - [ ] Keystages
-  - [ ] Subjects
-  - [ ] Class Sections
-  - [ ] Students
-  - [ ] Parents
-  - [ ] Teachers
-- [ ] Keep UX behavior stable (no visual regressions).
+- [x] Migrate `app/pages/login.vue`.
+- [x] Migrate Phase 3 modal forms:
+  - [x] Academic Years
+  - [x] Keystages
+  - [x] Subjects
+  - [x] Class Sections
+  - [x] Students
+  - [x] Parents
+  - [x] Teachers
+- [x] Keep UX behavior stable (no visual regressions).
 
 ### Phase V3 - Expansion
-- [ ] Migrate Phase 4+ forms (books, slips, settings).
-- [ ] Remove redundant per-page ad-hoc validation helpers.
+- [~] Migrate Phase 4+ forms (books, slips, settings).
+  - [x] Books (index dialog form)
+  - [x] Books stock-entry and stock-adjust dialogs
+  - [ ] Slips
+  - [ ] Settings
+- [~] Remove redundant per-page ad-hoc validation helpers.
+  - [x] Replaced ad-hoc bulk/async error extraction in books/students/teachers with shared friendly backend error normalization
 - [ ] Consolidate shared field-level message keys.
 
 ### Phase V4 - Validation Pass

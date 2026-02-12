@@ -16,11 +16,78 @@
 
       <!-- Navigation -->
       <nav class="flex-1 overflow-y-auto p-2">
-        <PanelMenu
-          :model="menuItems"
-          class="w-full border-none"
-          :class="{ 'sidebar-panel-collapsed': sidebarCollapsed }"
-        />
+        <div
+          v-if="sidebarCollapsed"
+          class="grid gap-1"
+        >
+          <Button
+            v-for="item in collapsedNavItems"
+            :key="item.label"
+            :icon="item.icon"
+            text
+            severity="secondary"
+            class="w-full justify-center"
+            :class="{ 'app-link-active': item.active }"
+            @click="item.command"
+          />
+        </div>
+
+        <div
+          v-else
+          class="grid gap-3"
+        >
+          <div class="rounded-lg border border-surface-200 p-2 dark:border-surface-700">
+            <div class="px-2 py-1 text-xs font-semibold uppercase tracking-wide text-surface-500">
+              Students
+            </div>
+            <div class="grid gap-1">
+              <Button
+                label="Distribution"
+                icon="pi pi-send"
+                text
+                severity="secondary"
+                class="w-full justify-start"
+                :class="{ 'app-link-active': isRouteActive('/distribution') }"
+                @click="navigateTo('/distribution')"
+              />
+              <Button
+                label="Returns"
+                icon="pi pi-replay"
+                text
+                severity="secondary"
+                class="w-full justify-start"
+                :class="{ 'app-link-active': isRouteActive('/returns') }"
+                @click="navigateTo('/returns')"
+              />
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-surface-200 p-2 dark:border-surface-700">
+            <div class="px-2 py-1 text-xs font-semibold uppercase tracking-wide text-surface-500">
+              Teachers
+            </div>
+            <div class="grid gap-1">
+              <Button
+                label="Issue Books"
+                icon="pi pi-users"
+                text
+                severity="secondary"
+                class="w-full justify-start"
+                :class="{ 'app-link-active': isRouteActive('/teacher-issues') }"
+                @click="navigateTo('/teacher-issues')"
+              />
+              <Button
+                label="Returns"
+                icon="pi pi-replay"
+                text
+                severity="secondary"
+                class="w-full justify-start"
+                :class="{ 'app-link-active': isRouteActive('/teacher-returns') }"
+                @click="navigateTo('/teacher-returns')"
+              />
+            </div>
+          </div>
+        </div>
       </nav>
 
       <div
@@ -129,24 +196,30 @@ const userMenuItems = ref([
   },
 ])
 
-const menuItems = computed(() => ([
+const collapsedNavItems = computed(() => ([
   {
     label: 'Distribution',
     icon: 'pi pi-send',
     command: () => navigateTo('/distribution'),
-    class: isRouteActive('/distribution') ? 'app-menu-item-active' : undefined,
+    active: isRouteActive('/distribution'),
   },
   {
     label: 'Returns',
     icon: 'pi pi-replay',
     command: () => navigateTo('/returns'),
-    class: isRouteActive('/returns') ? 'app-menu-item-active' : undefined,
+    active: isRouteActive('/returns'),
   },
   {
     label: 'Teacher Issues',
     icon: 'pi pi-users',
     command: () => navigateTo('/teacher-issues'),
-    class: isRouteActive('/teacher-issues') ? 'app-menu-item-active' : undefined,
+    active: isRouteActive('/teacher-issues'),
+  },
+  {
+    label: 'Teacher Returns',
+    icon: 'pi pi-replay',
+    command: () => navigateTo('/teacher-returns'),
+    active: isRouteActive('/teacher-returns'),
   },
 ]))
 
@@ -158,34 +231,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.sidebar-panel-collapsed :deep(.p-panelmenu-content),
-.sidebar-panel-collapsed :deep(.p-panelmenu-panel),
-.sidebar-panel-collapsed :deep(.p-panelmenu-header-content),
-.sidebar-panel-collapsed :deep(.p-menuitem-link) {
-  border: none;
-}
-
-.sidebar-panel-collapsed :deep(.p-menuitem-link) {
-  justify-content: center;
-  gap: 0;
-  padding-inline: 0.5rem;
-}
-
-.sidebar-panel-collapsed :deep(.p-menuitem-text),
-.sidebar-panel-collapsed :deep(.p-panelmenu-header-label),
-.sidebar-panel-collapsed :deep(.p-panelmenu-header-chevron),
-.sidebar-panel-collapsed :deep(.p-submenu-icon) {
-  display: none;
-}
-
-:deep(.app-menu-item-active > .p-panelmenu-header > .p-panelmenu-header-content),
-:deep(.app-menu-item-active > .p-panelmenu-item-content) {
+.app-link-active {
   background: color-mix(in srgb, var(--p-primary-color) 18%, transparent);
   border-radius: 0.5rem;
 }
 
-:deep(.app-menu-item-active .p-panelmenu-header-label),
-:deep(.app-menu-item-active .p-panelmenu-item-label) {
+.app-link-active :deep(.p-button-label),
+.app-link-active :deep(.p-button-icon) {
   color: var(--p-primary-color);
   font-weight: 600;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-[calc(100vh-8.5rem)] flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -16,9 +16,17 @@
       />
     </div>
 
-    <Card>
+    <Card class="flex min-h-0 flex-1 flex-col">
       <template #content>
-        <div class="mb-4 grid grid-cols-1 gap-4 md:max-w-sm">
+        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormsSearchInput
+            id="class-sections-search"
+            v-model="searchTerm"
+            name="class-sections-search"
+            persist-key="bp.search.admin.class-sections"
+            placeholder="Search by class, grade, section or keystage"
+            @search="handleSearch"
+          />
           <FormsFormField
             label="Filter by Academic Year"
             field-id="yearFilter"
@@ -31,15 +39,32 @@
               option-value="value"
               fluid
               @change="handleFilterChange"
-            />
+            >
+              <template #option="{ option }">
+                <div class="flex items-center gap-2">
+                  <span>{{ option.label }}</span>
+                  <Tag
+                    v-if="option.isActive"
+                    value="Active"
+                    severity="success"
+                  />
+                </div>
+              </template>
+            </Select>
           </FormsFormField>
         </div>
 
         <DataTable
-          :value="classSections"
+          :value="filteredClassSections"
           :loading="isLoading"
           data-key="id"
           size="small"
+          paginator
+          :rows="20"
+          :rows-per-page-options="[...PAGINATION.pageSizeOptions]"
+          scrollable
+          scroll-height="flex"
+          class="h-[calc(100%-4.5rem)]"
         >
           <Column
             field="displayName"
@@ -72,21 +97,16 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit class"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete class"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -121,7 +141,19 @@
             placeholder="Select academic year"
             fluid
             :invalid="!!errors.academicYearId"
-          />
+            @blur="touchField('academicYearId')"
+          >
+            <template #option="{ option }">
+              <div class="flex items-center gap-2">
+                <span>{{ option.label }}</span>
+                <Tag
+                  v-if="option.isActive"
+                  value="Active"
+                  severity="success"
+                />
+              </div>
+            </template>
+          </Select>
         </FormsFormField>
 
         <FormsFormField
@@ -139,6 +171,7 @@
             placeholder="Select keystage"
             fluid
             :invalid="!!errors.keystageId"
+            @blur="touchField('keystageId')"
           />
         </FormsFormField>
 
@@ -159,6 +192,7 @@
               fluid
               :disabled="!form.keystageId"
               :invalid="!!errors.gradeId"
+              @blur="touchField('gradeId')"
             />
           </FormsFormField>
 
@@ -173,6 +207,7 @@
               v-model.trim="form.section"
               fluid
               :invalid="!!errors.section"
+              @blur="touchField('section')"
             />
           </FormsFormField>
         </div>
@@ -205,7 +240,6 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod/v4'
 import type {
   AcademicYear,
   ClassSection,
@@ -213,16 +247,18 @@ import type {
   Keystage,
 } from '~/types/entities'
 import { CreateClassSectionRequestSchema } from '~/types/forms'
-import { API } from '~/utils/constants'
+import { API, PAGINATION } from '~/utils/constants'
 
 interface SelectOption {
   label: string
   value: number
+  isActive?: boolean
 }
 
 interface YearFilterOption {
   label: string
   value: number | null
+  isActive?: boolean
 }
 
 definePageMeta({
@@ -245,34 +281,47 @@ const academicYears = ref<AcademicYear[]>([])
 const keystages = ref<Keystage[]>([])
 const grades = ref<Grade[]>([])
 const selectedAcademicYearFilter = ref<number | null>(null)
+const searchTerm = ref('')
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
-
-const form = reactive({
-  academicYearId: null as number | null,
-  keystageId: null as number | null,
-  gradeId: null as number | null,
-  section: '',
+const FormSchema = CreateClassSectionRequestSchema.extend({
+  academicYearId: CreateClassSectionRequestSchema.shape.academicYearId.nullable(),
+  keystageId: CreateClassSectionRequestSchema.shape.keystageId.nullable(),
+  gradeId: CreateClassSectionRequestSchema.shape.gradeId.nullable(),
+}).superRefine((values, ctx) => {
+  if (values.academicYearId === null) {
+    ctx.addIssue({ code: 'custom', message: 'Academic year is required', path: ['academicYearId'] })
+  }
+  if (values.keystageId === null) {
+    ctx.addIssue({ code: 'custom', message: 'Keystage is required', path: ['keystageId'] })
+  }
+  if (values.gradeId === null) {
+    ctx.addIssue({ code: 'custom', message: 'Grade is required', path: ['gradeId'] })
+  }
 })
 
-const errors = reactive({
-  academicYearId: '',
-  keystageId: '',
-  gradeId: '',
-  section: '',
-})
-
-const FormSchema = z.object({
-  academicYearId: z.number().int().min(1, 'Academic year is required'),
-  keystageId: z.number().int().min(1, 'Keystage is required'),
-  gradeId: z.number().int().min(1, 'Grade is required'),
-  section: z.string().min(1, 'Section is required'),
-})
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    academicYearId: null as number | null,
+    keystageId: null as number | null,
+    gradeId: null as number | null,
+    section: '',
+  },
+  FormSchema,
+)
 
 const academicYearFilterOptions = computed<YearFilterOption[]>(() => {
   return [
@@ -280,6 +329,7 @@ const academicYearFilterOptions = computed<YearFilterOption[]>(() => {
     ...academicYears.value.map(year => ({
       label: year.name,
       value: year.id,
+      isActive: year.isActive,
     })),
   ]
 })
@@ -288,6 +338,7 @@ const academicYearOptions = computed<SelectOption[]>(() => {
   return academicYears.value.map(year => ({
     label: year.name,
     value: year.id,
+    isActive: year.isActive,
   }))
 })
 
@@ -305,21 +356,24 @@ const gradeOptions = computed<SelectOption[]>(() => {
   }))
 })
 
-function clearErrors() {
-  errors.academicYearId = ''
-  errors.keystageId = ''
-  errors.gradeId = ''
-  errors.section = ''
-  formError.value = ''
-}
+const filteredClassSections = computed(() => {
+  const query = searchTerm.value.trim().toLowerCase()
+  if (!query) {
+    return classSections.value
+  }
+
+  return classSections.value.filter(section =>
+    section.displayName.toLowerCase().includes(query)
+    || section.grade.toLowerCase().includes(query)
+    || section.section.toLowerCase().includes(query)
+    || section.keystageName.toLowerCase().includes(query)
+    || section.academicYearName.toLowerCase().includes(query),
+  )
+})
 
 function resetForm() {
-  form.academicYearId = null
-  form.keystageId = null
-  form.gradeId = null
-  form.section = ''
+  resetValidationForm()
   selectedId.value = null
-  clearErrors()
 }
 
 async function loadLookups() {
@@ -357,6 +411,18 @@ async function loadLookups() {
   }
 }
 
+async function loadActiveAcademicYear() {
+  try {
+    const response = await api.get<AcademicYear>(API.academicYears.active)
+    if (response.success) {
+      selectedAcademicYearFilter.value = response.data.id
+    }
+  }
+  catch {
+    // no active year is valid for initial setup
+  }
+}
+
 async function loadClassSections() {
   isLoading.value = true
   try {
@@ -382,13 +448,14 @@ async function loadClassSections() {
 function openCreateDialog() {
   isEditing.value = false
   resetForm()
+  form.academicYearId = selectedAcademicYearFilter.value
   isDialogVisible.value = true
 }
 
 function openEditDialog(item: ClassSection) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.academicYearId = item.academicYearId
   form.keystageId = item.keystageId
   form.gradeId = item.gradeId
@@ -401,34 +468,22 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'academicYearId') errors.academicYearId = issue.message
-    if (field === 'keystageId') errors.keystageId = issue.message
-    if (field === 'gradeId') errors.gradeId = issue.message
-    if (field === 'section') errors.section = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
-  const parsed = FormSchema.safeParse({
-    academicYearId: form.academicYearId,
-    keystageId: form.keystageId,
-    gradeId: form.gradeId,
-    section: form.section,
-  })
-
-  if (!parsed.success) {
-    mapValidationErrors(parsed)
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
+  if (parsed.data.academicYearId === null || parsed.data.keystageId === null || parsed.data.gradeId === null) {
+    setGlobalError('Invalid form payload')
     return
   }
 
-  const requestCheck = CreateClassSectionRequestSchema.safeParse(parsed.data)
+  const requestCheck = CreateClassSectionRequestSchema.safeParse({
+    ...parsed.data,
+    academicYearId: parsed.data.academicYearId,
+    keystageId: parsed.data.keystageId,
+    gradeId: parsed.data.gradeId,
+  })
   if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -445,7 +500,7 @@ async function handleSubmit() {
         await loadClassSections()
         return
       }
-      formError.value = response.message ?? 'Failed to update class section'
+      setGlobalError(response.message ?? 'Failed to update class section')
       return
     }
 
@@ -456,11 +511,10 @@ async function handleSubmit() {
       await loadClassSections()
       return
     }
-    formError.value = response.message ?? 'Failed to create class section'
+    setGlobalError(response.message ?? 'Failed to create class section')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save class section'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false
@@ -492,6 +546,10 @@ async function handleFilterChange() {
   await loadClassSections()
 }
 
+async function handleSearch() {
+  await loadClassSections()
+}
+
 watch(
   () => form.keystageId,
   async (keystageId) => {
@@ -519,7 +577,10 @@ watch(
 )
 
 onMounted(async () => {
-  await loadLookups()
+  await Promise.all([
+    loadLookups(),
+    loadActiveAcademicYear(),
+  ])
   await loadClassSections()
 })
 </script>

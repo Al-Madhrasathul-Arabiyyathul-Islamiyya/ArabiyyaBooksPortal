@@ -1,3 +1,4 @@
+import { useQuery, useQueryCache } from '@pinia/colada'
 import type { Lookup } from '~/types/entities'
 import { API } from '~/utils/constants'
 import {
@@ -10,114 +11,151 @@ import {
 
 export const useLookupsStore = defineStore('lookups', () => {
   const api = useApi()
+  const queryCache = useQueryCache()
+  const scopedGrades = ref<Lookup[] | null>(null)
 
-  // Cached lookup data
-  const academicYears = ref<Lookup[]>([])
-  const keystages = ref<Lookup[]>([])
-  const grades = ref<Lookup[]>([])
-  const subjects = ref<Lookup[]>([])
-  const classSections = ref<Lookup[]>([])
-  const terms = ref<Lookup[]>([])
-  const bookConditions = ref<Lookup[]>([])
-  const movementTypes = ref<Lookup[]>([])
+  async function fetchLookup(path: string, fallbackMessage: string) {
+    const response = await api.get<Lookup[]>(path)
+    if (!response.success) {
+      throw new Error(response.message ?? fallbackMessage)
+    }
+    return response.data
+  }
 
-  const isLoaded = ref(false)
+  const academicYearsQuery = useQuery({
+    key: () => ['lookups', 'academic-years'],
+    query: () => fetchLookup(API.lookups.academicYears, 'Failed to fetch academic years'),
+  })
+
+  const keystagesQuery = useQuery({
+    key: () => ['lookups', 'keystages'],
+    query: () => fetchLookup(API.lookups.keystages, 'Failed to fetch keystages'),
+  })
+
+  const subjectsQuery = useQuery({
+    key: () => ['lookups', 'subjects'],
+    query: () => fetchLookup(API.lookups.subjects, 'Failed to fetch subjects'),
+  })
+
+  const classSectionsQuery = useQuery({
+    key: () => ['lookups', 'class-sections'],
+    query: () => fetchLookup(API.lookups.classSections, 'Failed to fetch class sections'),
+  })
+
+  const termsQuery = useQuery({
+    key: () => ['lookups', 'terms'],
+    query: () => fetchLookup(API.lookups.terms, 'Failed to fetch terms'),
+  })
+
+  const bookConditionsQuery = useQuery({
+    key: () => ['lookups', 'book-conditions'],
+    query: () => fetchLookup(API.lookups.bookConditions, 'Failed to fetch book conditions'),
+  })
+
+  const movementTypesQuery = useQuery({
+    key: () => ['lookups', 'movement-types'],
+    query: () => fetchLookup(API.lookups.movementTypes, 'Failed to fetch movement types'),
+  })
+
+  const gradesQuery = useQuery({
+    key: () => ['lookups', 'grades', 'all'],
+    query: () => fetchLookup(API.lookups.grades, 'Failed to fetch grades'),
+  })
+
+  const academicYears = computed(() => academicYearsQuery.data.value ?? [])
+  const keystages = computed(() => keystagesQuery.data.value ?? [])
+  const subjects = computed(() => subjectsQuery.data.value ?? [])
+  const classSections = computed(() => classSectionsQuery.data.value ?? [])
+  const terms = computed(() => termsQuery.data.value ?? [])
+  const bookConditions = computed(() => bookConditionsQuery.data.value ?? [])
+  const movementTypes = computed(() => movementTypesQuery.data.value ?? [])
+
+  const grades = computed(() => {
+    if (scopedGrades.value) {
+      return scopedGrades.value
+    }
+    return gradesQuery.data.value ?? []
+  })
+
+  const isLoading = computed(() =>
+    academicYearsQuery.isPending.value
+    || keystagesQuery.isPending.value
+    || gradesQuery.isPending.value
+    || subjectsQuery.isPending.value
+    || classSectionsQuery.isPending.value
+    || termsQuery.isPending.value
+    || bookConditionsQuery.isPending.value
+    || movementTypesQuery.isPending.value,
+  )
+
+  const error = computed(() =>
+    academicYearsQuery.error.value
+    ?? keystagesQuery.error.value
+    ?? gradesQuery.error.value
+    ?? subjectsQuery.error.value
+    ?? classSectionsQuery.error.value
+    ?? termsQuery.error.value
+    ?? bookConditionsQuery.error.value
+    ?? movementTypesQuery.error.value
+    ?? null,
+  )
+
+  const isLoaded = computed(() =>
+    Boolean(
+      academicYearsQuery.data.value
+      && keystagesQuery.data.value
+      && gradesQuery.data.value
+      && subjectsQuery.data.value
+      && classSectionsQuery.data.value
+      && termsQuery.data.value
+      && bookConditionsQuery.data.value
+      && movementTypesQuery.data.value,
+    ),
+  )
 
   async function fetchAcademicYears() {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.academicYears)
-      if (response.success) {
-        academicYears.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch academic years lookup:', error)
-    }
+    await academicYearsQuery.refetch()
   }
 
   async function fetchKeystages() {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.keystages)
-      if (response.success) {
-        keystages.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch keystages lookup:', error)
-    }
+    await keystagesQuery.refetch()
   }
 
   async function fetchSubjects() {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.subjects)
-      if (response.success) {
-        subjects.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch subjects lookup:', error)
-    }
+    await subjectsQuery.refetch()
   }
 
   async function fetchClassSections() {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.classSections)
-      if (response.success) {
-        classSections.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch class sections lookup:', error)
-    }
+    await classSectionsQuery.refetch()
   }
 
   async function fetchTerms() {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.terms)
-      if (response.success) {
-        terms.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch terms lookup:', error)
-    }
-  }
-
-  async function fetchGrades(keystageId?: number) {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.grades, {
-        keystageId: keystageId || undefined,
-      })
-      if (response.success) {
-        grades.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch grades lookup:', error)
-    }
+    await termsQuery.refetch()
   }
 
   async function fetchBookConditions() {
-    try {
-      const response = await api.get<Lookup[]>(API.lookups.bookConditions)
-      if (response.success) {
-        bookConditions.value = response.data
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch book conditions lookup:', error)
-    }
+    await bookConditionsQuery.refetch()
   }
 
   async function fetchMovementTypes() {
+    await movementTypesQuery.refetch()
+  }
+
+  async function fetchGrades(keystageId?: number) {
+    if (!keystageId) {
+      scopedGrades.value = null
+      await gradesQuery.refetch()
+      return
+    }
+
     try {
-      const response = await api.get<Lookup[]>(API.lookups.movementTypes)
+      const response = await api.get<Lookup[]>(API.lookups.grades, { keystageId })
       if (response.success) {
-        movementTypes.value = response.data
+        scopedGrades.value = response.data
       }
     }
-    catch (error) {
-      console.error('Failed to fetch movement types lookup:', error)
+    catch {
+      scopedGrades.value = []
     }
   }
 
@@ -132,7 +170,10 @@ export const useLookupsStore = defineStore('lookups', () => {
       fetchBookConditions(),
       fetchMovementTypes(),
     ])
-    isLoaded.value = true
+  }
+
+  async function refreshAll() {
+    await queryCache.invalidateQueries({ key: ['lookups'] })
   }
 
   function getLookupLabel(list: Lookup[], id: number): string {
@@ -160,6 +201,8 @@ export const useLookupsStore = defineStore('lookups', () => {
     bookConditions,
     movementTypes,
     isLoaded,
+    isLoading,
+    error,
     fetchAll,
     fetchAcademicYears,
     fetchKeystages,
@@ -169,6 +212,7 @@ export const useLookupsStore = defineStore('lookups', () => {
     fetchTerms,
     fetchBookConditions,
     fetchMovementTypes,
+    refreshAll,
     getLookupLabel,
     getEnumLabel,
   }

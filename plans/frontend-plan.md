@@ -50,6 +50,12 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 - Use full-page forms only when form complexity is high (e.g., deeply nested or multi-section workflows).
 - For lookup/search dropdowns, provide inline "Create new" actions when no matching record exists.
   - Priority entities: `Student`, `Parent`, `Teacher`.
+- Table UX baseline:
+  - Action columns should use consistent icon+tooltip affordances.
+  - Prefer in-card table scrolling for dense admin grids.
+  - Use `primevue/skeleton` placeholders for table-loading states (pending rollout).
+- Post-core UX enhancement:
+  - Evaluate PrimeVue `AutoComplete` for search-heavy fields, entity pickers, parent linking, and teacher assignment selectors.
 
 ---
 
@@ -234,6 +240,10 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 - [x] Alignment branch created: `feature/module-10-backend-contract-alignment`
 - [x] Implementation completed (contract/type/store alignment + bulk-import UI readiness)
 
+## Validation Standardization Track
+> Cross-cutting validation standardization is tracked separately and executed incrementally with feature work.
+- [~] Follow `plans/frontend-validation-migration-plan.md` for shared Regle + Zod validation module rollout.
+
 ### 2.7.1 Route and BFF Contract Sync
 - [x] Verify BFF catch-all/proxy supports new backend routes:
   - [x] `GET /lookups/grades`
@@ -348,40 +358,39 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 > Book catalog, stock entries, stock movements, adjust stock
 
 ### 4.1 Book Pages
-- [ ] `app/pages/admin/books/index.vue`
-  - [ ] Paginated DataTable with search + subject filter dropdown
-  - [ ] Columns: code, title, subjectName, grade, totalStock, distributed, available (StockBadge)
-  - [ ] Row click → navigate to detail page
-  - [ ] "New Book" button → create page
-- [ ] `app/pages/admin/books/create.vue`
-  - [ ] Reused for create and edit (`/books/create?edit={id}` or separate `/books/[id]/edit`)
-  - [ ] Fields: isbn, code, title, author, edition, publisher, publishedYear, subjectId (dropdown), grade
-  - [ ] Zod validation (code + title required)
-- [ ] `app/pages/admin/books/[id].vue`
-  - [ ] Book detail header (title, code, subject, grade, stock summary)
-  - [ ] TabView with 2 tabs:
-    - [ ] Stock Entries tab — DataTable of stock entries + "Add Stock" button
-    - [ ] Stock Movements tab — DataTable of all movements (chronological)
-  - [ ] Edit button → navigate to edit form
-  - [ ] Delete button (SuperAdmin, confirm)
+- [x] `app/pages/admin/books/index.vue`
+  - [x] Paginated DataTable with search + subject filter dropdown
+  - [x] Columns: code, title, subjectName, grade, totalStock, distributed, available (StockBadge)
+  - [x] Row click → navigate to detail page
+  - [x] "New Book" button → create/edit modal flow
+- [x] `app/pages/admin/books/create.vue`
+  - [x] Replaced by modal-first create/edit flow in `books/index.vue` to keep UX consistency
+  - [x] Fields: isbn, code, title, author, edition, publisher, publishedYear, subjectId (dropdown), grade
+  - [x] Zod validation (code + title required)
+- [x] `app/pages/admin/books/[id].vue`
+  - [x] Book detail header (title, code, stock summary)
+  - [x] Stock entries + stock movements sections with DataTables and stock action buttons
+  - [x] Edit button → navigate to edit form
+  - [x] Delete button (SuperAdmin, confirm)
+- [ ] Enhancement: allow entering initial stock quantity directly in create-book flow once stock workflow finalization is complete.
 
 ### 4.2 Book Components
-- [ ] `app/components/books/StockBadge.vue`
-  - [ ] Color-coded PrimeVue Tag: green (>=10), yellow (<10), red (0)
-  - [ ] Props: `available: number`, `showLabel?: boolean`
-- [ ] `app/components/books/StockEntryDialog.vue`
-  - [ ] Dialog form: academicYearId (dropdown), quantity, source, notes
-  - [ ] POST to `/books/{id}/stock-entry`
-  - [ ] Emits `created` event to refresh parent
-- [ ] `app/components/books/StockAdjustDialog.vue`
-  - [ ] Dialog form: academicYearId, movementType (dropdown: MarkDamaged, MarkLost, Adjustment, WriteOff), quantity, notes
-  - [ ] Only visible to Admin+ roles
-  - [ ] POST to `/books/{id}/adjust-stock`
-- [ ] `app/components/books/BookSelector.vue`
-  - [ ] Search input → calls `GET /books/search?q=` → shows results
-  - [ ] Click result → adds to selected list with quantity=1
-  - [ ] Selected books table: title, code, available (StockBadge), quantity (InputNumber, max=available), remove button
-  - [ ] v-model: `SelectedBook[]` (id, title, code, available, quantity)
+- [x] `app/components/books/StockBadge.vue`
+  - [x] Color-coded PrimeVue Tag: green (>=10), yellow (<10), red (0)
+  - [x] Props: `available: number`, `showLabel?: boolean`
+- [x] `app/components/books/StockEntryDialog.vue`
+  - [x] Dialog form: academicYearId (dropdown), quantity, source, notes
+  - [x] POST to `/books/{id}/stock-entry` (wired through parent page handler)
+  - [x] Emits submit/cancel events to parent for refresh flow
+- [x] `app/components/books/StockAdjustDialog.vue`
+  - [x] Dialog form: academicYearId, movementType (dropdown: MarkDamaged, MarkLost, Adjustment, WriteOff), quantity, notes
+  - [x] Only visible to Admin+ roles (enforced by parent action visibility)
+  - [x] POST to `/books/{id}/adjust-stock` (wired through parent page handler)
+- [x] `app/components/books/BookSelector.vue`
+  - [x] Search input → calls `GET /books/search?q=` → shows results
+  - [x] Click result → adds to selected list with quantity=1
+  - [x] Selected books table: title, code, available (StockBadge), quantity (InputNumber, max=available), remove button
+  - [x] v-model: `SelectedBook[]` (id, title, code, available, quantity)
   - [ ] Used by Distribution, Returns, and Teacher Issues forms
 
 ### Phase 4 Verification
@@ -398,59 +407,64 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 > Create slips with stock deduction, view/search slips, print PDFs
 
 ### 5.1 Shared Slip Components
-- [ ] `app/components/slips/StudentLookup.vue`
-  - [ ] Search students by name/indexNo (paginated API call)
-  - [ ] Select student → emit selected student object
-  - [ ] Shows className and nationalId
-  - [ ] If no result found, show inline "Create Student" action (modal)
-- [ ] `app/components/slips/ParentLookup.vue`
-  - [ ] When student is selected, auto-load student's parents
-  - [ ] If only one parent, auto-select
-  - [ ] If multiple, show dropdown
-  - [ ] Also allow manual parent search
-  - [ ] If no result found, show inline "Create Parent" action (modal)
-- [ ] `app/components/slips/ConditionSelector.vue`
-  - [ ] Dropdown for BookCondition enum (Good, Fair, Poor, Damaged, Lost)
-  - [ ] Optional conditionNotes text field
-- [ ] `app/components/slips/SlipDetail.vue`
-  - [ ] Reusable slip detail layout: header info (reference, date, year) + items table + notes + action buttons
+- [x] `app/components/slips/StudentLookup.vue`
+  - [x] Search students by name/indexNo (paginated API call)
+  - [x] Debounced live search while typing (no explicit "Search" click required)
+  - [x] Support year-scoped queries via `academicYearId`
+  - [x] Allow clearing selected student from lookup UI
+  - [x] Select student → emit selected student object
+  - [x] Shows className and nationalId
+  - [x] If no result found, show inline "Create Student" action (modal trigger event)
+- [x] `app/components/slips/ParentLookup.vue`
+  - [x] When student is selected, auto-load student's parents
+  - [x] If only one parent, auto-select
+  - [x] If multiple, show dropdown
+  - [x] Also allow debounced manual parent search
+  - [x] Allow clearing selected parent from lookup UI
+  - [x] If no result found, show inline "Create Parent" action (modal trigger event)
+- [x] `app/components/slips/ConditionSelector.vue`
+  - [x] Dropdown for BookCondition enum (Good, Fair, Poor, Damaged, Lost)
+  - [x] Optional conditionNotes text field
+- [x] `app/components/slips/SlipDetail.vue`
+  - [x] Reusable slip detail layout: header info (reference, date, year) + items table + notes + action buttons
 
 ### 5.2 Distribution Pages
-- [ ] `app/pages/distribution/index.vue`
-  - [ ] Paginated DataTable with filters: academicYearId, studentId (search)
-  - [ ] Columns: referenceNo, studentName, studentClassName, parentName, issuedAt, item count
-  - [ ] Search by reference number (GET `/distributions/by-reference/{ref}`)
-  - [ ] Row click → detail page
-- [ ] `app/pages/distribution/create.vue`
-  - [ ] Step-by-step form:
+- [x] `app/pages/distribution/index.vue`
+  - [x] Paginated DataTable with filters: academicYearId, studentId (search)
+  - [x] Columns: referenceNo, studentName, studentClassName, parentName, issuedAt, item count
+  - [x] Search by reference number (GET `/distributions/by-reference/{ref}`)
+  - [x] Row click → detail page
+- [x] `app/pages/distribution/create.vue`
+  - [x] Modal-first flow + two-column create UX:
     1. Select academic year + term (from lookups)
-    2. StudentLookup → auto-loads parents via ParentLookup
-    3. BookSelector (multi-select with quantities)
+    2. Left column: Book selector (multi-select with quantities)
+    3. Right column: slip preview + modal triggers for student/parent selection
     4. Notes (optional)
-  - [ ] Zod validation: year, term, student, parent, at least one book item
-  - [ ] POST to `/distributions` → on success navigate to detail page
-- [ ] `app/pages/distribution/[id].vue`
-  - [ ] Slip detail: reference, year, term, student info, parent info, issued date
-  - [ ] Items table: bookCode, bookTitle, quantity
-  - [ ] Print button (GET `/{id}/print` → open PDF)
-  - [ ] Cancel button (DELETE, with confirm dialog, reverses stock)
+  - [x] Non-admin users are locked to active academic year
+  - [x] Zod validation: year, term, student, parent, at least one book item
+  - [x] POST to `/distributions` → on success navigate to detail page
+- [x] `app/pages/distribution/[id].vue`
+  - [x] Slip detail: reference, year, term, student info, parent info, issued date
+  - [x] Items table: bookCode, bookTitle, quantity
+  - [x] Print button (GET `/{id}/print` → open PDF)
+  - [x] Cancel button (DELETE, with confirm dialog, reverses stock)
 
 ### 5.3 Return Pages
-- [ ] `app/pages/returns/index.vue`
-  - [ ] Same pattern as distribution index
-  - [ ] Columns: referenceNo, studentName, studentClassName, returnedByName, receivedAt, item count
-- [ ] `app/pages/returns/create.vue`
-  - [ ] Form:
+- [x] `app/pages/returns/index.vue`
+  - [x] Same pattern as distribution index
+  - [x] Columns: referenceNo, studentName, studentClassName, returnedByName, receivedAt, item count
+- [x] `app/pages/returns/create.vue`
+  - [x] Modal-first flow with preview panel:
     1. Select academic year
-    2. StudentLookup
-    3. Select returnedById (parent/guardian dropdown from student's parents, or manual)
-    4. BookSelector (with ConditionSelector per item)
-    5. Notes
-  - [ ] Each item has: bookId, quantity, condition (ConditionSelector), conditionNotes
-  - [ ] POST to `/returns`
-- [ ] `app/pages/returns/[id].vue`
-  - [ ] Slip detail with condition column in items table
-  - [ ] Print + Cancel buttons
+    2. Left column: BookSelector + per-item ConditionSelector
+    3. Right column: return preview + modal triggers for student/returned-by selection
+    4. Notes
+  - [x] Non-admin users are locked to active academic year
+  - [x] Each item has: bookId, quantity, condition (ConditionSelector), conditionNotes
+  - [x] POST to `/returns`
+- [x] `app/pages/returns/[id].vue`
+  - [x] Slip detail with condition column in items table
+  - [x] Print + Cancel buttons
 
 ### Phase 5 Verification
 - [ ] Distribution: list → create → detail → print → cancel flow works
@@ -459,6 +473,7 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 - [ ] PDF print opens in new tab
 - [ ] Reference number search works
 - [ ] Student/parent lookup and auto-selection works
+- [x] Inline create student/parent flows are available directly in lookup modals (no admin navigation required).
 
 ---
 
@@ -466,38 +481,39 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 > Issue books to teachers, process partial/full returns
 
 ### 6.1 Teacher Issue Pages
-- [ ] `app/pages/teacher-issues/index.vue`
-  - [ ] Paginated DataTable with filters: academicYearId, teacherId (search)
-  - [ ] Columns: referenceNo, teacherName, issuedAt, expectedReturnDate, status (badge), item count
-  - [ ] Status badges: Active (blue), Partial (yellow), Returned (green), Overdue (red)
-- [ ] `app/pages/teacher-issues/create.vue`
-  - [ ] Form:
+- [x] `app/pages/teacher-issues/index.vue`
+  - [x] Paginated DataTable with filters: academicYearId, teacherId (search)
+  - [x] Columns: referenceNo, teacherName, issuedAt, expectedReturnDate, status (badge), item count
+  - [x] Status badges: Active (blue), Partial (yellow), Returned (green), Overdue (red)
+- [x] `app/pages/teacher-issues/create.vue`
+  - [x] Form:
     1. Select academic year
     2. Teacher lookup (search by name)
     3. BookSelector (multi-select with quantities)
     4. Expected return date (DatePicker, optional)
     5. Notes
-  - [ ] POST to `/teacher-issues`
-- [ ] `app/pages/teacher-issues/[id].vue`
-  - [ ] Issue detail: reference, teacher, year, issuedAt, expectedReturnDate, status
-  - [ ] Items table: bookCode, bookTitle, quantity, returnedQuantity, outstandingQuantity, returnedAt
-  - [ ] "Process Return" button (opens return dialog) — only if status != Returned
-  - [ ] Print button
-  - [ ] Cancel button (only if outstanding items exist)
+  - [x] POST to `/teacher-issues`
+- [x] `app/pages/teacher-issues/[id].vue`
+  - [x] Issue detail: reference, teacher, year, issuedAt, expectedReturnDate, status
+  - [x] Items table: bookCode, bookTitle, quantity, returnedQuantity, outstandingQuantity, returnedAt
+  - [x] "Process Return" button (navigates to return processing) - only if outstanding exists
+  - [x] Print button
+  - [x] Cancel button (only if outstanding items exist)
 
 ### 6.2 Teacher Return Dialog
-- [ ] `app/components/teachers/ProcessReturnDialog.vue`
-  - [ ] Shows outstanding items only (outstandingQuantity > 0)
-  - [ ] Per item: checkbox to include, quantity to return (max = outstanding)
-  - [ ] Notes field
-  - [ ] POST to `/teacher-issues/{id}/return` with `ProcessTeacherReturnRequest`
-  - [ ] On success: show return slip reference, refresh parent page
+- [x] `app/pages/teacher-returns/index.vue` integrated return dialog
+  - [x] Shows outstanding items only (outstandingQuantity > 0)
+  - [x] Per item: quantity to return (max = outstanding)
+  - [x] Notes field
+  - [x] POST to `/teacher-issues/{id}/return` with `ProcessTeacherReturnRequest`
+  - [x] On success: show return slip reference, refresh list
 
 ### 6.3 Teacher Lookup
-- [ ] `app/components/slips/TeacherLookup.vue`
-  - [ ] Search teachers by name
-  - [ ] Select teacher → emit teacher object
-  - [ ] If no result found, show inline "Create Teacher" action (modal)
+- [x] `app/components/slips/TeacherLookup.vue`
+  - [x] Search teachers by name
+  - [x] Select teacher -> emit teacher object
+  - [x] If no result found, show inline "Create Teacher" action (modal)
+
 
 ### Phase 6 Verification
 - [ ] Teacher issue: list → create → detail → process return → print flow works
@@ -562,48 +578,51 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 > User management, system settings, audit log, user profile
 
 ### 8.1 User Management
-- [ ] `app/pages/admin/settings/users/index.vue`
-  - [ ] DataTable: userName, email, fullName, roles (tags), isActive (badge), createdAt
-  - [ ] Toggle active button (POST `/{id}/toggle-active`)
-  - [ ] "New User" button
-  - [ ] Route guard: Admin+ only
-- [ ] `app/pages/admin/settings/users/[id].vue`
-  - [ ] Create/Edit form: userName (create only), email, password (create only), fullName, nationalId, designation, roles (MultiSelect), isActive
-  - [ ] Role assignment section (PUT `/{id}/roles`)
+- [x] `app/pages/admin/settings/users/index.vue`
+  - [x] DataTable: userName, email, fullName, roles (tags), isActive (badge), createdAt
+  - [x] Toggle active button (POST `/{id}/toggle-active`)
+  - [x] "New User" button
+  - [x] Route guard: Admin+ only
+- [x] `app/pages/admin/settings/users/[id].vue`
+  - [x] Replaced by modal-first create/edit flow in `users/index.vue` for UX consistency
+  - [x] Create/Edit form: userName (create only), email, password (create only), fullName, nationalId, designation, roles (MultiSelect), isActive
+  - [x] Role assignment section (PUT `/{id}/roles`)
 
 ### 8.2 Reference Number Formats
-- [ ] `app/pages/admin/settings/reference-formats.vue`
-  - [ ] DataTable: slipType, academicYearName, formatTemplate, paddingWidth
-  - [ ] Create/Edit dialog: slipType (dropdown), academicYearId (dropdown), formatTemplate, paddingWidth
-  - [ ] Help text explaining tokens: `{year}`, `{autonum}`
-  - [ ] Delete (SuperAdmin, confirm)
-  - [ ] Route guard: Admin+ only
+- [x] `app/pages/admin/settings/reference-formats.vue`
+  - [x] DataTable: slipType, academicYearName, formatTemplate, paddingWidth
+  - [x] Create/Edit dialog: slipType (dropdown), academicYearId (dropdown), formatTemplate, paddingWidth
+  - [x] Help text explaining tokens: `{year}`, `{autonum}`
+  - [x] Live preview visualization: template tokens + generated examples in create/edit dialog
+  - [x] Delete (SuperAdmin, confirm)
+  - [x] Route guard: Admin+ only
+  - [ ] Enhancement backlog: support configurable starting number/offset per format for manual pre-existing references
 
 ### 8.3 Slip Template Settings
-- [ ] `app/pages/admin/settings/slip-templates.vue`
-  - [ ] Grouped by category (DataTable with grouping or Accordion)
-  - [ ] Inline edit: value + sortOrder per row
-  - [ ] Save individual setting (PUT `/{id}`)
-  - [ ] "Reset to Defaults" button (POST `/reset`, SuperAdmin only, confirm)
-  - [ ] Route guard: Admin+ only
+- [x] `app/pages/admin/settings/slip-templates.vue`
+  - [x] Grouped by category (DataTable with grouping or Accordion)
+  - [x] Inline edit: value + sortOrder per row
+  - [x] Save individual setting (PUT `/{id}`)
+  - [x] "Reset to Defaults" button (POST `/reset`, SuperAdmin only, confirm)
+  - [x] Route guard: Admin+ only
 
 ### 8.4 Audit Log
-- [ ] `app/pages/admin/audit-log/index.vue`
-  - [ ] Paginated DataTable
-  - [ ] Filters: entityType, action, userId, date range (from/to)
-  - [ ] Columns: timestamp, action, entityType, entityId, userName
-  - [ ] Expandable row for oldValues/newValues (JSON display)
-  - [ ] Route guard: Admin+ only
+- [x] `app/pages/admin/audit-log/index.vue`
+  - [x] Paginated DataTable
+  - [x] Filters: entityType, action, userId, date range (from/to)
+  - [x] Columns: timestamp, action, entityType, entityId, userName
+  - [x] Expandable row for oldValues/newValues (JSON display)
+  - [x] Route guard: Admin+ only
 
 ### 8.5 User Profile
-- [ ] `app/pages/admin/settings/profile.vue`
-  - [ ] Display current user info (from auth store)
-  - [ ] Change password form (currentPassword, newPassword, confirmPassword)
-  - [ ] POST to `/auth/change-password`
-  - [ ] Route guard: Admin+ only
+- [x] `app/pages/admin/settings/profile.vue`
+  - [x] Display current user info (from auth store)
+  - [x] Change password form (currentPassword, newPassword, confirmPassword)
+  - [x] POST to `/auth/change-password`
+  - [x] Route guard: Admin+ only
 
 ### Phase 8 Verification
-- [ ] User CRUD works, role assignment works
+- [ ] User CRUD works, role assignment works (UI + API wiring complete; run manual verification)
 - [ ] Non-admin users cannot access settings/users or audit log
 - [ ] Reference number format CRUD works
 - [ ] Slip template settings inline edit works

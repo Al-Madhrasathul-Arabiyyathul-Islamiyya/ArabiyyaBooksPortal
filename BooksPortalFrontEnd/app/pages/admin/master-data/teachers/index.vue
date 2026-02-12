@@ -29,7 +29,10 @@
       <template #content>
         <div class="mb-4 max-w-lg">
           <FormsSearchInput
+            id="teachers-search"
             v-model="searchTerm"
+            name="teachers-search"
+            persist-key="bp.search.admin.teachers"
             placeholder="Search by name or national ID"
             @search="handleSearch"
           />
@@ -78,29 +81,22 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-sitemap"
-                  text
-                  rounded
                   severity="info"
-                  aria-label="Manage Assignments"
+                  tooltip="Manage assignments"
                   @click="openAssignmentsDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit teacher"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete teacher"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -131,6 +127,7 @@
             v-model.trim="form.fullName"
             fluid
             :invalid="!!errors.fullName"
+            @blur="touchField('fullName')"
           />
         </FormsFormField>
 
@@ -145,6 +142,7 @@
             v-model.trim="form.nationalId"
             fluid
             :invalid="!!errors.nationalId"
+            @blur="touchField('nationalId')"
           />
         </FormsFormField>
 
@@ -158,6 +156,7 @@
             v-model.trim="form.email"
             fluid
             :invalid="!!errors.email"
+            @blur="touchField('email')"
           />
         </FormsFormField>
 
@@ -171,6 +170,7 @@
             v-model.trim="form.phone"
             fluid
             :invalid="!!errors.phone"
+            @blur="touchField('phone')"
           />
         </FormsFormField>
 
@@ -221,6 +221,7 @@
               placeholder="Select subject"
               fluid
               :invalid="!!assignmentErrors.subjectId"
+              @blur="touchAssignmentField('subjectId')"
             />
           </FormsFormField>
 
@@ -238,6 +239,7 @@
               placeholder="Select class"
               fluid
               :invalid="!!assignmentErrors.classSectionId"
+              @blur="touchAssignmentField('classSectionId')"
             />
           </FormsFormField>
 
@@ -276,12 +278,10 @@
             style="width: 6rem;"
           >
             <template #body="{ data }">
-              <Button
+              <CommonIconActionButton
                 icon="pi pi-trash"
-                text
-                rounded
                 severity="danger"
-                aria-label="Remove assignment"
+                tooltip="Remove assignment"
                 @click="handleRemoveAssignment(data.id)"
               />
             </template>
@@ -318,6 +318,7 @@ import {
   CreateTeacherRequestSchema,
 } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 interface OptionItem {
   label: string
@@ -352,42 +353,16 @@ const isDialogVisible = ref(false)
 const isBulkDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
 const isBulkValidating = ref(false)
 const isBulkCommitting = ref(false)
 const bulkError = ref('')
 const bulkReport = ref<BulkImportReport | null>(null)
-
-const form = reactive({
-  fullName: '',
-  nationalId: '',
-  email: '',
-  phone: '',
-})
-
-const errors = reactive({
-  fullName: '',
-  nationalId: '',
-  email: '',
-  phone: '',
-})
 
 const isAssignmentsDialogVisible = ref(false)
 const selectedTeacherId = ref<number | null>(null)
 const selectedTeacherName = ref('')
 const selectedTeacherAssignments = ref<TeacherAssignment[]>([])
 const isAssignmentSubmitting = ref(false)
-const assignmentError = ref('')
-
-const assignmentForm = reactive({
-  subjectId: null as number | null,
-  classSectionId: null as number | null,
-})
-
-const assignmentErrors = reactive({
-  subjectId: '',
-  classSectionId: '',
-})
 
 const subjectOptions = computed<OptionItem[]>(() =>
   subjects.value.map(subject => ({
@@ -410,32 +385,60 @@ const FormSchema = z.object({
   phone: z.string().optional(),
 })
 
-const AssignmentSchema = z.object({
-  subjectId: z.number().int().min(1, 'Subject is required'),
-  classSectionId: z.number().int().min(1, 'Class is required'),
-})
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    fullName: '',
+    nationalId: '',
+    email: '',
+    phone: '',
+  },
+  FormSchema,
+)
 
-function clearErrors() {
-  errors.fullName = ''
-  errors.nationalId = ''
-  errors.email = ''
-  errors.phone = ''
-  formError.value = ''
-}
+const {
+  state: assignmentState,
+  errors: assignmentErrors,
+  globalError: assignmentError,
+  touchField: touchAssignmentField,
+  validateWithSchema: validateAssignmentWithSchema,
+  setGlobalError: setAssignmentGlobalError,
+  resetForm: resetAssignmentValidationForm,
+} = useAppValidation(
+  {
+    subjectId: null as number | null,
+    classSectionId: null as number | null,
+  },
+  z.object({
+    subjectId: z.number().int().min(1, 'Subject is required').nullable(),
+    classSectionId: z.number().int().min(1, 'Class is required').nullable(),
+  }).superRefine((values, ctx) => {
+    if (values.subjectId === null) {
+      ctx.addIssue({ code: 'custom', message: 'Subject is required', path: ['subjectId'] })
+    }
+    if (values.classSectionId === null) {
+      ctx.addIssue({ code: 'custom', message: 'Class is required', path: ['classSectionId'] })
+    }
+  }),
+)
+const assignmentForm = assignmentState
 
 function resetForm() {
-  form.fullName = ''
-  form.nationalId = ''
-  form.email = ''
-  form.phone = ''
+  resetValidationForm()
   selectedId.value = null
-  clearErrors()
 }
 
 function clearAssignmentErrors() {
-  assignmentErrors.subjectId = ''
-  assignmentErrors.classSectionId = ''
-  assignmentError.value = ''
+  setAssignmentGlobalError('')
+  resetAssignmentValidationForm()
 }
 
 function normalizeNullable(value: string) {
@@ -465,8 +468,7 @@ async function loadLookups() {
     }
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load assignment lookups')
+    showError(getFriendlyErrorMessage(error, 'Failed to load assignment lookups'))
   }
 }
 
@@ -485,8 +487,7 @@ async function loadTeachers() {
     showError(response.message ?? 'Failed to load teachers')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load teachers')
+    showError(getFriendlyErrorMessage(error, 'Failed to load teachers'))
   }
   finally {
     isLoading.value = false
@@ -530,8 +531,7 @@ async function validateTeacherBulk(file: File) {
     bulkError.value = response.message ?? 'Validation failed'
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    bulkError.value = fetchError.data?.message ?? 'Validation failed'
+    bulkError.value = getFriendlyErrorMessage(error, 'Validation failed')
   }
   finally {
     isBulkValidating.value = false
@@ -557,8 +557,7 @@ async function commitTeacherBulk(file: File) {
     bulkError.value = response.message ?? 'Commit failed'
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    bulkError.value = fetchError.data?.message ?? 'Commit failed'
+    bulkError.value = getFriendlyErrorMessage(error, 'Commit failed')
   }
   finally {
     isBulkCommitting.value = false
@@ -574,7 +573,7 @@ function openCreateDialog() {
 function openEditDialog(item: Teacher) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.fullName = item.fullName
   form.nationalId = item.nationalId
   form.email = item.email ?? ''
@@ -587,29 +586,9 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'fullName') errors.fullName = issue.message
-    if (field === 'nationalId') errors.nationalId = issue.message
-    if (field === 'email') errors.email = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
-  const parsed = FormSchema.safeParse({
-    fullName: form.fullName,
-    nationalId: form.nationalId,
-    email: form.email,
-    phone: form.phone,
-  })
-
-  if (!parsed.success) {
-    mapValidationErrors(parsed)
-    return
-  }
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
 
   const requestCheck = CreateTeacherRequestSchema.safeParse({
     ...parsed.data,
@@ -618,7 +597,7 @@ async function handleSubmit() {
   })
 
   if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -632,7 +611,7 @@ async function handleSubmit() {
         await loadTeachers()
         return
       }
-      formError.value = response.message ?? 'Failed to update teacher'
+      setGlobalError(response.message ?? 'Failed to update teacher')
       return
     }
 
@@ -643,11 +622,10 @@ async function handleSubmit() {
       await loadTeachers()
       return
     }
-    formError.value = response.message ?? 'Failed to create teacher'
+    setGlobalError(response.message ?? 'Failed to create teacher')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save teacher'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false
@@ -668,8 +646,7 @@ function handleDelete(item: Teacher) {
         showError(response.message ?? 'Failed to delete teacher')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete teacher')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete teacher'))
       }
     },
   )
@@ -692,35 +669,25 @@ async function openAssignmentsDialog(item: Teacher) {
     showError(response.message ?? 'Failed to load assignments')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load assignments')
-  }
-}
-
-function mapAssignmentErrors(result: Extract<ReturnType<typeof AssignmentSchema.safeParse>, { success: false }>) {
-  clearAssignmentErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'subjectId') assignmentErrors.subjectId = issue.message
-    if (field === 'classSectionId') assignmentErrors.classSectionId = issue.message
+    showError(getFriendlyErrorMessage(error, 'Failed to load assignments'))
   }
 }
 
 async function handleAddAssignment() {
   clearAssignmentErrors()
-  const parsed = AssignmentSchema.safeParse({
-    subjectId: assignmentForm.subjectId,
-    classSectionId: assignmentForm.classSectionId,
-  })
-
-  if (!parsed.success) {
-    mapAssignmentErrors(parsed)
+  const parsed = await validateAssignmentWithSchema(assignmentState)
+  if (!parsed.success) return
+  if (parsed.data.subjectId === null || parsed.data.classSectionId === null) {
+    setAssignmentGlobalError('Invalid assignment payload')
     return
   }
 
-  const requestCheck = CreateTeacherAssignmentRequestSchema.safeParse(parsed.data)
+  const requestCheck = CreateTeacherAssignmentRequestSchema.safeParse({
+    subjectId: parsed.data.subjectId,
+    classSectionId: parsed.data.classSectionId,
+  })
   if (!requestCheck.success || !selectedTeacherId.value) {
-    assignmentError.value = 'Invalid assignment payload'
+    setAssignmentGlobalError('Invalid assignment payload')
     return
   }
 
@@ -747,11 +714,10 @@ async function handleAddAssignment() {
       await loadTeachers()
       return
     }
-    assignmentError.value = response.message ?? 'Failed to add assignment'
+    setAssignmentGlobalError(response.message ?? 'Failed to add assignment')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    assignmentError.value = fetchError.data?.message ?? 'Failed to add assignment'
+    setAssignmentGlobalError(getFriendlyErrorMessage(error, 'Failed to add assignment'))
   }
   finally {
     isAssignmentSubmitting.value = false
@@ -775,8 +741,7 @@ function handleRemoveAssignment(assignmentId: number) {
         showError(response.message ?? 'Failed to remove assignment')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to remove assignment')
+        showError(getFriendlyErrorMessage(error, 'Failed to remove assignment'))
       }
     },
   )

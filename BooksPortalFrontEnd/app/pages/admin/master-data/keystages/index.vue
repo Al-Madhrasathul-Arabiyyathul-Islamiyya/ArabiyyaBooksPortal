@@ -43,21 +43,16 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit keystage"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete keystage"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -88,6 +83,7 @@
             v-model.trim="form.code"
             fluid
             :invalid="!!errors.code"
+            @blur="touchField('code')"
           />
         </FormsFormField>
 
@@ -102,6 +98,7 @@
             v-model.trim="form.name"
             fluid
             :invalid="!!errors.name"
+            @blur="touchField('name')"
           />
         </FormsFormField>
 
@@ -117,6 +114,7 @@
             :min="0"
             fluid
             :invalid="!!errors.sortOrder"
+            @blur="touchField('sortOrder')"
           />
         </FormsFormField>
 
@@ -148,7 +146,6 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod/v4'
 import type { Keystage } from '~/types/entities'
 import { CreateKeystageRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
@@ -174,39 +171,37 @@ const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
-
-const form = reactive({
-  code: '',
-  name: '',
-  sortOrder: null as number | null,
-})
-
-const errors = reactive({
-  code: '',
-  name: '',
-  sortOrder: '',
-})
-
-const FormSchema = z.object({
-  code: z.string().min(1, 'Code is required'),
-  name: z.string().min(1, 'Name is required'),
-  sortOrder: z.number().int().min(0, 'Sort order must be 0 or greater'),
-})
-
-function clearErrors() {
-  errors.code = ''
-  errors.name = ''
-  errors.sortOrder = ''
-  formError.value = ''
-}
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    code: '',
+    name: '',
+    sortOrder: null as number | null,
+  },
+  CreateKeystageRequestSchema.extend({
+    sortOrder: CreateKeystageRequestSchema.shape.sortOrder.nullable(),
+  }).superRefine((values, ctx) => {
+    if (values.sortOrder === null) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Sort order is required',
+        path: ['sortOrder'],
+      })
+    }
+  }),
+)
 
 function resetForm() {
-  form.code = ''
-  form.name = ''
-  form.sortOrder = null
+  resetValidationForm()
   selectedId.value = null
-  clearErrors()
 }
 
 async function loadKeystages() {
@@ -237,7 +232,7 @@ function openCreateDialog() {
 function openEditDialog(item: Keystage) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.code = item.code
   form.name = item.name
   form.sortOrder = item.sortOrder
@@ -249,32 +244,20 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'code') errors.code = issue.message
-    if (field === 'name') errors.name = issue.message
-    if (field === 'sortOrder') errors.sortOrder = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
-  const parsed = FormSchema.safeParse({
-    code: form.code,
-    name: form.name,
-    sortOrder: form.sortOrder,
-  })
-
-  if (!parsed.success) {
-    mapValidationErrors(parsed)
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
+  if (parsed.data.sortOrder === null) {
+    setGlobalError('Invalid form payload')
     return
   }
 
-  const requestCheck = CreateKeystageRequestSchema.safeParse(parsed.data)
+  const requestCheck = CreateKeystageRequestSchema.safeParse({
+    ...parsed.data,
+    sortOrder: parsed.data.sortOrder,
+  })
   if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -291,7 +274,7 @@ async function handleSubmit() {
         await loadKeystages()
         return
       }
-      formError.value = response.message ?? 'Failed to update keystage'
+      setGlobalError(response.message ?? 'Failed to update keystage')
       return
     }
 
@@ -302,11 +285,10 @@ async function handleSubmit() {
       await loadKeystages()
       return
     }
-    formError.value = response.message ?? 'Failed to create keystage'
+    setGlobalError(response.message ?? 'Failed to create keystage')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save keystage'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false

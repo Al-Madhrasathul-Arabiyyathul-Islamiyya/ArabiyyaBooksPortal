@@ -57,30 +57,23 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit academic year"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="!data.isActive"
                   icon="pi pi-check-circle"
-                  text
-                  rounded
                   severity="success"
-                  aria-label="Activate"
+                  tooltip="Activate year"
                   @click="handleActivate(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete academic year"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -111,6 +104,7 @@
             v-model.trim="form.name"
             fluid
             :invalid="!!errors.name"
+            @blur="touchField('name')"
           />
         </FormsFormField>
 
@@ -126,7 +120,9 @@
             :min="2000"
             :max="2100"
             fluid
+            disabled
             :invalid="!!errors.year"
+            @blur="touchField('year')"
           />
         </FormsFormField>
 
@@ -143,6 +139,7 @@
               show-icon
               fluid
               :invalid="!!errors.startDate"
+              @blur="touchField('startDate')"
             />
           </FormsFormField>
 
@@ -158,6 +155,7 @@
               show-icon
               fluid
               :invalid="!!errors.endDate"
+              @blur="touchField('endDate')"
             />
           </FormsFormField>
         </div>
@@ -219,47 +217,59 @@ const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
-
-const form = reactive({
-  name: '',
-  year: null as number | null,
-  startDate: null as Date | null,
-  endDate: null as Date | null,
-})
-
-const errors = reactive({
-  name: '',
-  year: '',
-  startDate: '',
-  endDate: '',
-})
 
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  year: z.number().int().min(2000).max(2100),
-  startDate: z.date(),
-  endDate: z.date(),
-}).refine(values => values.endDate > values.startDate, {
-  message: 'End date must be after start date',
-  path: ['endDate'],
+  year: z.number().int().min(2000).max(2100).nullable(),
+  startDate: z.date().nullable(),
+  endDate: z.date().nullable(),
+}).superRefine((values, ctx) => {
+  if (values.year === null) {
+    ctx.addIssue({ code: 'custom', message: 'Year is required', path: ['year'] })
+  }
+  if (values.startDate === null) {
+    ctx.addIssue({ code: 'custom', message: 'Start date is required', path: ['startDate'] })
+  }
+  if (values.endDate === null) {
+    ctx.addIssue({ code: 'custom', message: 'End date is required', path: ['endDate'] })
+  }
+
+  if (!values.startDate || !values.endDate) return
+
+  const startAt = new Date(values.startDate.getFullYear(), values.startDate.getMonth(), values.startDate.getDate()).getTime()
+  const endAt = new Date(values.endDate.getFullYear(), values.endDate.getMonth(), values.endDate.getDate()).getTime()
+
+  if (endAt <= startAt) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'End date must be after start date',
+      path: ['endDate'],
+    })
+  }
 })
 
-function clearErrors() {
-  errors.name = ''
-  errors.year = ''
-  errors.startDate = ''
-  errors.endDate = ''
-  formError.value = ''
-}
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    name: '',
+    year: null as number | null,
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+  },
+  FormSchema,
+)
 
 function resetForm() {
-  form.name = ''
-  form.year = null
-  form.startDate = null
-  form.endDate = null
+  resetValidationForm()
   selectedId.value = null
-  clearErrors()
 }
 
 function toDate(value: string | null | undefined) {
@@ -302,7 +312,7 @@ function openCreateDialog() {
 function openEditDialog(item: AcademicYear) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.name = item.name
   form.year = item.year
   form.startDate = toDate(item.startDate)
@@ -315,28 +325,11 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'name') errors.name = issue.message
-    if (field === 'year') errors.year = issue.message
-    if (field === 'startDate') errors.startDate = issue.message
-    if (field === 'endDate') errors.endDate = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
-  const parsed = FormSchema.safeParse({
-    name: form.name,
-    year: form.year,
-    startDate: form.startDate,
-    endDate: form.endDate,
-  })
-
-  if (!parsed.success) {
-    mapValidationErrors(parsed)
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
+  if (!parsed.data.startDate || !parsed.data.endDate || parsed.data.year === null) {
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -353,7 +346,7 @@ async function handleSubmit() {
 
   const requestCheck = requestSchema.safeParse(payload)
   if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -370,7 +363,7 @@ async function handleSubmit() {
         await loadAcademicYears()
         return
       }
-      formError.value = response.message ?? 'Failed to update academic year'
+      setGlobalError(response.message ?? 'Failed to update academic year')
       return
     }
 
@@ -384,11 +377,10 @@ async function handleSubmit() {
       await loadAcademicYears()
       return
     }
-    formError.value = response.message ?? 'Failed to create academic year'
+    setGlobalError(response.message ?? 'Failed to create academic year')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save academic year'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false
@@ -443,4 +435,13 @@ function handleDelete(item: AcademicYear) {
 onMounted(async () => {
   await loadAcademicYears()
 })
+
+watch(
+  () => form.startDate,
+  (startDate) => {
+    if (startDate) {
+      form.year = startDate.getFullYear()
+    }
+  },
+)
 </script>

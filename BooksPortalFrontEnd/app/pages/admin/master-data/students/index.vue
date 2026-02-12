@@ -27,12 +27,20 @@
 
     <Card>
       <template #content>
-        <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <FormsSearchInput
-            v-model="searchTerm"
-            placeholder="Search by name or index number"
-            @search="handleSearch"
-          />
+        <div class="mb-4 grid grid-cols-1 items-end gap-4 lg:grid-cols-3">
+          <FormsFormField
+            label="Search"
+            field-id="studentSearch"
+          >
+            <FormsSearchInput
+              id="studentSearch"
+              v-model="searchTerm"
+              name="students-search"
+              persist-key="bp.search.admin.students"
+              placeholder="Search by name or index number"
+              @search="handleSearch"
+            />
+          </FormsFormField>
 
           <FormsFormField
             label="Class Filter"
@@ -59,6 +67,7 @@
           :rows="pageSize"
           :first="(page - 1) * pageSize"
           :total-records="totalRecords"
+          :rows-per-page-options="[10, 20, 50, 100]"
           size="small"
           @page="onPageAndLoad"
         >
@@ -104,21 +113,16 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit student"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete student"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -150,6 +154,7 @@
               v-model.trim="form.fullName"
               fluid
               :invalid="!!errors.fullName"
+              @blur="touchField('fullName')"
             />
           </FormsFormField>
 
@@ -165,6 +170,7 @@
               fluid
               :invalid="!!errors.indexNo"
               :disabled="isEditing"
+              @blur="touchField('indexNo')"
             />
           </FormsFormField>
         </div>
@@ -181,6 +187,7 @@
               v-model.trim="form.nationalId"
               fluid
               :invalid="!!errors.nationalId"
+              @blur="touchField('nationalId')"
             />
           </FormsFormField>
 
@@ -199,6 +206,7 @@
               placeholder="Select class"
               fluid
               :invalid="!!errors.classSectionId"
+              @blur="touchField('classSectionId')"
             />
           </FormsFormField>
         </div>
@@ -276,13 +284,10 @@
               style="width: 5rem;"
             >
               <template #body="{ data }">
-                <Button
-                  type="button"
+                <CommonIconActionButton
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Remove parent link"
+                  tooltip="Remove parent link"
                   @click="removeLinkedParent(data.parentId)"
                 />
               </template>
@@ -343,6 +348,7 @@ import {
   UpdateStudentRequestSchema,
 } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 interface OptionItem {
   label: string
@@ -378,6 +384,7 @@ const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePaginati
 const students = ref<Student[]>([])
 const classSections = ref<ClassSection[]>([])
 const parentSuggestions = ref<Parent[]>([])
+const activeAcademicYearId = ref<number | null>(null)
 
 const searchTerm = ref('')
 const selectedClassSectionFilter = ref<number | null>(null)
@@ -389,27 +396,12 @@ const isDialogVisible = ref(false)
 const isBulkDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
 const isBulkValidating = ref(false)
 const isBulkCommitting = ref(false)
 const bulkError = ref('')
 const bulkReport = ref<BulkImportReport | null>(null)
 
-const form = reactive({
-  fullName: '',
-  indexNo: '',
-  nationalId: '',
-  classSectionId: null as number | null,
-})
-
 const linkedParents = ref<LinkedParent[]>([])
-
-const errors = reactive({
-  fullName: '',
-  indexNo: '',
-  nationalId: '',
-  classSectionId: '',
-})
 
 const classSectionFilterOptions = computed<FilterOption[]>(() => [
   { label: 'All Classes', value: null },
@@ -426,41 +418,51 @@ const classSectionOptions = computed<OptionItem[]>(() =>
   })),
 )
 
-const CreateSchema = z.object({
+const StudentValidationSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
-  indexNo: z.string().min(1, 'Index number is required'),
+  indexNo: z.string().optional(),
   nationalId: z.string().min(1, 'National ID is required'),
-  classSectionId: z.number().int().min(1, 'Class is required'),
+  classSectionId: z.number().int().min(1, 'Class is required').nullable(),
+}).superRefine((values, ctx) => {
+  if (!isEditing.value && !values.indexNo?.trim()) {
+    ctx.addIssue({ code: 'custom', message: 'Index number is required', path: ['indexNo'] })
+  }
+  if (values.classSectionId === null) {
+    ctx.addIssue({ code: 'custom', message: 'Class is required', path: ['classSectionId'] })
+  }
 })
 
-const UpdateSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  nationalId: z.string().min(1, 'National ID is required'),
-  classSectionId: z.number().int().min(1, 'Class is required'),
-})
-
-function clearErrors() {
-  errors.fullName = ''
-  errors.indexNo = ''
-  errors.nationalId = ''
-  errors.classSectionId = ''
-  formError.value = ''
-}
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    fullName: '',
+    indexNo: '',
+    nationalId: '',
+    classSectionId: null as number | null,
+  },
+  StudentValidationSchema,
+)
 
 function resetForm() {
-  form.fullName = ''
-  form.indexNo = ''
-  form.nationalId = ''
-  form.classSectionId = null
+  resetValidationForm()
   linkedParents.value = []
   selectedParentCandidate.value = null
   selectedId.value = null
-  clearErrors()
 }
 
 async function loadClassSections() {
   try {
-    const response = await api.get<ClassSection[]>(API.classSections.base)
+    const response = await api.get<ClassSection[]>(API.classSections.base, {
+      academicYearId: activeAcademicYearId.value ?? undefined,
+    })
     if (response.success) {
       classSections.value = response.data
       return
@@ -468,8 +470,19 @@ async function loadClassSections() {
     showError(response.message ?? 'Failed to load classes')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load classes')
+    showError(getFriendlyErrorMessage(error, 'Failed to load classes'))
+  }
+}
+
+async function loadActiveAcademicYear() {
+  try {
+    const response = await api.get<{ id: number }>(API.academicYears.active)
+    if (response.success) {
+      activeAcademicYearId.value = response.data.id
+    }
+  }
+  catch {
+    // no active year configured yet
   }
 }
 
@@ -489,8 +502,7 @@ async function loadStudents() {
     showError(response.message ?? 'Failed to load students')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load students')
+    showError(getFriendlyErrorMessage(error, 'Failed to load students'))
   }
   finally {
     isLoading.value = false
@@ -603,8 +615,7 @@ async function validateStudentBulk(file: File) {
     bulkError.value = response.message ?? 'Validation failed'
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    bulkError.value = fetchError.data?.message ?? 'Validation failed'
+    bulkError.value = getFriendlyErrorMessage(error, 'Validation failed')
   }
   finally {
     isBulkValidating.value = false
@@ -630,8 +641,7 @@ async function commitStudentBulk(file: File) {
     bulkError.value = response.message ?? 'Commit failed'
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    bulkError.value = fetchError.data?.message ?? 'Commit failed'
+    bulkError.value = getFriendlyErrorMessage(error, 'Commit failed')
   }
   finally {
     isBulkCommitting.value = false
@@ -647,7 +657,7 @@ function openCreateDialog() {
 function openEditDialog(item: Student) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.fullName = item.fullName
   form.indexNo = item.indexNo
   form.nationalId = item.nationalId ?? ''
@@ -661,43 +671,19 @@ function closeDialog() {
   resetForm()
 }
 
-function mapCreateErrors(result: Extract<ReturnType<typeof CreateSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'fullName') errors.fullName = issue.message
-    if (field === 'nationalId') errors.nationalId = issue.message
-    if (field === 'indexNo') errors.indexNo = issue.message
-    if (field === 'classSectionId') errors.classSectionId = issue.message
-  }
-}
-
-function mapUpdateErrors(result: Extract<ReturnType<typeof UpdateSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'fullName') errors.fullName = issue.message
-    if (field === 'nationalId') errors.nationalId = issue.message
-    if (field === 'classSectionId') errors.classSectionId = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
+  if (parsed.data.classSectionId === null) {
+    setGlobalError('Invalid form payload')
+    return
+  }
 
   if (isEditing.value) {
-    const parsed = UpdateSchema.safeParse({
-      fullName: form.fullName,
-      nationalId: form.nationalId,
-      classSectionId: form.classSectionId,
-    })
-    if (!parsed.success) {
-      mapUpdateErrors(parsed)
-      return
-    }
-
     const requestCheck = UpdateStudentRequestSchema.safeParse({
-      ...parsed.data,
+      fullName: parsed.data.fullName,
+      nationalId: parsed.data.nationalId,
+      classSectionId: parsed.data.classSectionId,
       parents: linkedParents.value.map(parent => ({
         parentId: parent.parentId,
         isPrimary: parent.isPrimary,
@@ -705,7 +691,7 @@ async function handleSubmit() {
     })
 
     if (!requestCheck.success || !selectedId.value) {
-      formError.value = 'Invalid form payload'
+      setGlobalError('Invalid form payload')
       return
     }
 
@@ -718,11 +704,10 @@ async function handleSubmit() {
         await loadStudents()
         return
       }
-      formError.value = response.message ?? 'Failed to update student'
+      setGlobalError(response.message ?? 'Failed to update student')
     }
     catch (error: unknown) {
-      const fetchError = error as { data?: { message?: string } }
-      formError.value = fetchError.data?.message ?? 'Unable to save student'
+      applyBackendErrors(error)
     }
     finally {
       isSubmitting.value = false
@@ -730,26 +715,18 @@ async function handleSubmit() {
     return
   }
 
-  const parsed = CreateSchema.safeParse({
-    fullName: form.fullName,
-    indexNo: form.indexNo,
-    nationalId: form.nationalId,
-    classSectionId: form.classSectionId,
-  })
-  if (!parsed.success) {
-    mapCreateErrors(parsed)
-    return
-  }
-
   const requestCheck = CreateStudentRequestSchema.safeParse({
-    ...parsed.data,
+    fullName: parsed.data.fullName,
+    indexNo: parsed.data.indexNo ?? '',
+    nationalId: parsed.data.nationalId,
+    classSectionId: parsed.data.classSectionId,
     parents: linkedParents.value.map(parent => ({
       parentId: parent.parentId,
       isPrimary: parent.isPrimary,
     })),
   })
   if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -762,11 +739,10 @@ async function handleSubmit() {
       await loadStudents()
       return
     }
-    formError.value = response.message ?? 'Failed to create student'
+    setGlobalError(response.message ?? 'Failed to create student')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save student'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false
@@ -787,14 +763,14 @@ function handleDelete(item: Student) {
         showError(response.message ?? 'Failed to delete student')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete student')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete student'))
       }
     },
   )
 }
 
 onMounted(async () => {
+  await loadActiveAcademicYear()
   await Promise.all([
     loadClassSections(),
     loadStudents(),

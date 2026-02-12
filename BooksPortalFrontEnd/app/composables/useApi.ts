@@ -4,7 +4,7 @@ type ApiMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 type QueryValue = string | number | boolean | null | undefined
 type QueryParams = Record<string, QueryValue>
 type JsonBody = Record<string, unknown>
-type ApiBody = BodyInit | JsonBody | null
+type ApiBody = BodyInit | JsonBody | unknown[] | null
 
 interface ApiOptions {
   method?: ApiMethod
@@ -38,20 +38,7 @@ export function useApi() {
       const fetchError = error as { status?: number }
 
       if (fetchError.status === 401) {
-        try {
-          const refreshFetcher = (import.meta.client ? csrfFetch : requestFetch) as typeof $fetch
-          await refreshFetcher<ApiResponse<{ expiresAt: string }>>(`${baseURL}/auth/refresh`, {
-            method: 'POST',
-          })
-
-          return await fetcher<ApiResponse<T>>(`${baseURL}${url}`, {
-            ...options,
-            method,
-          })
-        }
-        catch {
-          await navigateTo('/login')
-        }
+        await navigateTo('/login')
       }
 
       throw error

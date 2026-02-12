@@ -39,21 +39,16 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit subject"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete subject"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -84,6 +79,7 @@
             v-model.trim="form.code"
             fluid
             :invalid="!!errors.code"
+            @blur="touchField('code')"
           />
         </FormsFormField>
 
@@ -98,6 +94,7 @@
             v-model.trim="form.name"
             fluid
             :invalid="!!errors.name"
+            @blur="touchField('name')"
           />
         </FormsFormField>
 
@@ -129,7 +126,6 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod/v4'
 import type { Subject } from '~/types/entities'
 import { CreateSubjectRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
@@ -155,34 +151,26 @@ const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
-
-const form = reactive({
-  code: '',
-  name: '',
-})
-
-const errors = reactive({
-  code: '',
-  name: '',
-})
-
-const FormSchema = z.object({
-  code: z.string().min(1, 'Code is required'),
-  name: z.string().min(1, 'Name is required'),
-})
-
-function clearErrors() {
-  errors.code = ''
-  errors.name = ''
-  formError.value = ''
-}
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    code: '',
+    name: '',
+  },
+  CreateSubjectRequestSchema,
+)
 
 function resetForm() {
-  form.code = ''
-  form.name = ''
+  resetValidationForm()
   selectedId.value = null
-  clearErrors()
 }
 
 async function loadSubjects() {
@@ -213,7 +201,7 @@ function openCreateDialog() {
 function openEditDialog(item: Subject) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.code = item.code
   form.name = item.name
   isDialogVisible.value = true
@@ -224,39 +212,16 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'code') errors.code = issue.message
-    if (field === 'name') errors.name = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
-  const parsed = FormSchema.safeParse({
-    code: form.code,
-    name: form.name,
-  })
-
-  if (!parsed.success) {
-    mapValidationErrors(parsed)
-    return
-  }
-
-  const requestCheck = CreateSubjectRequestSchema.safeParse(parsed.data)
-  if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
-    return
-  }
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
 
   isSubmitting.value = true
   try {
     if (isEditing.value && selectedId.value) {
       const response = await api.put<Subject>(
         API.subjects.byId(selectedId.value),
-        requestCheck.data,
+        parsed.data,
       )
       if (response.success) {
         showSuccess('Subject updated')
@@ -264,22 +229,21 @@ async function handleSubmit() {
         await loadSubjects()
         return
       }
-      formError.value = response.message ?? 'Failed to update subject'
+      setGlobalError(response.message ?? 'Failed to update subject')
       return
     }
 
-    const response = await api.post<Subject>(API.subjects.base, requestCheck.data)
+    const response = await api.post<Subject>(API.subjects.base, parsed.data)
     if (response.success) {
       showSuccess('Subject created')
       closeDialog()
       await loadSubjects()
       return
     }
-    formError.value = response.message ?? 'Failed to create subject'
+    setGlobalError(response.message ?? 'Failed to create subject')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save subject'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false

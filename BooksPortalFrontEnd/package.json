@@ -21,7 +21,6 @@
     "dayjs-nuxt": "2.1.11",
     "eslint": "^9.0.0",
     "nuxt": "^4.3.0",
-    "nuxt-charts": "2.1.1",
     "nuxt-csurf": "^1.6.5",
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
@@ -39,7 +38,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "analyze": "nuxt analyze"
   },
   "type": "module"
 }

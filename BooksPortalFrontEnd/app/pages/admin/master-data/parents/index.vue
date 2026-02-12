@@ -20,7 +20,10 @@
       <template #content>
         <div class="mb-4 max-w-lg">
           <FormsSearchInput
+            id="parents-search"
             v-model="searchTerm"
+            name="parents-search"
+            persist-key="bp.search.admin.parents"
             placeholder="Search by name or national ID"
             @search="handleSearch"
           />
@@ -61,21 +64,16 @@
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
-                <Button
+                <CommonIconActionButton
                   icon="pi pi-pencil"
-                  text
-                  rounded
-                  severity="secondary"
-                  aria-label="Edit"
+                  tooltip="Edit parent"
                   @click="openEditDialog(data)"
                 />
-                <Button
+                <CommonIconActionButton
                   v-if="isSuperAdmin"
                   icon="pi pi-trash"
-                  text
-                  rounded
                   severity="danger"
-                  aria-label="Delete"
+                  tooltip="Delete parent"
                   @click="handleDelete(data)"
                 />
               </div>
@@ -106,6 +104,7 @@
             v-model.trim="form.fullName"
             fluid
             :invalid="!!errors.fullName"
+            @blur="touchField('fullName')"
           />
         </FormsFormField>
 
@@ -120,6 +119,7 @@
             v-model.trim="form.nationalId"
             fluid
             :invalid="!!errors.nationalId"
+            @blur="touchField('nationalId')"
           />
         </FormsFormField>
 
@@ -133,6 +133,7 @@
             v-model.trim="form.phone"
             fluid
             :invalid="!!errors.phone"
+            @blur="touchField('phone')"
           />
         </FormsFormField>
 
@@ -146,6 +147,7 @@
             v-model.trim="form.relationship"
             fluid
             :invalid="!!errors.relationship"
+            @blur="touchField('relationship')"
           />
         </FormsFormField>
 
@@ -207,44 +209,32 @@ const isSubmitting = ref(false)
 const isDialogVisible = ref(false)
 const isEditing = ref(false)
 const selectedId = ref<number | null>(null)
-const formError = ref('')
 
-const form = reactive({
-  fullName: '',
-  nationalId: '',
-  phone: '',
-  relationship: '',
-})
-
-const errors = reactive({
-  fullName: '',
-  nationalId: '',
-  phone: '',
-  relationship: '',
-})
-
-const FormSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  nationalId: z.string().min(1, 'National ID is required'),
-  phone: z.string().optional(),
-  relationship: z.string().optional(),
-})
-
-function clearErrors() {
-  errors.fullName = ''
-  errors.nationalId = ''
-  errors.phone = ''
-  errors.relationship = ''
-  formError.value = ''
-}
+const {
+  state: form,
+  errors,
+  globalError: formError,
+  touchField,
+  validateWithSchema,
+  setGlobalError,
+  applyBackendErrors,
+  resetForm: resetValidationForm,
+} = useAppValidation(
+  {
+    fullName: '',
+    nationalId: '',
+    phone: '',
+    relationship: '',
+  },
+  CreateParentRequestSchema.extend({
+    phone: z.string().optional(),
+    relationship: z.string().optional(),
+  }),
+)
 
 function resetForm() {
-  form.fullName = ''
-  form.nationalId = ''
-  form.phone = ''
-  form.relationship = ''
+  resetValidationForm()
   selectedId.value = null
-  clearErrors()
 }
 
 function normalizeNullable(value: string) {
@@ -294,7 +284,7 @@ function openCreateDialog() {
 function openEditDialog(item: Parent) {
   isEditing.value = true
   selectedId.value = item.id
-  clearErrors()
+  setGlobalError('')
   form.fullName = item.fullName
   form.nationalId = item.nationalId
   form.phone = item.phone ?? ''
@@ -307,36 +297,19 @@ function closeDialog() {
   resetForm()
 }
 
-function mapValidationErrors(result: Extract<ReturnType<typeof FormSchema.safeParse>, { success: false }>) {
-  clearErrors()
-  for (const issue of result.error.issues) {
-    const field = issue.path[0]
-    if (field === 'fullName') errors.fullName = issue.message
-    if (field === 'nationalId') errors.nationalId = issue.message
-  }
-}
-
 async function handleSubmit() {
-  clearErrors()
-  const parsed = FormSchema.safeParse({
-    fullName: form.fullName,
-    nationalId: form.nationalId,
-    phone: form.phone,
-    relationship: form.relationship,
-  })
+  const parsed = await validateWithSchema(form)
+  if (!parsed.success) return
 
-  if (!parsed.success) {
-    mapValidationErrors(parsed)
-    return
-  }
-
-  const requestCheck = CreateParentRequestSchema.safeParse({
+  const requestPayload = {
     ...parsed.data,
     phone: normalizeNullable(parsed.data.phone ?? ''),
     relationship: normalizeNullable(parsed.data.relationship ?? ''),
-  })
+  }
+
+  const requestCheck = CreateParentRequestSchema.safeParse(requestPayload)
   if (!requestCheck.success) {
-    formError.value = 'Invalid form payload'
+    setGlobalError('Invalid form payload')
     return
   }
 
@@ -350,7 +323,7 @@ async function handleSubmit() {
         await loadParents()
         return
       }
-      formError.value = response.message ?? 'Failed to update parent'
+      setGlobalError(response.message ?? 'Failed to update parent')
       return
     }
 
@@ -361,11 +334,10 @@ async function handleSubmit() {
       await loadParents()
       return
     }
-    formError.value = response.message ?? 'Failed to create parent'
+    setGlobalError(response.message ?? 'Failed to create parent')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    formError.value = fetchError.data?.message ?? 'Unable to save parent'
+    applyBackendErrors(error)
   }
   finally {
     isSubmitting.value = false

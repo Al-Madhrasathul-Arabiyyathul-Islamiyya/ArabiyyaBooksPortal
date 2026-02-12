@@ -58,6 +58,9 @@ export const teacherIssueStatusSeverity: Record<number, string> = {
   [TeacherIssueStatusValue.Overdue]: 'danger',
 }
 
+// Backward-compatible alias used by page implementations.
+export const teacherIssueStatusSeverities = teacherIssueStatusSeverity
+
 // Dropdown option arrays for PrimeVue Select components
 export const termOptions = Object.entries(termLabels).map(([value, label]) => ({
   value: Number(value),
@@ -70,6 +73,11 @@ export const conditionOptions = Object.entries(conditionLabels).map(([value, lab
 }))
 
 export const slipTypeOptions = Object.entries(slipTypeLabels).map(([value, label]) => ({
+  value: Number(value),
+  label,
+}))
+
+export const teacherIssueStatusOptions = Object.entries(teacherIssueStatusLabels).map(([value, label]) => ({
   value: Number(value),
   label,
 }))

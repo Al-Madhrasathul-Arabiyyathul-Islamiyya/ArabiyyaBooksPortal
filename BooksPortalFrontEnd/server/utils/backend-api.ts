@@ -4,6 +4,7 @@ import { appendHeader, createError, getHeader, getMethod, getQuery, readBody, se
 import { clearSessionTokens, getSessionTokens, isExpiryExpired, setSessionTokens } from './auth-session'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+const refreshInFlight = new Map<string, Promise<boolean>>()
 
 function getBackendBaseUrl(event: H3Event): string {
   const config = useRuntimeConfig(event)
@@ -44,27 +45,40 @@ export async function refreshServerSession(event: H3Event): Promise<boolean> {
   const { accessToken, refreshToken } = getSessionTokens(event)
   if (!accessToken || !refreshToken) return false
 
-  try {
-    const response = await $fetch<{
-      success: boolean
-      data: { accessToken: string, refreshToken: string, expiresAt: string }
-    }>(`${base}/auth/refresh`, {
-      method: 'POST',
-      body: { accessToken, refreshToken },
-    })
+  const existing = refreshInFlight.get(refreshToken)
+  if (existing) {
+    return await existing
+  }
 
-    if (!response.success) {
+  const refreshPromise = (async () => {
+    try {
+      const response = await $fetch<{
+        success: boolean
+        data: { accessToken: string, refreshToken: string, expiresAt: string }
+      }>(`${base}/auth/refresh`, {
+        method: 'POST',
+        body: { accessToken, refreshToken },
+      })
+
+      if (!response.success) {
+        clearSessionTokens(event)
+        return false
+      }
+
+      setSessionTokens(event, response.data.accessToken, response.data.refreshToken, response.data.expiresAt)
+      return true
+    }
+    catch {
       clearSessionTokens(event)
       return false
     }
+    finally {
+      refreshInFlight.delete(refreshToken)
+    }
+  })()
 
-    setSessionTokens(event, response.data.accessToken, response.data.refreshToken, response.data.expiresAt)
-    return true
-  }
-  catch {
-    clearSessionTokens(event)
-    return false
-  }
+  refreshInFlight.set(refreshToken, refreshPromise)
+  return await refreshPromise
 }
 
 export async function requireAccessToken(event: H3Event): Promise<string> {

@@ -16,8 +16,8 @@ export default defineNuxtConfig({
     '@pinia/colada-nuxt',
     '@regle/nuxt',
     'dayjs-nuxt',
-    'nuxt-charts',
   ],
+
   devtools: { enabled: true },
 
   css: ['./app/assets/css/main.css'],
@@ -55,7 +55,7 @@ export default defineNuxtConfig({
       tailwindcss(),
     ],
     build: {
-      sourcemap: false, // Disable source maps in production
+      sourcemap: false,
     },
   },
 
@@ -91,6 +91,7 @@ export default defineNuxtConfig({
       { name: 'Sofia Sans', provider: 'google' },
       { name: 'Playfair Display', provider: 'google' },
       { name: 'Geist Mono', provider: 'google' },
+      { name: 'Faruma', provider: 'local' },
     ],
     defaults: {
       weights: [300, 400, 500, 600, 700],
