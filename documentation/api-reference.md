@@ -863,8 +863,9 @@ All endpoints require **Bearer auth**.
 
 List distribution slips (paginated).
 
-- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&studentId={int}`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&studentId={int}&includeCancelled={bool}`
 - **Defaults**: pageNumber=1, pageSize=20
+- **Default behavior**: cancelled slips are excluded unless `includeCancelled=true`.
 - **Response**: `PaginatedList<DistributionSlipResponse>`
 
 ### GET /api/distributions/{id}
@@ -890,6 +891,8 @@ Create a distribution slip.
   | term | Term (int) | yes |
   | studentId | int | yes |
   | parentId | int | yes |
+  | issuedDate | DateOnly? | no |
+  | issuedTime | TimeOnly? | no |
   | notes | string? | no |
   | items | CreateDistributionSlipItemRequest[] | yes |
 
@@ -905,6 +908,14 @@ Create a distribution slip.
 Cancel a distribution slip (reverses stock).
 
 - **Response**: `string` message
+- **Rule**: finalized slips cannot be cancelled.
+
+### POST /api/distributions/{id}/finalize
+
+Finalize a distribution slip.
+
+- **Response**: `string` message
+- **Rule**: cancelled slips cannot be finalized.
 
 ### GET /api/distributions/{id}/print
 
@@ -928,8 +939,18 @@ Download PDF for a distribution slip.
 | studentNationalId | string? |
 | parentId | int |
 | parentName | string |
+| parentNationalId | string? |
+| parentPhone | string? |
+| parentRelationship | string? |
 | issuedById | int |
+| issuedByName | string |
+| issuedByDesignation | string? |
 | issuedAt | DateTime |
+| lifecycleStatus | SlipLifecycleStatus (int) |
+| finalizedById | int? |
+| finalizedAt | DateTime? |
+| cancelledById | int? |
+| cancelledAt | DateTime? |
 | notes | string? |
 | pdfFilePath | string? |
 | items | DistributionSlipItemResponse[] |
@@ -982,6 +1003,8 @@ Create a return slip.
   | academicYearId | int | yes |
   | studentId | int | yes |
   | returnedById | int | yes |
+  | receivedDate | DateOnly? | no |
+  | receivedTime | TimeOnly? | no |
   | notes | string? | no |
   | items | CreateReturnSlipItemRequest[] | yes |
 
@@ -1021,7 +1044,12 @@ Download PDF for a return slip.
 | studentNationalId | string? |
 | returnedById | int |
 | returnedByName | string |
+| returnedByNationalId | string? |
+| returnedByPhone | string? |
+| returnedByRelationship | string? |
 | receivedById | int |
+| receivedByName | string |
+| receivedByDesignation | string? |
 | receivedAt | DateTime |
 | notes | string? |
 | pdfFilePath | string? |
@@ -1051,8 +1079,9 @@ All endpoints require **Bearer auth**.
 
 List teacher issues (paginated).
 
-- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&teacherId={int}`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&teacherId={int}&includeCancelled={bool}`
 - **Defaults**: pageNumber=1, pageSize=20
+- **Default behavior**: cancelled slips are excluded unless `includeCancelled=true`.
 - **Response**: `PaginatedList<TeacherIssueResponse>`
 
 ### GET /api/TeacherIssues/{id}
@@ -1070,6 +1099,8 @@ Create a teacher issue.
   |-------|------|----------|
   | academicYearId | int | yes |
   | teacherId | int | yes |
+  | issuedDate | DateOnly? | no |
+  | issuedTime | TimeOnly? | no |
   | expectedReturnDate | DateTime? | no |
   | notes | string? | no |
   | items | TeacherIssueItemRequest[] | yes |
@@ -1088,6 +1119,8 @@ Process a partial or full return of books from a teacher.
 - **Request**: `ProcessTeacherReturnRequest`
   | Field | Type | Required |
   |-------|------|----------|
+  | receivedDate | DateOnly? | no |
+  | receivedTime | TimeOnly? | no |
   | notes | string? | no |
   | items | TeacherReturnItemRequest[] | yes |
 
@@ -1100,13 +1133,27 @@ Process a partial or full return of books from a teacher.
 
 ### DELETE /api/TeacherIssues/{id}
 
-Cancel a teacher issue (reverses stock).
+Cancel a teacher issue (reverses outstanding stock).
 
 - **Response**: `string` message
+- **Rule**: finalized slips cannot be cancelled.
+
+### POST /api/TeacherIssues/{id}/finalize
+
+Finalize a teacher issue.
+
+- **Response**: `string` message
+- **Rule**: cancelled slips cannot be finalized.
 
 ### GET /api/TeacherIssues/{id}/print
 
 Download PDF for a teacher issue.
+
+- **Response**: `application/pdf` file
+
+### GET /api/TeacherIssues/{id}/return/print
+
+Download PDF for the latest teacher return slip created for the teacher issue.
 
 - **Response**: `application/pdf` file
 
@@ -1120,8 +1167,16 @@ Download PDF for a teacher issue.
 | academicYearName | string |
 | teacherId | int |
 | teacherName | string |
+| teacherNationalId | string? |
 | issuedById | int |
+| issuedByName | string |
+| issuedByDesignation | string? |
 | issuedAt | DateTime |
+| lifecycleStatus | SlipLifecycleStatus (int) |
+| finalizedById | int? |
+| finalizedAt | DateTime? |
+| cancelledById | int? |
+| cancelledAt | DateTime? |
 | expectedReturnDate | DateTime? |
 | status | TeacherIssueStatus (int) |
 | notes | string? |
@@ -1150,9 +1205,12 @@ Download PDF for a teacher issue.
 | referenceNo | string |
 | teacherIssueId | int |
 | teacherName | string |
+| teacherNationalId | string? |
 | academicYearId | int |
 | academicYearName | string |
 | receivedById | int |
+| receivedByName | string |
+| receivedByDesignation | string? |
 | receivedAt | DateTime |
 | notes | string? |
 | pdfFilePath | string? |
@@ -1601,13 +1659,18 @@ Frozen routes:
 - `GET /api/lookups/terms`
 - `GET /api/lookups/book-conditions`
 - `GET /api/lookups/movement-types`
+- `GET /api/lookups/operations/students?academicYearId={id}&search={term?}&take={n?}`
+- `GET /api/lookups/operations/parents?studentId={id}&search={term?}&take={n?}`
+- `GET /api/lookups/operations/books?academicYearId={id}&search={term?}&take={n?}`
+- `GET /api/lookups/operations/teachers?academicYearId={id?}&search={term?}&take={n?}`
+- `GET /api/lookups/operations/teacher-issues/outstanding?academicYearId={id?}&teacherId={id?}&search={term?}&take={n?}`
 
 #### Example Success (frozen)
 ```json
 {
   "success": true,
   "data": [
-    { "value": 1, "label": "2025/2026" }
+    { "id": 1, "name": "2025/2026" }
   ],
   "message": null,
   "errors": null
@@ -1815,6 +1878,7 @@ Frozen routes:
 - `GET /api/distributions/by-reference/{referenceNo}`
 - `POST /api/distributions`
 - `DELETE /api/distributions/{id}`
+- `POST /api/distributions/{id}/finalize`
 - `GET /api/distributions/{id}/print`
 
 #### GET `/api/distributions` Example Success (frozen)
@@ -1828,7 +1892,8 @@ Frozen routes:
         "referenceNo": "DIS-2026-0001",
         "studentId": 12,
         "studentName": "Student One",
-        "term": 1
+        "term": 1,
+        "lifecycleStatus": 0
       }
     ],
     "totalCount": 1,
@@ -1852,7 +1917,11 @@ Frozen routes:
     "referenceNo": "DIS-2026-0001",
     "studentId": 12,
     "parentId": 3,
+    "parentName": "Parent One",
+    "parentNationalId": "A123456",
+    "parentPhone": "7777777",
     "issuedAt": "2026-02-09T03:04:30Z",
+    "lifecycleStatus": 0,
     "items": [{ "bookId": 21, "bookTitle": "Sample Book", "quantity": 1 }]
   },
   "message": null,
@@ -1877,7 +1946,17 @@ Frozen routes:
 ```json
 {
   "success": true,
-  "data": "Distribution slip cancelled successfully.",
+  "data": "Distribution slip cancelled.",
+  "message": null,
+  "errors": null
+}
+```
+
+#### POST `/api/distributions/{id}/finalize` Example Success (frozen)
+```json
+{
+  "success": true,
+  "data": "Distribution slip finalized.",
   "message": null,
   "errors": null
 }
@@ -1957,7 +2036,7 @@ Frozen routes:
 ```json
 {
   "success": true,
-  "data": "Return slip cancelled successfully.",
+  "data": "Return slip cancelled.",
   "message": null,
   "errors": null
 }
