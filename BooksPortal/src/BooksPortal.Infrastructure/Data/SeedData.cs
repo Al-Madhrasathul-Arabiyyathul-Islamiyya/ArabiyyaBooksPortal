@@ -42,6 +42,7 @@ public static class SeedData
                 UserName = superAdmin.UserName,
                 Email = superAdmin.Email,
                 FullName = superAdmin.FullName,
+                Designation = superAdmin.Designation,
                 IsActive = true
             };
 
@@ -58,6 +59,7 @@ public static class SeedData
         adminUser.UserName = superAdmin.UserName;
         adminUser.Email = superAdmin.Email;
         adminUser.FullName = superAdmin.FullName;
+        adminUser.Designation = superAdmin.Designation;
         adminUser.IsActive = true;
 
         var updateResult = await userManager.UpdateAsync(adminUser);

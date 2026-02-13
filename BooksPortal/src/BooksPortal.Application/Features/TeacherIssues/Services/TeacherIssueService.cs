@@ -70,6 +70,7 @@ public class TeacherIssueService : ITeacherIssueService
             AcademicYearName = t.AcademicYear.Name,
             TeacherId = t.TeacherId,
             TeacherName = t.Teacher.FullName,
+            TeacherNationalId = t.Teacher.NationalId,
             IssuedById = t.IssuedById,
             IssuedAt = t.IssuedAt,
             LifecycleStatus = t.LifecycleStatus,
@@ -137,7 +138,7 @@ public class TeacherIssueService : ITeacherIssueService
                 AcademicYearId = request.AcademicYearId,
                 TeacherId = request.TeacherId,
                 IssuedById = userId,
-                IssuedAt = DateTime.UtcNow,
+                IssuedAt = ResolveTimestamp(request.IssuedDate, request.IssuedTime),
                 LifecycleStatus = SlipLifecycleStatus.Processing,
                 ExpectedReturnDate = request.ExpectedReturnDate,
                 Status = TeacherIssueStatus.Active,
@@ -195,7 +196,7 @@ public class TeacherIssueService : ITeacherIssueService
                 ReferenceNo = returnSlipRefNo,
                 TeacherIssueId = issue.Id,
                 ReceivedById = userId,
-                ReceivedAt = DateTime.UtcNow,
+                ReceivedAt = ResolveTimestamp(request.ReceivedDate, request.ReceivedTime),
                 Notes = request.Notes
             };
 
@@ -209,7 +210,7 @@ public class TeacherIssueService : ITeacherIssueService
                         $"Cannot return {returnItem.Quantity} — only {issueItem.OutstandingQuantity} outstanding for this item.");
 
                 issueItem.ReturnedQuantity += returnItem.Quantity;
-                issueItem.ReturnedAt = DateTime.UtcNow;
+                issueItem.ReturnedAt = returnSlip.ReceivedAt;
                 issueItem.ReceivedById = userId;
 
                 var book = await _bookRepo.GetByIdAsync(issueItem.BookId)
@@ -239,6 +240,7 @@ public class TeacherIssueService : ITeacherIssueService
                 ReferenceNo = returnSlip.ReferenceNo,
                 TeacherIssueId = issue.Id,
                 TeacherName = issue.Teacher.FullName,
+                TeacherNationalId = issue.Teacher.NationalId,
                 AcademicYearId = issue.AcademicYearId,
                 AcademicYearName = issue.AcademicYear.Name,
                 ReceivedById = userId,
@@ -278,6 +280,50 @@ public class TeacherIssueService : ITeacherIssueService
             await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
+    }
+
+    public async Task<TeacherReturnSlipResponse> GetLatestReturnSlipByIssueIdAsync(int issueId)
+    {
+        var slip = await _returnSlipRepo.Query()
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.AcademicYear)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Teacher)
+            .Include(r => r.Items).ThenInclude(i => i.Book)
+            .Where(r => r.TeacherIssueId == issueId)
+            .OrderByDescending(r => r.ReceivedAt)
+            .FirstOrDefaultAsync()
+            ?? throw new NotFoundException("TeacherReturnSlip", issueId);
+
+        var response = new TeacherReturnSlipResponse
+        {
+            Id = slip.Id,
+            ReferenceNo = slip.ReferenceNo,
+            TeacherIssueId = slip.TeacherIssueId,
+            TeacherName = slip.TeacherIssue.Teacher.FullName,
+            TeacherNationalId = slip.TeacherIssue.Teacher.NationalId,
+            AcademicYearId = slip.TeacherIssue.AcademicYearId,
+            AcademicYearName = slip.TeacherIssue.AcademicYear.Name,
+            ReceivedById = slip.ReceivedById,
+            ReceivedAt = slip.ReceivedAt,
+            Notes = slip.Notes,
+            PdfFilePath = slip.PdfFilePath,
+            Items = slip.Items.Select(i => new TeacherReturnSlipItemResponse
+            {
+                Id = i.Id,
+                BookId = i.BookId,
+                BookCode = i.Book.Code,
+                BookTitle = i.Book.Title,
+                Quantity = i.Quantity
+            }).ToList()
+        };
+
+        var receivingStaff = await _staffDirectoryService.GetByIdAsync(response.ReceivedById);
+        if (receivingStaff != null)
+        {
+            response.ReceivedByName = receivingStaff.DisplayName;
+            response.ReceivedByDesignation = receivingStaff.Designation;
+        }
+
+        return response;
     }
 
     public async Task FinalizeAsync(int id, int userId)
@@ -379,6 +425,7 @@ public class TeacherIssueService : ITeacherIssueService
             AcademicYearName = issue.AcademicYear.Name,
             TeacherId = issue.TeacherId,
             TeacherName = issue.Teacher.FullName,
+            TeacherNationalId = issue.Teacher.NationalId,
             IssuedById = issue.IssuedById,
             IssuedByName = string.Empty,
             IssuedAt = issue.IssuedAt,
@@ -430,5 +477,13 @@ public class TeacherIssueService : ITeacherIssueService
             response.AcademicYearName,
             $"{issue.ReferenceNo}-{issue.LifecycleStatus}",
             pdfBytes);
+    }
+
+    private static DateTime ResolveTimestamp(DateOnly? date, TimeOnly? time)
+    {
+        var now = DateTime.UtcNow;
+        var resolvedDate = date ?? DateOnly.FromDateTime(now);
+        var resolvedTime = time ?? TimeOnly.FromDateTime(now);
+        return DateTime.SpecifyKind(resolvedDate.ToDateTime(resolvedTime), DateTimeKind.Utc);
     }
 }

@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
+using BooksPortal.Domain.Enums;
 
 namespace BooksPortal.IntegrationTests;
 
@@ -31,6 +32,9 @@ public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplica
         await FinalizeDistributionAsync(distributionId);
         await DownloadPdfAsync($"/api/Distributions/{distributionId}/print", "distribution-finalized.pdf");
 
+        var returnId = await CreateReturnAsync(activeYearId, student.Id, parentId, distributionBookId);
+        await DownloadPdfAsync($"/api/Returns/{returnId}/print", "return-finalized.pdf");
+
         var distributionCancelId = await CreateDistributionAsync(activeYearId, student.Id, parentId, distributionBookId);
         await CancelDistributionAsync(distributionCancelId);
         await DownloadPdfAsync($"/api/Distributions/{distributionCancelId}/print", "distribution-cancelled.pdf");
@@ -39,6 +43,9 @@ public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplica
         var teacherIssueId = await CreateTeacherIssueAsync(activeYearId, teacherId, distributionBookId);
         await FinalizeTeacherIssueAsync(teacherIssueId);
         await DownloadPdfAsync($"/api/TeacherIssues/{teacherIssueId}/print", "teacher-issue-finalized.pdf");
+
+        await ProcessTeacherReturnAsync(teacherIssueId);
+        await DownloadPdfAsync($"/api/TeacherIssues/{teacherIssueId}/return/print", "teacher-return-finalized.pdf");
 
         var teacherIssueCancelId = await CreateTeacherIssueAsync(activeYearId, teacherId, distributionBookId);
         await CancelTeacherIssueAsync(teacherIssueCancelId);
@@ -171,12 +178,15 @@ public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplica
 
     private async Task<int> CreateDistributionAsync(int academicYearId, int studentId, int parentId, int bookId)
     {
+        var now = DateTime.UtcNow;
         var createResponse = await _client.PostAsJsonAsync("/api/Distributions", new
         {
             academicYearId,
             term = "Both",
             studentId,
             parentId,
+            issuedDate = DateOnly.FromDateTime(now),
+            issuedTime = TimeOnly.FromDateTime(now),
             notes = "Integration sample",
             items = new[]
             {
@@ -288,10 +298,13 @@ public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplica
 
     private async Task<int> CreateTeacherIssueAsync(int academicYearId, int teacherId, int bookId)
     {
+        var now = DateTime.UtcNow;
         var createResponse = await _client.PostAsJsonAsync("/api/TeacherIssues", new
         {
             academicYearId,
             teacherId,
+            issuedDate = DateOnly.FromDateTime(now),
+            issuedTime = TimeOnly.FromDateTime(now),
             expectedReturnDate = DateTime.UtcNow.AddDays(7),
             notes = "Integration sample",
             items = new[]
@@ -315,6 +328,63 @@ public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplica
     {
         var response = await _client.DeleteAsync($"/api/TeacherIssues/{id}");
         response.EnsureSuccessStatusCode();
+    }
+
+    private async Task<int> CreateReturnAsync(int academicYearId, int studentId, int parentId, int bookId)
+    {
+        var now = DateTime.UtcNow;
+        var createResponse = await _client.PostAsJsonAsync("/api/Returns", new
+        {
+            academicYearId,
+            studentId,
+            returnedById = parentId,
+            receivedDate = DateOnly.FromDateTime(now),
+            receivedTime = TimeOnly.FromDateTime(now),
+            notes = "Integration return sample",
+            items = new[]
+            {
+                new
+                {
+                    bookId,
+                    quantity = 1,
+                    condition = BookCondition.Good,
+                    conditionNotes = "Returned in good condition"
+                }
+            }
+        });
+        createResponse.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
+        return doc.RootElement.GetProperty("data").GetProperty("id").GetInt32();
+    }
+
+    private async Task ProcessTeacherReturnAsync(int teacherIssueId)
+    {
+        var issueResponse = await _client.GetAsync($"/api/TeacherIssues/{teacherIssueId}");
+        issueResponse.EnsureSuccessStatusCode();
+
+        using var issueDoc = JsonDocument.Parse(await issueResponse.Content.ReadAsStringAsync());
+        var items = issueDoc.RootElement.GetProperty("data").GetProperty("items");
+        items.GetArrayLength().Should().BeGreaterThan(0);
+
+        var teacherIssueItemId = items[0].GetProperty("id").GetInt32();
+        var now = DateTime.UtcNow;
+
+        var returnResponse = await _client.PostAsJsonAsync($"/api/TeacherIssues/{teacherIssueId}/return", new
+        {
+            receivedDate = DateOnly.FromDateTime(now),
+            receivedTime = TimeOnly.FromDateTime(now),
+            notes = "Integration teacher return sample",
+            items = new[]
+            {
+                new
+                {
+                    teacherIssueItemId,
+                    quantity = 1
+                }
+            }
+        });
+        returnResponse.EnsureSuccessStatusCode();
     }
 
     private async Task DownloadPdfAsync(string route, string fileName)

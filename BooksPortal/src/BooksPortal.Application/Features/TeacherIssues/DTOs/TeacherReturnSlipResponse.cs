@@ -6,6 +6,7 @@ public class TeacherReturnSlipResponse
     public string ReferenceNo { get; set; } = string.Empty;
     public int TeacherIssueId { get; set; }
     public string TeacherName { get; set; } = string.Empty;
+    public string? TeacherNationalId { get; set; }
     public int AcademicYearId { get; set; }
     public string AcademicYearName { get; set; } = string.Empty;
     public int ReceivedById { get; set; }

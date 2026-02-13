@@ -157,7 +157,7 @@ public class DistributionService : IDistributionService
                 StudentId = request.StudentId,
                 ParentId = request.ParentId,
                 IssuedById = userId,
-                IssuedAt = DateTime.UtcNow,
+                IssuedAt = ResolveTimestamp(request.IssuedDate, request.IssuedTime),
                 LifecycleStatus = SlipLifecycleStatus.Processing,
                 Notes = request.Notes
             };
@@ -330,5 +330,13 @@ public class DistributionService : IDistributionService
             response.AcademicYearName,
             $"{slip.ReferenceNo}-{slip.LifecycleStatus}",
             pdfBytes);
+    }
+
+    private static DateTime ResolveTimestamp(DateOnly? date, TimeOnly? time)
+    {
+        var now = DateTime.UtcNow;
+        var resolvedDate = date ?? DateOnly.FromDateTime(now);
+        var resolvedTime = time ?? TimeOnly.FromDateTime(now);
+        return DateTime.SpecifyKind(resolvedDate.ToDateTime(resolvedTime), DateTimeKind.Utc);
     }
 }

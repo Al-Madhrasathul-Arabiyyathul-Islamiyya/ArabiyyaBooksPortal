@@ -4,6 +4,8 @@ public class CreateTeacherIssueRequest
 {
     public int AcademicYearId { get; set; }
     public int TeacherId { get; set; }
+    public DateOnly? IssuedDate { get; set; }
+    public TimeOnly? IssuedTime { get; set; }
     public DateTime? ExpectedReturnDate { get; set; }
     public string? Notes { get; set; }
     public List<CreateTeacherIssueItemRequest> Items { get; set; } = new();

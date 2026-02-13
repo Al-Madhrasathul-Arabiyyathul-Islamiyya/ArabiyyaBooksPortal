@@ -67,4 +67,17 @@ public class TeacherIssuesController : ApiControllerBase
         var pdf = await _pdfService.GenerateTeacherIssueSlipAsync(issue);
         return File(pdf, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}-{issue.LifecycleStatus}.pdf");
     }
+
+    [HttpGet("{id}/return/print")]
+    public async Task<IActionResult> PrintLatestReturn(int id)
+    {
+        var slip = await _service.GetLatestReturnSlipByIssueIdAsync(id);
+
+        var stored = await _storageService.LoadAsync(slip.PdfFilePath);
+        if (stored != null)
+            return File(stored, "application/pdf", $"TeacherReturn-{slip.ReferenceNo}.pdf");
+
+        var pdf = await _pdfService.GenerateTeacherReturnSlipAsync(slip);
+        return File(pdf, "application/pdf", $"TeacherReturn-{slip.ReferenceNo}.pdf");
+    }
 }

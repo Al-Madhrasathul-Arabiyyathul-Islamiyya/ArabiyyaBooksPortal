@@ -8,6 +8,8 @@ public class CreateDistributionSlipRequest
     public Term Term { get; set; }
     public int StudentId { get; set; }
     public int ParentId { get; set; }
+    public DateOnly? IssuedDate { get; set; }
+    public TimeOnly? IssuedTime { get; set; }
     public string? Notes { get; set; }
     public List<CreateDistributionSlipItemRequest> Items { get; set; } = new();
 }

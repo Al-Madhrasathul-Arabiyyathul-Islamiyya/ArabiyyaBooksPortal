@@ -10,6 +10,7 @@ public class TeacherIssueResponse
     public string AcademicYearName { get; set; } = string.Empty;
     public int TeacherId { get; set; }
     public string TeacherName { get; set; } = string.Empty;
+    public string? TeacherNationalId { get; set; }
     public int IssuedById { get; set; }
     public string IssuedByName { get; set; } = string.Empty;
     public string? IssuedByDesignation { get; set; }

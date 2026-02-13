@@ -129,7 +129,7 @@ public class ReturnService : IReturnService
                 StudentId = request.StudentId,
                 ReturnedById = request.ReturnedById,
                 ReceivedById = userId,
-                ReceivedAt = DateTime.UtcNow,
+                ReceivedAt = ResolveTimestamp(request.ReceivedDate, request.ReceivedTime),
                 Notes = request.Notes
             };
 
@@ -309,5 +309,13 @@ public class ReturnService : IReturnService
                 slip.ReceivedByDesignation = staff.Designation;
             }
         }
+    }
+
+    private static DateTime ResolveTimestamp(DateOnly? date, TimeOnly? time)
+    {
+        var now = DateTime.UtcNow;
+        var resolvedDate = date ?? DateOnly.FromDateTime(now);
+        var resolvedTime = time ?? TimeOnly.FromDateTime(now);
+        return DateTime.SpecifyKind(resolvedDate.ToDateTime(resolvedTime), DateTimeKind.Utc);
     }
 }

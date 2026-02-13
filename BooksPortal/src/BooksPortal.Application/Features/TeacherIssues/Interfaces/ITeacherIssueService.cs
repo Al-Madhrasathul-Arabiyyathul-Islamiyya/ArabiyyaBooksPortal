@@ -14,6 +14,7 @@ public interface ITeacherIssueService
     Task<TeacherIssueResponse> GetByIdAsync(int id);
     Task<TeacherIssueResponse> CreateAsync(CreateTeacherIssueRequest request, int userId);
     Task<TeacherIssueResponse> ProcessReturnAsync(int id, ProcessTeacherReturnRequest request, int userId);
+    Task<TeacherReturnSlipResponse> GetLatestReturnSlipByIssueIdAsync(int issueId);
     Task FinalizeAsync(int id, int userId);
     Task CancelAsync(int id, int userId);
 }

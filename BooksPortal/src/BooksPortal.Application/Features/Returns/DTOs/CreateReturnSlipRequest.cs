@@ -7,6 +7,8 @@ public class CreateReturnSlipRequest
     public int AcademicYearId { get; set; }
     public int StudentId { get; set; }
     public int ReturnedById { get; set; }
+    public DateOnly? ReceivedDate { get; set; }
+    public TimeOnly? ReceivedTime { get; set; }
     public string? Notes { get; set; }
     public List<CreateReturnSlipItemRequest> Items { get; set; } = new();
 }

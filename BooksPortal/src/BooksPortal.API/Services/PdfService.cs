@@ -455,7 +455,9 @@ public class PdfService : IPdfService
                     includeDateTime: true,
                     nameValue: slip.ParentName,
                     idCardValue: slip.ParentNationalId,
-                    phoneValue: slip.ParentPhone));
+                    phoneValue: slip.ParentPhone,
+                    dateValue: FormatDate(slip.IssuedAt),
+                    timeValue: FormatTime(slip.IssuedAt)));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
                 ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), slip.IssuedByName, slip.IssuedByDesignation));
@@ -478,7 +480,9 @@ public class PdfService : IPdfService
                     includeDateTime: true,
                     nameValue: slip.ReturnedByName,
                     idCardValue: slip.ReturnedByNationalId,
-                    phoneValue: slip.ReturnedByPhone));
+                    phoneValue: slip.ReturnedByPhone,
+                    dateValue: FormatDate(slip.ReceivedAt),
+                    timeValue: FormatTime(slip.ReceivedAt)));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
                 ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), slip.ReceivedByName, slip.ReceivedByDesignation));
@@ -499,7 +503,8 @@ public class PdfService : IPdfService
                     common,
                     L(labels, "SignatureTeacher"),
                     includeDateTime: false,
-                    nameValue: issue.TeacherName));
+                    nameValue: issue.TeacherName,
+                    idCardValue: issue.TeacherNationalId));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
                 ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), issue.IssuedByName, issue.IssuedByDesignation));
@@ -515,7 +520,15 @@ public class PdfService : IPdfService
         container.Row(row =>
         {
             row.RelativeItem().Element(c =>
-                ComposeReceiverBlock(c, common, L(labels, "SignatureTeacher"), includeDateTime: true, nameValue: slip.TeacherName));
+                ComposeReceiverBlock(
+                    c,
+                    common,
+                    L(labels, "SignatureTeacher"),
+                    includeDateTime: true,
+                    nameValue: slip.TeacherName,
+                    idCardValue: slip.TeacherNationalId,
+                    dateValue: FormatDate(slip.ReceivedAt),
+                    timeValue: FormatTime(slip.ReceivedAt)));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
                 ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), slip.ReceivedByName, slip.ReceivedByDesignation));
@@ -529,7 +542,9 @@ public class PdfService : IPdfService
         bool includeDateTime,
         string? nameValue = null,
         string? idCardValue = null,
-        string? phoneValue = null)
+        string? phoneValue = null,
+        string? dateValue = null,
+        string? timeValue = null)
     {
         container.ContentFromRightToLeft().Column(col =>
         {
@@ -543,9 +558,9 @@ public class PdfService : IPdfService
             {
                 col.Item().Row(dateTimeRow =>
                 {
-                    dateTimeRow.RelativeItem().Element(c => SignatureField(c, L(common, "LabelDate")));
+                    dateTimeRow.RelativeItem().Element(c => SignatureField(c, L(common, "LabelDate"), dateValue));
                     dateTimeRow.ConstantItem(10);
-                    dateTimeRow.RelativeItem().Element(c => SignatureField(c, L(common, "LabelTime")));
+                    dateTimeRow.RelativeItem().Element(c => SignatureField(c, L(common, "LabelTime"), timeValue));
                 });
             }
         });
@@ -620,4 +635,7 @@ public class PdfService : IPdfService
 
     private static string L(Dictionary<string, string> labels, string key, string fallback = "")
         => labels.TryGetValue(key, out var value) ? value : fallback;
+
+    private static string FormatDate(DateTime value) => value.ToString("dd-MM-yyyy");
+    private static string FormatTime(DateTime value) => value.ToString("HH:mm");
 }
