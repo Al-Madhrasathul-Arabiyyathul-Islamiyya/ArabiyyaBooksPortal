@@ -18,6 +18,7 @@ public class TeacherIssueService : ITeacherIssueService
     private readonly IReferenceNumberService _refService;
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
+    private readonly IStaffDirectoryService _staffDirectoryService;
 
     public TeacherIssueService(
         IRepository<TeacherIssue> issueRepo,
@@ -26,7 +27,8 @@ public class TeacherIssueService : ITeacherIssueService
         IUnitOfWork unitOfWork,
         IReferenceNumberService refService,
         IPdfService pdfService,
-        ISlipStorageService storageService)
+        ISlipStorageService storageService,
+        IStaffDirectoryService staffDirectoryService)
     {
         _issueRepo = issueRepo;
         _returnSlipRepo = returnSlipRepo;
@@ -35,6 +37,7 @@ public class TeacherIssueService : ITeacherIssueService
         _refService = refService;
         _pdfService = pdfService;
         _storageService = storageService;
+        _staffDirectoryService = staffDirectoryService;
     }
 
     public async Task<PaginatedList<TeacherIssueResponse>> GetPagedAsync(
@@ -92,7 +95,9 @@ public class TeacherIssueService : ITeacherIssueService
             }).ToList()
         });
 
-        return await PaginatedList<TeacherIssueResponse>.CreateAsync(projected, pageNumber, pageSize);
+        var page = await PaginatedList<TeacherIssueResponse>.CreateAsync(projected, pageNumber, pageSize);
+        await EnrichWithStaffAsync(page.Items);
+        return page;
     }
 
     public async Task<TeacherIssueResponse> GetByIdAsync(int id)
@@ -104,7 +109,9 @@ public class TeacherIssueService : ITeacherIssueService
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException(nameof(TeacherIssue), id);
 
-        return MapToResponse(issue);
+        var response = MapToResponse(issue);
+        await EnrichWithStaffAsync([response]);
+        return response;
     }
 
     public async Task<TeacherIssueResponse> CreateAsync(CreateTeacherIssueRequest request, int userId)
@@ -235,6 +242,7 @@ public class TeacherIssueService : ITeacherIssueService
                 AcademicYearId = issue.AcademicYearId,
                 AcademicYearName = issue.AcademicYear.Name,
                 ReceivedById = userId,
+                ReceivedByName = string.Empty,
                 ReceivedAt = returnSlip.ReceivedAt,
                 Notes = returnSlip.Notes,
                 Items = returnSlip.Items.Select(i =>
@@ -250,6 +258,12 @@ public class TeacherIssueService : ITeacherIssueService
                     };
                 }).ToList()
             };
+            var receivingStaff = await _staffDirectoryService.GetByIdAsync(userId);
+            if (receivingStaff != null)
+            {
+                returnResponse.ReceivedByName = receivingStaff.DisplayName;
+                returnResponse.ReceivedByDesignation = receivingStaff.Designation;
+            }
 
             var returnPdfBytes = await _pdfService.GenerateTeacherReturnSlipAsync(returnResponse);
             returnSlip.PdfFilePath = await _storageService.SaveAsync("TeacherReturn", issue.AcademicYear.Name, returnSlip.ReferenceNo, returnPdfBytes);
@@ -366,6 +380,7 @@ public class TeacherIssueService : ITeacherIssueService
             TeacherId = issue.TeacherId,
             TeacherName = issue.Teacher.FullName,
             IssuedById = issue.IssuedById,
+            IssuedByName = string.Empty,
             IssuedAt = issue.IssuedAt,
             LifecycleStatus = issue.LifecycleStatus,
             FinalizedById = issue.FinalizedById,
@@ -389,6 +404,22 @@ public class TeacherIssueService : ITeacherIssueService
                 ReceivedById = i.ReceivedById
             }).ToList()
         };
+    }
+
+    private async Task EnrichWithStaffAsync(ICollection<TeacherIssueResponse> issues)
+    {
+        if (issues.Count == 0)
+            return;
+
+        var staffMap = await _staffDirectoryService.GetByIdsAsync(issues.Select(i => i.IssuedById));
+        foreach (var issue in issues)
+        {
+            if (staffMap.TryGetValue(issue.IssuedById, out var staff))
+            {
+                issue.IssuedByName = staff.DisplayName;
+                issue.IssuedByDesignation = staff.Designation;
+            }
+        }
     }
 
     private async Task SaveIssuePdfAsync(TeacherIssue issue, TeacherIssueResponse response)

@@ -13,25 +13,31 @@ public class ReturnService : IReturnService
 {
     private readonly IRepository<ReturnSlip> _slipRepo;
     private readonly IRepository<Book> _bookRepo;
+    private readonly IRepository<Parent> _parentRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
+    private readonly IStaffDirectoryService _staffDirectoryService;
 
     public ReturnService(
         IRepository<ReturnSlip> slipRepo,
         IRepository<Book> bookRepo,
+        IRepository<Parent> parentRepo,
         IUnitOfWork unitOfWork,
         IReferenceNumberService refService,
         IPdfService pdfService,
-        ISlipStorageService storageService)
+        ISlipStorageService storageService,
+        IStaffDirectoryService staffDirectoryService)
     {
         _slipRepo = slipRepo;
         _bookRepo = bookRepo;
+        _parentRepo = parentRepo;
         _unitOfWork = unitOfWork;
         _refService = refService;
         _pdfService = pdfService;
         _storageService = storageService;
+        _staffDirectoryService = staffDirectoryService;
     }
 
     public async Task<PaginatedList<ReturnSlipResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? studentId = null)
@@ -76,7 +82,9 @@ public class ReturnService : IReturnService
             }).ToList()
         });
 
-        return await PaginatedList<ReturnSlipResponse>.CreateAsync(projected, pageNumber, pageSize);
+        var page = await PaginatedList<ReturnSlipResponse>.CreateAsync(projected, pageNumber, pageSize);
+        await EnrichPartyAndStaffAsync(page.Items);
+        return page;
     }
 
     public async Task<ReturnSlipResponse> GetByIdAsync(int id)
@@ -88,7 +96,9 @@ public class ReturnService : IReturnService
             .FirstOrDefaultAsync(r => r.Id == id)
             ?? throw new NotFoundException(nameof(ReturnSlip), id);
 
-        return MapToResponse(slip);
+        var response = MapToResponse(slip);
+        await EnrichPartyAndStaffAsync([response]);
+        return response;
     }
 
     public async Task<ReturnSlipResponse> GetByReferenceAsync(string referenceNo)
@@ -100,7 +110,9 @@ public class ReturnService : IReturnService
             .FirstOrDefaultAsync(r => r.ReferenceNo == referenceNo)
             ?? throw new NotFoundException(nameof(ReturnSlip), referenceNo);
 
-        return MapToResponse(slip);
+        var response = MapToResponse(slip);
+        await EnrichPartyAndStaffAsync([response]);
+        return response;
     }
 
     public async Task<ReturnSlipResponse> CreateAsync(CreateReturnSlipRequest request, int userId)
@@ -248,7 +260,9 @@ public class ReturnService : IReturnService
             StudentClassName = $"{slip.Student.ClassSection.Grade.Name} - {slip.Student.ClassSection.Section}",
             StudentNationalId = slip.Student.NationalId,
             ReturnedById = slip.ReturnedById,
+            ReturnedByName = string.Empty,
             ReceivedById = slip.ReceivedById,
+            ReceivedByName = string.Empty,
             ReceivedAt = slip.ReceivedAt,
             Notes = slip.Notes,
             PdfFilePath = slip.PdfFilePath,
@@ -263,5 +277,37 @@ public class ReturnService : IReturnService
                 ConditionNotes = i.ConditionNotes
             }).ToList()
         };
+    }
+
+    private async Task EnrichPartyAndStaffAsync(ICollection<ReturnSlipResponse> slips)
+    {
+        if (slips.Count == 0)
+            return;
+
+        var parentIds = slips.Select(s => s.ReturnedById).Distinct().ToList();
+        var parents = await _parentRepo.Query()
+            .Where(p => parentIds.Contains(p.Id))
+            .Select(p => new { p.Id, p.FullName, p.NationalId, p.Phone, p.Relationship })
+            .ToListAsync();
+        var parentMap = parents.ToDictionary(p => p.Id);
+
+        var staffMap = await _staffDirectoryService.GetByIdsAsync(slips.Select(s => s.ReceivedById));
+
+        foreach (var slip in slips)
+        {
+            if (parentMap.TryGetValue(slip.ReturnedById, out var parent))
+            {
+                slip.ReturnedByName = parent.FullName;
+                slip.ReturnedByNationalId = parent.NationalId;
+                slip.ReturnedByPhone = parent.Phone;
+                slip.ReturnedByRelationship = parent.Relationship;
+            }
+
+            if (staffMap.TryGetValue(slip.ReceivedById, out var staff))
+            {
+                slip.ReceivedByName = staff.DisplayName;
+                slip.ReceivedByDesignation = staff.Designation;
+            }
+        }
     }
 }

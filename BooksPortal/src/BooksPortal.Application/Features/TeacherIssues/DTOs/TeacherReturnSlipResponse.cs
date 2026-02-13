@@ -9,6 +9,8 @@ public class TeacherReturnSlipResponse
     public int AcademicYearId { get; set; }
     public string AcademicYearName { get; set; } = string.Empty;
     public int ReceivedById { get; set; }
+    public string ReceivedByName { get; set; } = string.Empty;
+    public string? ReceivedByDesignation { get; set; }
     public DateTime ReceivedAt { get; set; }
     public string? Notes { get; set; }
     public string? PdfFilePath { get; set; }

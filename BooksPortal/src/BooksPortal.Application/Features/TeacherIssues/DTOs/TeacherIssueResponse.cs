@@ -11,6 +11,8 @@ public class TeacherIssueResponse
     public int TeacherId { get; set; }
     public string TeacherName { get; set; } = string.Empty;
     public int IssuedById { get; set; }
+    public string IssuedByName { get; set; } = string.Empty;
+    public string? IssuedByDesignation { get; set; }
     public DateTime IssuedAt { get; set; }
     public SlipLifecycleStatus LifecycleStatus { get; set; }
     public int? FinalizedById { get; set; }

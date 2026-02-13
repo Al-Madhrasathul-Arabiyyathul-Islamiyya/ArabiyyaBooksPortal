@@ -13,21 +13,25 @@ public class ReturnServiceTests
 {
     private readonly IRepository<ReturnSlip> _slipRepo;
     private readonly IRepository<Book> _bookRepo;
+    private readonly IRepository<Parent> _parentRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IReferenceNumberService _refService;
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
+    private readonly IStaffDirectoryService _staffDirectoryService;
     private readonly ReturnService _sut;
 
     public ReturnServiceTests()
     {
         _slipRepo = Substitute.For<IRepository<ReturnSlip>>();
         _bookRepo = Substitute.For<IRepository<Book>>();
+        _parentRepo = Substitute.For<IRepository<Parent>>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _refService = Substitute.For<IReferenceNumberService>();
         _pdfService = Substitute.For<IPdfService>();
         _storageService = Substitute.For<ISlipStorageService>();
-        _sut = new ReturnService(_slipRepo, _bookRepo, _unitOfWork, _refService, _pdfService, _storageService);
+        _staffDirectoryService = Substitute.For<IStaffDirectoryService>();
+        _sut = new ReturnService(_slipRepo, _bookRepo, _parentRepo, _unitOfWork, _refService, _pdfService, _storageService, _staffDirectoryService);
     }
 
     private static Book CreateBook(int id = 1, int totalStock = 100, int distributed = 30,

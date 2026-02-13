@@ -13,7 +13,12 @@ public class ReturnSlipResponse
     public string? StudentNationalId { get; set; }
     public int ReturnedById { get; set; }
     public string ReturnedByName { get; set; } = string.Empty;
+    public string? ReturnedByNationalId { get; set; }
+    public string? ReturnedByPhone { get; set; }
+    public string? ReturnedByRelationship { get; set; }
     public int ReceivedById { get; set; }
+    public string ReceivedByName { get; set; } = string.Empty;
+    public string? ReceivedByDesignation { get; set; }
     public DateTime ReceivedAt { get; set; }
     public string? Notes { get; set; }
     public string? PdfFilePath { get; set; }

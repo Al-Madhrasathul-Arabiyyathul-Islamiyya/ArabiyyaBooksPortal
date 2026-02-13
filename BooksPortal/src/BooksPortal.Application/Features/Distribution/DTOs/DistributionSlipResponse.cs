@@ -20,6 +20,8 @@ public class DistributionSlipResponse
     public string? ParentPhone { get; set; }
     public string? ParentRelationship { get; set; }
     public int IssuedById { get; set; }
+    public string IssuedByName { get; set; } = string.Empty;
+    public string? IssuedByDesignation { get; set; }
     public DateTime IssuedAt { get; set; }
     public SlipLifecycleStatus LifecycleStatus { get; set; }
     public int? FinalizedById { get; set; }

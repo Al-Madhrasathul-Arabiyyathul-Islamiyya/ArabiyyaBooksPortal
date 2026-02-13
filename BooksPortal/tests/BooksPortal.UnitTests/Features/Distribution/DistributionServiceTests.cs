@@ -17,6 +17,7 @@ public class DistributionServiceTests
     private readonly IReferenceNumberService _refService;
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
+    private readonly IStaffDirectoryService _staffDirectoryService;
     private readonly DistributionService _sut;
 
     public DistributionServiceTests()
@@ -27,7 +28,8 @@ public class DistributionServiceTests
         _refService = Substitute.For<IReferenceNumberService>();
         _pdfService = Substitute.For<IPdfService>();
         _storageService = Substitute.For<ISlipStorageService>();
-        _sut = new DistributionService(_slipRepo, _bookRepo, _unitOfWork, _refService, _pdfService, _storageService);
+        _staffDirectoryService = Substitute.For<IStaffDirectoryService>();
+        _sut = new DistributionService(_slipRepo, _bookRepo, _unitOfWork, _refService, _pdfService, _storageService, _staffDirectoryService);
     }
 
     private static Book CreateBook(int id, int totalStock = 100, int distributed = 0,

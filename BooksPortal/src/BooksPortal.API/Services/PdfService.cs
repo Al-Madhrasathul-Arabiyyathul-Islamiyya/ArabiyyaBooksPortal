@@ -235,7 +235,7 @@ public class PdfService : IPdfService
             slip.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, slip.AcademicYearName, "-", "-")).ToList()));
 
         col.Item().ExtendVertical().AlignBottom()
-            .PaddingTop(8).Element(c => ComposeReturnSignatures(c, common, labels));
+            .PaddingTop(8).Element(c => ComposeReturnSignatures(c, common, labels, slip));
     }
 
     private static void ComposeTeacherIssueCopy(
@@ -253,7 +253,7 @@ public class PdfService : IPdfService
             issue.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, issue.AcademicYearName, "-", null)).ToList()));
 
         col.Item().ExtendVertical().AlignBottom()
-            .PaddingTop(8).Element(c => ComposeTeacherIssueSignatures(c, common, labels));
+            .PaddingTop(8).Element(c => ComposeTeacherIssueSignatures(c, common, labels, issue));
     }
 
     private static void ComposeTeacherReturnCopy(
@@ -271,7 +271,7 @@ public class PdfService : IPdfService
             slip.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, slip.AcademicYearName, "-", null)).ToList()));
 
         col.Item().ExtendVertical().AlignBottom()
-            .PaddingTop(8).Element(c => ComposeTeacherReturnSignatures(c, common, labels));
+            .PaddingTop(8).Element(c => ComposeTeacherReturnSignatures(c, common, labels, slip));
     }
 
     // ── Header ──────────────────────────────────────────────────────
@@ -458,43 +458,67 @@ public class PdfService : IPdfService
                     phoneValue: slip.ParentPhone));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
-                ComposeStaffBlock(c, common, L(labels, "SignatureStaff")));
+                ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), slip.IssuedByName, slip.IssuedByDesignation));
         });
     }
 
-    private static void ComposeReturnSignatures(IContainer container, Dictionary<string, string> common, Dictionary<string, string> labels)
+    private static void ComposeReturnSignatures(
+        IContainer container,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels,
+        ReturnSlipResponse slip)
     {
         container.Row(row =>
         {
             row.RelativeItem().Element(c =>
-                ComposeReceiverBlock(c, common, L(labels, "SignatureParent"), includeDateTime: true));
+                ComposeReceiverBlock(
+                    c,
+                    common,
+                    L(labels, "SignatureParent"),
+                    includeDateTime: true,
+                    nameValue: slip.ReturnedByName,
+                    idCardValue: slip.ReturnedByNationalId,
+                    phoneValue: slip.ReturnedByPhone));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
-                ComposeStaffBlock(c, common, L(labels, "SignatureStaff")));
+                ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), slip.ReceivedByName, slip.ReceivedByDesignation));
         });
     }
 
-    private static void ComposeTeacherIssueSignatures(IContainer container, Dictionary<string, string> common, Dictionary<string, string> labels)
+    private static void ComposeTeacherIssueSignatures(
+        IContainer container,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels,
+        TeacherIssueResponse issue)
     {
         container.Row(row =>
         {
             row.RelativeItem().Element(c =>
-                ComposeReceiverBlock(c, common, L(labels, "SignatureTeacher"), includeDateTime: false));
+                ComposeReceiverBlock(
+                    c,
+                    common,
+                    L(labels, "SignatureTeacher"),
+                    includeDateTime: false,
+                    nameValue: issue.TeacherName));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
-                ComposeStaffBlock(c, common, L(labels, "SignatureStaff")));
+                ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), issue.IssuedByName, issue.IssuedByDesignation));
         });
     }
 
-    private static void ComposeTeacherReturnSignatures(IContainer container, Dictionary<string, string> common, Dictionary<string, string> labels)
+    private static void ComposeTeacherReturnSignatures(
+        IContainer container,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels,
+        TeacherReturnSlipResponse slip)
     {
         container.Row(row =>
         {
             row.RelativeItem().Element(c =>
-                ComposeReceiverBlock(c, common, L(labels, "SignatureTeacher"), includeDateTime: true));
+                ComposeReceiverBlock(c, common, L(labels, "SignatureTeacher"), includeDateTime: true, nameValue: slip.TeacherName));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
-                ComposeStaffBlock(c, common, L(labels, "SignatureStaff")));
+                ComposeStaffBlock(c, common, L(labels, "SignatureStaff"), slip.ReceivedByName, slip.ReceivedByDesignation));
         });
     }
 
@@ -527,13 +551,18 @@ public class PdfService : IPdfService
         });
     }
 
-    private static void ComposeStaffBlock(IContainer container, Dictionary<string, string> common, string title)
+    private static void ComposeStaffBlock(
+        IContainer container,
+        Dictionary<string, string> common,
+        string title,
+        string? nameValue = null,
+        string? positionValue = null)
     {
         container.ContentFromRightToLeft().Column(col =>
         {
             col.Item().AlignRight().Text(title).FontFamily(ThaanaFont).FontSize(10).Bold();
-            col.Item().PaddingTop(6).Element(c => SignatureField(c, L(common, "LabelName")));
-            col.Item().Element(c => SignatureField(c, L(common, "LabelPosition")));
+            col.Item().PaddingTop(6).Element(c => SignatureField(c, L(common, "LabelName"), nameValue));
+            col.Item().Element(c => SignatureField(c, L(common, "LabelPosition"), positionValue));
             col.Item().Element(c => SignatureField(c, L(common, "LabelSignature")));
         });
     }

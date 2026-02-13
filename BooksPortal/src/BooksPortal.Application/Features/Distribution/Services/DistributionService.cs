@@ -17,6 +17,7 @@ public class DistributionService : IDistributionService
     private readonly IReferenceNumberService _refService;
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
+    private readonly IStaffDirectoryService _staffDirectoryService;
 
     public DistributionService(
         IRepository<DistributionSlip> slipRepo,
@@ -24,7 +25,8 @@ public class DistributionService : IDistributionService
         IUnitOfWork unitOfWork,
         IReferenceNumberService refService,
         IPdfService pdfService,
-        ISlipStorageService storageService)
+        ISlipStorageService storageService,
+        IStaffDirectoryService staffDirectoryService)
     {
         _slipRepo = slipRepo;
         _bookRepo = bookRepo;
@@ -32,6 +34,7 @@ public class DistributionService : IDistributionService
         _refService = refService;
         _pdfService = pdfService;
         _storageService = storageService;
+        _staffDirectoryService = staffDirectoryService;
     }
 
     public async Task<PaginatedList<DistributionSlipResponse>> GetPagedAsync(
@@ -93,7 +96,9 @@ public class DistributionService : IDistributionService
             }).ToList()
         });
 
-        return await PaginatedList<DistributionSlipResponse>.CreateAsync(projected, pageNumber, pageSize);
+        var page = await PaginatedList<DistributionSlipResponse>.CreateAsync(projected, pageNumber, pageSize);
+        await EnrichWithStaffAsync(page.Items);
+        return page;
     }
 
     public async Task<DistributionSlipResponse> GetByIdAsync(int id)
@@ -106,7 +111,9 @@ public class DistributionService : IDistributionService
             .FirstOrDefaultAsync(d => d.Id == id)
             ?? throw new NotFoundException(nameof(DistributionSlip), id);
 
-        return MapToResponse(slip);
+        var response = MapToResponse(slip);
+        await EnrichWithStaffAsync([response]);
+        return response;
     }
 
     public async Task<DistributionSlipResponse> GetByReferenceAsync(string referenceNo)
@@ -119,7 +126,9 @@ public class DistributionService : IDistributionService
             .FirstOrDefaultAsync(d => d.ReferenceNo == referenceNo)
             ?? throw new NotFoundException(nameof(DistributionSlip), referenceNo);
 
-        return MapToResponse(slip);
+        var response = MapToResponse(slip);
+        await EnrichWithStaffAsync([response]);
+        return response;
     }
 
     public async Task<DistributionSlipResponse> CreateAsync(CreateDistributionSlipRequest request, int userId)
@@ -276,6 +285,7 @@ public class DistributionService : IDistributionService
             ParentPhone = slip.Parent.Phone,
             ParentRelationship = slip.Parent.Relationship,
             IssuedById = slip.IssuedById,
+            IssuedByName = string.Empty,
             IssuedAt = slip.IssuedAt,
             LifecycleStatus = slip.LifecycleStatus,
             FinalizedById = slip.FinalizedById,
@@ -293,6 +303,23 @@ public class DistributionService : IDistributionService
                 Quantity = i.Quantity
             }).ToList()
         };
+    }
+
+    private async Task EnrichWithStaffAsync(ICollection<DistributionSlipResponse> slips)
+    {
+        if (slips.Count == 0)
+            return;
+
+        var staffMap = await _staffDirectoryService.GetByIdsAsync(slips.Select(s => s.IssuedById));
+
+        foreach (var slip in slips)
+        {
+            if (staffMap.TryGetValue(slip.IssuedById, out var staff))
+            {
+                slip.IssuedByName = staff.DisplayName;
+                slip.IssuedByDesignation = staff.Designation;
+            }
+        }
     }
 
     private async Task SaveSlipPdfAsync(DistributionSlip slip, DistributionSlipResponse response)
