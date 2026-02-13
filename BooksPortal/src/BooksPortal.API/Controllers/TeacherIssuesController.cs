@@ -21,8 +21,13 @@ public class TeacherIssuesController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPaged(int pageNumber = 1, int pageSize = 20, int? academicYearId = null, int? teacherId = null)
-        => OkResponse(await _service.GetPagedAsync(pageNumber, pageSize, academicYearId, teacherId));
+    public async Task<IActionResult> GetPaged(
+        int pageNumber = 1,
+        int pageSize = 20,
+        int? academicYearId = null,
+        int? teacherId = null,
+        bool includeCancelled = false)
+        => OkResponse(await _service.GetPagedAsync(pageNumber, pageSize, academicYearId, teacherId, includeCancelled));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -39,8 +44,15 @@ public class TeacherIssuesController : ApiControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Cancel(int id)
     {
-        await _service.CancelAsync(id);
+        await _service.CancelAsync(id, CurrentUserId);
         return OkResponse("Teacher issue cancelled.");
+    }
+
+    [HttpPost("{id}/finalize")]
+    public async Task<IActionResult> FinalizeIssue(int id)
+    {
+        await _service.FinalizeAsync(id, CurrentUserId);
+        return OkResponse("Teacher issue finalized.");
     }
 
     [HttpGet("{id}/print")]
@@ -50,9 +62,9 @@ public class TeacherIssuesController : ApiControllerBase
 
         var stored = await _storageService.LoadAsync(issue.PdfFilePath);
         if (stored != null)
-            return File(stored, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}.pdf");
+            return File(stored, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}-{issue.LifecycleStatus}.pdf");
 
         var pdf = await _pdfService.GenerateTeacherIssueSlipAsync(issue);
-        return File(pdf, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}.pdf");
+        return File(pdf, "application/pdf", $"TeacherIssue-{issue.ReferenceNo}-{issue.LifecycleStatus}.pdf");
     }
 }

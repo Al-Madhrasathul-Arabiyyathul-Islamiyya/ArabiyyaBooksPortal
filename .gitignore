@@ -7,6 +7,8 @@
 
 **/.ignore/
 
+**/TestArtifacts/
+
 # Dev server logs
 backend.log
 frontend.log

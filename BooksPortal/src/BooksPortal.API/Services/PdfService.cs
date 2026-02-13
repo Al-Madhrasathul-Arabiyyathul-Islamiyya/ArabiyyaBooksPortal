@@ -36,15 +36,46 @@ public class PdfService : IPdfService
         var logo = _logoPng;
         return GenerateDocument(page =>
         {
-            page.Content().Row(mainRow =>
+            page.Content().Layers(layers =>
             {
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeDistributionCopy(col, slip, common, labels, logo));
+                layers.PrimaryLayer().Row(mainRow =>
+                {
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeDistributionCopy(col, slip, common, labels, logo));
 
-                mainRow.ConstantItem(1).Element(ComposeCenterDivider);
+                    mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeDistributionCopy(col, slip, common, labels, logo));
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeDistributionCopy(col, slip, common, labels, logo));
+                });
+
+                if (slip.LifecycleStatus == BooksPortal.Domain.Enums.SlipLifecycleStatus.Cancelled)
+                {
+                    layers.Layer().Row(row =>
+                    {
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .TranslateX(-100)
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+
+                        row.ConstantItem(1);
+
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .TranslateX(-100)
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+                    });
+                }
             });
         });
     }
@@ -78,15 +109,46 @@ public class PdfService : IPdfService
         var logo = _logoPng;
         return GenerateDocument(page =>
         {
-            page.Content().Row(mainRow =>
+            page.Content().Layers(layers =>
             {
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeTeacherIssueCopy(col, issue, common, labels, logo));
+                layers.PrimaryLayer().Row(mainRow =>
+                {
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeTeacherIssueCopy(col, issue, common, labels, logo));
 
-                mainRow.ConstantItem(1).Element(ComposeCenterDivider);
+                    mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeTeacherIssueCopy(col, issue, common, labels, logo));
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeTeacherIssueCopy(col, issue, common, labels, logo));
+                });
+
+                if (issue.LifecycleStatus == BooksPortal.Domain.Enums.SlipLifecycleStatus.Cancelled)
+                {
+                    layers.Layer().Row(row =>
+                    {
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .PaddingRight(150)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+
+                        row.ConstantItem(1);
+
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .PaddingRight(150)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+                    });
+                }
             });
         });
     }
@@ -151,7 +213,7 @@ public class PdfService : IPdfService
             slip.Items.Select(i => new TableRow(i.BookTitle, i.BookCode, slip.AcademicYearName, "-", slip.Term.ToString())).ToList()));
 
         col.Item().ExtendVertical().AlignBottom()
-            .PaddingTop(8).Element(c => ComposeDistributionSignatures(c, common, labels));
+            .PaddingTop(8).Element(c => ComposeDistributionSignatures(c, common, labels, slip));
     }
 
     private static void ComposeReturnCopy(
@@ -377,12 +439,23 @@ public class PdfService : IPdfService
 
     // ── Signature Blocks (per-slip-type) ────────────────────────────
 
-    private static void ComposeDistributionSignatures(IContainer container, Dictionary<string, string> common, Dictionary<string, string> labels)
+    private static void ComposeDistributionSignatures(
+        IContainer container,
+        Dictionary<string, string> common,
+        Dictionary<string, string> labels,
+        DistributionSlipResponse slip)
     {
         container.Row(row =>
         {
             row.RelativeItem().Element(c =>
-                ComposeReceiverBlock(c, common, L(labels, "SignatureReceiver"), includeDateTime: true));
+                ComposeReceiverBlock(
+                    c,
+                    common,
+                    L(labels, "SignatureReceiver"),
+                    includeDateTime: true,
+                    nameValue: slip.ParentName,
+                    idCardValue: slip.ParentNationalId,
+                    phoneValue: slip.ParentPhone));
             row.ConstantItem(15);
             row.RelativeItem().Element(c =>
                 ComposeStaffBlock(c, common, L(labels, "SignatureStaff")));
@@ -425,14 +498,21 @@ public class PdfService : IPdfService
         });
     }
 
-    private static void ComposeReceiverBlock(IContainer container, Dictionary<string, string> common, string title, bool includeDateTime)
+    private static void ComposeReceiverBlock(
+        IContainer container,
+        Dictionary<string, string> common,
+        string title,
+        bool includeDateTime,
+        string? nameValue = null,
+        string? idCardValue = null,
+        string? phoneValue = null)
     {
         container.ContentFromRightToLeft().Column(col =>
         {
             col.Item().AlignRight().Text(title).FontFamily(ThaanaFont).FontSize(10).Bold();
-            col.Item().PaddingTop(6).Element(c => SignatureField(c, L(common, "LabelName")));
-            col.Item().Element(c => SignatureField(c, L(common, "LabelIdCard")));
-            col.Item().Element(c => SignatureField(c, L(common, "LabelPhone")));
+            col.Item().PaddingTop(6).Element(c => SignatureField(c, L(common, "LabelName"), nameValue));
+            col.Item().Element(c => SignatureField(c, L(common, "LabelIdCard"), idCardValue));
+            col.Item().Element(c => SignatureField(c, L(common, "LabelPhone"), phoneValue));
             col.Item().Element(c => SignatureField(c, L(common, "LabelSignature")));
 
             if (includeDateTime)
@@ -458,13 +538,16 @@ public class PdfService : IPdfService
         });
     }
 
-    private static void SignatureField(IContainer container, string label)
+    private static void SignatureField(IContainer container, string label, string? value = null)
     {
         container.PaddingTop(6).Row(row =>
         {
             row.AutoItem().Text(label).FontFamily(ThaanaFont).FontSize(9);
-            row.RelativeItem().PaddingRight(4).PaddingBottom(1).AlignBottom()
-                .LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
+            row.RelativeItem().PaddingRight(4).Column(col =>
+            {
+                col.Item().AlignLeft().Text(value ?? string.Empty).FontSize(8.5f);
+                col.Item().PaddingBottom(1).LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
+            });
         });
     }
 

@@ -12,6 +12,11 @@ public class DistributionSlip : BaseEntity
     public int ParentId { get; set; }
     public int IssuedById { get; set; }
     public DateTime IssuedAt { get; set; }
+    public SlipLifecycleStatus LifecycleStatus { get; set; } = SlipLifecycleStatus.Processing;
+    public int? FinalizedById { get; set; }
+    public DateTime? FinalizedAt { get; set; }
+    public int? CancelledById { get; set; }
+    public DateTime? CancelledAt { get; set; }
     public string? Notes { get; set; }
     public string? PdfFilePath { get; set; }
 

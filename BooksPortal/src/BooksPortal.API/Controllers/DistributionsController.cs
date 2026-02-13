@@ -21,8 +21,13 @@ public class DistributionsController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPaged(int pageNumber = 1, int pageSize = 20, int? academicYearId = null, int? studentId = null)
-        => OkResponse(await _service.GetPagedAsync(pageNumber, pageSize, academicYearId, studentId));
+    public async Task<IActionResult> GetPaged(
+        int pageNumber = 1,
+        int pageSize = 20,
+        int? academicYearId = null,
+        int? studentId = null,
+        bool includeCancelled = false)
+        => OkResponse(await _service.GetPagedAsync(pageNumber, pageSize, academicYearId, studentId, includeCancelled));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -39,8 +44,15 @@ public class DistributionsController : ApiControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Cancel(int id)
     {
-        await _service.CancelAsync(id);
+        await _service.CancelAsync(id, CurrentUserId);
         return OkResponse("Distribution slip cancelled.");
+    }
+
+    [HttpPost("{id}/finalize")]
+    public async Task<IActionResult> FinalizeSlip(int id)
+    {
+        await _service.FinalizeAsync(id, CurrentUserId);
+        return OkResponse("Distribution slip finalized.");
     }
 
     [HttpGet("{id}/print")]
@@ -50,9 +62,9 @@ public class DistributionsController : ApiControllerBase
 
         var stored = await _storageService.LoadAsync(slip.PdfFilePath);
         if (stored != null)
-            return File(stored, "application/pdf", $"Distribution-{slip.ReferenceNo}.pdf");
+            return File(stored, "application/pdf", $"Distribution-{slip.ReferenceNo}-{slip.LifecycleStatus}.pdf");
 
         var pdf = await _pdfService.GenerateDistributionSlipAsync(slip);
-        return File(pdf, "application/pdf", $"Distribution-{slip.ReferenceNo}.pdf");
+        return File(pdf, "application/pdf", $"Distribution-{slip.ReferenceNo}-{slip.LifecycleStatus}.pdf");
     }
 }

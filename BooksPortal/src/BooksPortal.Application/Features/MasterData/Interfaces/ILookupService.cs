@@ -12,4 +12,9 @@ public interface ILookupService
     Task<List<LookupResponse>> GetTermsAsync();
     Task<List<LookupResponse>> GetBookConditionsAsync();
     Task<List<LookupResponse>> GetMovementTypesAsync();
+    Task<List<StudentOperationsLookupResponse>> GetStudentsForOperationsAsync(int academicYearId, string? search = null, int take = 20);
+    Task<List<ParentLookupSummaryResponse>> GetParentsForOperationsAsync(int studentId, string? search = null, int take = 20);
+    Task<List<BookOperationsLookupResponse>> GetBooksForOperationsAsync(int academicYearId, string? search = null, int take = 20);
+    Task<List<TeacherOperationsLookupResponse>> GetTeachersForOperationsAsync(int? academicYearId = null, string? search = null, int take = 20);
+    Task<List<TeacherIssueOutstandingLookupResponse>> GetTeacherIssueOutstandingForOperationsAsync(int? academicYearId = null, int? teacherId = null, string? search = null, int take = 20);
 }

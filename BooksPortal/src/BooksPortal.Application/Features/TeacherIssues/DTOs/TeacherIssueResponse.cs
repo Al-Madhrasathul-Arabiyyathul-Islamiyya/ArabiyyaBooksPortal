@@ -12,6 +12,11 @@ public class TeacherIssueResponse
     public string TeacherName { get; set; } = string.Empty;
     public int IssuedById { get; set; }
     public DateTime IssuedAt { get; set; }
+    public SlipLifecycleStatus LifecycleStatus { get; set; }
+    public int? FinalizedById { get; set; }
+    public DateTime? FinalizedAt { get; set; }
+    public int? CancelledById { get; set; }
+    public DateTime? CancelledAt { get; set; }
     public DateTime? ExpectedReturnDate { get; set; }
     public TeacherIssueStatus Status { get; set; }
     public string? Notes { get; set; }

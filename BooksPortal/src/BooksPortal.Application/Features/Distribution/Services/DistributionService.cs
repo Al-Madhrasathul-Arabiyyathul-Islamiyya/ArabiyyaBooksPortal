@@ -34,7 +34,12 @@ public class DistributionService : IDistributionService
         _storageService = storageService;
     }
 
-    public async Task<PaginatedList<DistributionSlipResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? studentId = null)
+    public async Task<PaginatedList<DistributionSlipResponse>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        int? academicYearId = null,
+        int? studentId = null,
+        bool includeCancelled = false)
     {
         var query = _slipRepo.Query()
             .Include(d => d.AcademicYear)
@@ -48,6 +53,9 @@ public class DistributionService : IDistributionService
 
         if (studentId.HasValue)
             query = query.Where(d => d.StudentId == studentId.Value);
+
+        if (!includeCancelled)
+            query = query.Where(d => d.LifecycleStatus != SlipLifecycleStatus.Cancelled);
 
         var projected = query.OrderByDescending(d => d.IssuedAt).Select(d => new DistributionSlipResponse
         {
@@ -63,8 +71,16 @@ public class DistributionService : IDistributionService
             StudentNationalId = d.Student.NationalId,
             ParentId = d.ParentId,
             ParentName = d.Parent.FullName,
+            ParentNationalId = d.Parent.NationalId,
+            ParentPhone = d.Parent.Phone,
+            ParentRelationship = d.Parent.Relationship,
             IssuedById = d.IssuedById,
             IssuedAt = d.IssuedAt,
+            LifecycleStatus = d.LifecycleStatus,
+            FinalizedById = d.FinalizedById,
+            FinalizedAt = d.FinalizedAt,
+            CancelledById = d.CancelledById,
+            CancelledAt = d.CancelledAt,
             Notes = d.Notes,
             PdfFilePath = d.PdfFilePath,
             Items = d.Items.Select(i => new DistributionSlipItemResponse
@@ -133,6 +149,7 @@ public class DistributionService : IDistributionService
                 ParentId = request.ParentId,
                 IssuedById = userId,
                 IssuedAt = DateTime.UtcNow,
+                LifecycleStatus = SlipLifecycleStatus.Processing,
                 Notes = request.Notes
             };
 
@@ -154,8 +171,7 @@ public class DistributionService : IDistributionService
             await _unitOfWork.SaveChangesAsync();
 
             var response = await GetByIdAsync(slip.Id);
-            var pdfBytes = await _pdfService.GenerateDistributionSlipAsync(response);
-            slip.PdfFilePath = await _storageService.SaveAsync("Distribution", response.AcademicYearName, slip.ReferenceNo, pdfBytes);
+            await SaveSlipPdfAsync(slip, response);
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
@@ -169,12 +185,46 @@ public class DistributionService : IDistributionService
         }
     }
 
-    public async Task CancelAsync(int id)
+    public async Task FinalizeAsync(int id, int userId)
     {
         var slip = await _slipRepo.Query()
-            .Include(d => d.Items)
+            .Include(d => d.AcademicYear)
+            .Include(d => d.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
+            .Include(d => d.Parent)
+            .Include(d => d.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(d => d.Id == id)
             ?? throw new NotFoundException(nameof(DistributionSlip), id);
+
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            throw new BusinessRuleException("Cancelled distribution slips cannot be finalized.");
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            return;
+
+        slip.LifecycleStatus = SlipLifecycleStatus.Finalized;
+        slip.FinalizedById = userId;
+        slip.FinalizedAt = DateTime.UtcNow;
+        _slipRepo.Update(slip);
+
+        var response = MapToResponse(slip);
+        await SaveSlipPdfAsync(slip, response);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CancelAsync(int id, int userId)
+    {
+        var slip = await _slipRepo.Query()
+            .Include(d => d.AcademicYear)
+            .Include(d => d.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
+            .Include(d => d.Parent)
+            .Include(d => d.Items)
+            .ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(d => d.Id == id)
+            ?? throw new NotFoundException(nameof(DistributionSlip), id);
+
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            throw new BusinessRuleException("Finalized distribution slips cannot be cancelled.");
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            return;
 
         await _unitOfWork.BeginTransactionAsync();
         try
@@ -189,7 +239,13 @@ public class DistributionService : IDistributionService
                 _bookRepo.Update(book);
             }
 
-            _slipRepo.SoftDelete(slip);
+            slip.LifecycleStatus = SlipLifecycleStatus.Cancelled;
+            slip.CancelledAt = DateTime.UtcNow;
+            slip.CancelledById = userId;
+            _slipRepo.Update(slip);
+
+            var response = MapToResponse(slip);
+            await SaveSlipPdfAsync(slip, response);
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
         }
@@ -216,8 +272,16 @@ public class DistributionService : IDistributionService
             StudentNationalId = slip.Student.NationalId,
             ParentId = slip.ParentId,
             ParentName = slip.Parent.FullName,
+            ParentNationalId = slip.Parent.NationalId,
+            ParentPhone = slip.Parent.Phone,
+            ParentRelationship = slip.Parent.Relationship,
             IssuedById = slip.IssuedById,
             IssuedAt = slip.IssuedAt,
+            LifecycleStatus = slip.LifecycleStatus,
+            FinalizedById = slip.FinalizedById,
+            FinalizedAt = slip.FinalizedAt,
+            CancelledById = slip.CancelledById,
+            CancelledAt = slip.CancelledAt,
             Notes = slip.Notes,
             PdfFilePath = slip.PdfFilePath,
             Items = slip.Items.Select(i => new DistributionSlipItemResponse
@@ -229,5 +293,15 @@ public class DistributionService : IDistributionService
                 Quantity = i.Quantity
             }).ToList()
         };
+    }
+
+    private async Task SaveSlipPdfAsync(DistributionSlip slip, DistributionSlipResponse response)
+    {
+        var pdfBytes = await _pdfService.GenerateDistributionSlipAsync(response);
+        slip.PdfFilePath = await _storageService.SaveAsync(
+            "Distribution",
+            response.AcademicYearName,
+            $"{slip.ReferenceNo}-{slip.LifecycleStatus}",
+            pdfBytes);
     }
 }

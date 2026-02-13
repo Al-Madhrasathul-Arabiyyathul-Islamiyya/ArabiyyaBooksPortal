@@ -42,4 +42,28 @@ public class LookupsController : ApiControllerBase
     [HttpGet("movement-types")]
     public async Task<IActionResult> GetMovementTypes()
         => OkResponse(await _service.GetMovementTypesAsync());
+
+    [HttpGet("operations/students")]
+    public async Task<IActionResult> GetStudentsForOperations([FromQuery] int academicYearId, [FromQuery] string? search = null, [FromQuery] int take = 20)
+        => OkResponse(await _service.GetStudentsForOperationsAsync(academicYearId, search, take));
+
+    [HttpGet("operations/parents")]
+    public async Task<IActionResult> GetParentsForOperations([FromQuery] int studentId, [FromQuery] string? search = null, [FromQuery] int take = 20)
+        => OkResponse(await _service.GetParentsForOperationsAsync(studentId, search, take));
+
+    [HttpGet("operations/books")]
+    public async Task<IActionResult> GetBooksForOperations([FromQuery] int academicYearId, [FromQuery] string? search = null, [FromQuery] int take = 20)
+        => OkResponse(await _service.GetBooksForOperationsAsync(academicYearId, search, take));
+
+    [HttpGet("operations/teachers")]
+    public async Task<IActionResult> GetTeachersForOperations([FromQuery] int? academicYearId = null, [FromQuery] string? search = null, [FromQuery] int take = 20)
+        => OkResponse(await _service.GetTeachersForOperationsAsync(academicYearId, search, take));
+
+    [HttpGet("operations/teacher-issues/outstanding")]
+    public async Task<IActionResult> GetTeacherIssueOutstandingForOperations(
+        [FromQuery] int? academicYearId = null,
+        [FromQuery] int? teacherId = null,
+        [FromQuery] string? search = null,
+        [FromQuery] int take = 20)
+        => OkResponse(await _service.GetTeacherIssueOutstandingForOperationsAsync(academicYearId, teacherId, search, take));
 }

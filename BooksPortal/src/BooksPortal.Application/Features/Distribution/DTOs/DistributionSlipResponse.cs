@@ -16,8 +16,16 @@ public class DistributionSlipResponse
     public string? StudentNationalId { get; set; }
     public int ParentId { get; set; }
     public string ParentName { get; set; } = string.Empty;
+    public string? ParentNationalId { get; set; }
+    public string? ParentPhone { get; set; }
+    public string? ParentRelationship { get; set; }
     public int IssuedById { get; set; }
     public DateTime IssuedAt { get; set; }
+    public SlipLifecycleStatus LifecycleStatus { get; set; }
+    public int? FinalizedById { get; set; }
+    public DateTime? FinalizedAt { get; set; }
+    public int? CancelledById { get; set; }
+    public DateTime? CancelledAt { get; set; }
     public string? Notes { get; set; }
     public string? PdfFilePath { get; set; }
     public List<DistributionSlipItemResponse> Items { get; set; } = new();

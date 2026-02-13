@@ -37,7 +37,12 @@ public class TeacherIssueService : ITeacherIssueService
         _storageService = storageService;
     }
 
-    public async Task<PaginatedList<TeacherIssueResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? teacherId = null)
+    public async Task<PaginatedList<TeacherIssueResponse>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        int? academicYearId = null,
+        int? teacherId = null,
+        bool includeCancelled = false)
     {
         var query = _issueRepo.Query()
             .Include(t => t.AcademicYear)
@@ -51,6 +56,9 @@ public class TeacherIssueService : ITeacherIssueService
         if (teacherId.HasValue)
             query = query.Where(t => t.TeacherId == teacherId.Value);
 
+        if (!includeCancelled)
+            query = query.Where(t => t.LifecycleStatus != SlipLifecycleStatus.Cancelled);
+
         var projected = query.OrderByDescending(t => t.IssuedAt).Select(t => new TeacherIssueResponse
         {
             Id = t.Id,
@@ -61,6 +69,11 @@ public class TeacherIssueService : ITeacherIssueService
             TeacherName = t.Teacher.FullName,
             IssuedById = t.IssuedById,
             IssuedAt = t.IssuedAt,
+            LifecycleStatus = t.LifecycleStatus,
+            FinalizedById = t.FinalizedById,
+            FinalizedAt = t.FinalizedAt,
+            CancelledById = t.CancelledById,
+            CancelledAt = t.CancelledAt,
             ExpectedReturnDate = t.ExpectedReturnDate,
             Status = t.Status,
             Notes = t.Notes,
@@ -118,6 +131,7 @@ public class TeacherIssueService : ITeacherIssueService
                 TeacherId = request.TeacherId,
                 IssuedById = userId,
                 IssuedAt = DateTime.UtcNow,
+                LifecycleStatus = SlipLifecycleStatus.Processing,
                 ExpectedReturnDate = request.ExpectedReturnDate,
                 Status = TeacherIssueStatus.Active,
                 Notes = request.Notes
@@ -141,8 +155,7 @@ public class TeacherIssueService : ITeacherIssueService
             await _unitOfWork.SaveChangesAsync();
 
             var response = await GetByIdAsync(issue.Id);
-            var pdfBytes = await _pdfService.GenerateTeacherIssueSlipAsync(response);
-            issue.PdfFilePath = await _storageService.SaveAsync("TeacherIssue", response.AcademicYearName, issue.ReferenceNo, pdfBytes);
+            await SaveIssuePdfAsync(issue, response);
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
@@ -253,12 +266,41 @@ public class TeacherIssueService : ITeacherIssueService
         }
     }
 
-    public async Task CancelAsync(int id)
+    public async Task FinalizeAsync(int id, int userId)
+    {
+        var issue = await _issueRepo.Query()
+            .Include(t => t.AcademicYear)
+            .Include(t => t.Teacher)
+            .Include(t => t.Items).ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(t => t.Id == id)
+            ?? throw new NotFoundException(nameof(TeacherIssue), id);
+
+        if (issue.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            throw new BusinessRuleException("Cancelled teacher issues cannot be finalized.");
+        if (issue.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            return;
+
+        issue.LifecycleStatus = SlipLifecycleStatus.Finalized;
+        issue.FinalizedById = userId;
+        issue.FinalizedAt = DateTime.UtcNow;
+        _issueRepo.Update(issue);
+
+        var response = MapToResponse(issue);
+        await SaveIssuePdfAsync(issue, response);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CancelAsync(int id, int userId)
     {
         var issue = await _issueRepo.Query()
             .Include(t => t.Items)
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException(nameof(TeacherIssue), id);
+
+        if (issue.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            throw new BusinessRuleException("Finalized teacher issues cannot be cancelled.");
+        if (issue.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            return;
 
         await _unitOfWork.BeginTransactionAsync();
         try
@@ -275,7 +317,19 @@ public class TeacherIssueService : ITeacherIssueService
                 _bookRepo.Update(book);
             }
 
-            _issueRepo.SoftDelete(issue);
+            issue.LifecycleStatus = SlipLifecycleStatus.Cancelled;
+            issue.CancelledAt = DateTime.UtcNow;
+            issue.CancelledById = userId;
+            _issueRepo.Update(issue);
+
+            var hydratedIssue = await _issueRepo.Query()
+                .Include(t => t.AcademicYear)
+                .Include(t => t.Teacher)
+                .Include(t => t.Items).ThenInclude(i => i.Book)
+                .FirstAsync(t => t.Id == id);
+            var response = MapToResponse(hydratedIssue);
+            await SaveIssuePdfAsync(hydratedIssue, response);
+
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
         }
@@ -313,6 +367,11 @@ public class TeacherIssueService : ITeacherIssueService
             TeacherName = issue.Teacher.FullName,
             IssuedById = issue.IssuedById,
             IssuedAt = issue.IssuedAt,
+            LifecycleStatus = issue.LifecycleStatus,
+            FinalizedById = issue.FinalizedById,
+            FinalizedAt = issue.FinalizedAt,
+            CancelledById = issue.CancelledById,
+            CancelledAt = issue.CancelledAt,
             ExpectedReturnDate = issue.ExpectedReturnDate,
             Status = issue.Status,
             Notes = issue.Notes,
@@ -330,5 +389,15 @@ public class TeacherIssueService : ITeacherIssueService
                 ReceivedById = i.ReceivedById
             }).ToList()
         };
+    }
+
+    private async Task SaveIssuePdfAsync(TeacherIssue issue, TeacherIssueResponse response)
+    {
+        var pdfBytes = await _pdfService.GenerateTeacherIssueSlipAsync(response);
+        issue.PdfFilePath = await _storageService.SaveAsync(
+            "TeacherIssue",
+            response.AcademicYearName,
+            $"{issue.ReferenceNo}-{issue.LifecycleStatus}",
+            pdfBytes);
     }
 }
