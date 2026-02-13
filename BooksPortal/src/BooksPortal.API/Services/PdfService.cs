@@ -128,9 +128,9 @@ public class PdfService : IPdfService
                     {
                         row.RelativeItem()
                             .Rotate(-20)
-                            .PaddingRight(150)
                             .AlignCenter()
                             .AlignMiddle()
+                            .TranslateX(-100)
                             .Text("CANCELLED")
                             .Bold()
                             .FontSize(46)
@@ -140,9 +140,9 @@ public class PdfService : IPdfService
 
                         row.RelativeItem()
                             .Rotate(-20)
-                            .PaddingRight(150)
                             .AlignCenter()
                             .AlignMiddle()
+                            .TranslateX(-100)
                             .Text("CANCELLED")
                             .Bold()
                             .FontSize(46)
@@ -350,7 +350,7 @@ public class PdfService : IPdfService
             row.AutoItem().Text(label).FontFamily(ThaanaFont).FontSize(9);
             row.RelativeItem().PaddingRight(4).Column(col =>
             {
-                col.Item().Text(value).FontSize(9);
+                col.Item().AlignRight().Text(value).FontSize(9);
                 col.Item().LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
             });
         });
@@ -589,7 +589,7 @@ public class PdfService : IPdfService
             row.AutoItem().Text(label).FontFamily(ThaanaFont).FontSize(9);
             row.RelativeItem().PaddingRight(4).Column(col =>
             {
-                col.Item().AlignLeft().Text(value ?? string.Empty).FontSize(8.5f);
+                col.Item().AlignRight().Text(value ?? string.Empty).FontSize(8.5f);
                 col.Item().PaddingBottom(1).LineHorizontal(0.5f).LineColor(Colors.Grey.Medium);
             });
         });
