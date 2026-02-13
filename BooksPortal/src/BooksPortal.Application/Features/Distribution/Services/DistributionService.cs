@@ -219,6 +219,86 @@ public class DistributionService : IDistributionService
         await _unitOfWork.SaveChangesAsync();
     }
 
+    public async Task<DistributionSlipResponse> UpdateAsync(int id, UpdateDistributionSlipRequest request, int userId)
+    {
+        var slip = await _slipRepo.Query()
+            .Include(d => d.AcademicYear)
+            .Include(d => d.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
+            .Include(d => d.Parent)
+            .Include(d => d.Items).ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(d => d.Id == id)
+            ?? throw new NotFoundException(nameof(DistributionSlip), id);
+
+        if (slip.LifecycleStatus != SlipLifecycleStatus.Processing)
+            throw new BusinessRuleException("Only processing distribution slips can be revised.");
+
+        var normalizedItems = NormalizeItems(request.Items);
+
+        var existingByBook = slip.Items
+            .GroupBy(i => i.BookId)
+            .ToDictionary(g => g.Key, g => g.Sum(i => i.Quantity));
+
+        var allBookIds = existingByBook.Keys.Union(normalizedItems.Keys).Distinct().ToList();
+        var deltaByBook = allBookIds.ToDictionary(
+            id => id,
+            id => normalizedItems.GetValueOrDefault(id, 0) - existingByBook.GetValueOrDefault(id, 0));
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            foreach (var (bookId, delta) in deltaByBook.Where(x => x.Value > 0))
+            {
+                var book = await _bookRepo.GetByIdAsync(bookId)
+                    ?? throw new NotFoundException(nameof(Book), bookId);
+
+                var available = book.TotalStock - book.Distributed - book.WithTeachers - book.Damaged - book.Lost;
+                if (available < delta)
+                    throw new BusinessRuleException($"Insufficient stock for book '{book.Title}'. Available: {available}, Requested additional: {delta}.");
+            }
+
+            foreach (var (bookId, delta) in deltaByBook.Where(x => x.Value != 0))
+            {
+                var book = await _bookRepo.GetByIdAsync(bookId)
+                    ?? throw new NotFoundException(nameof(Book), bookId);
+
+                book.Distributed += delta;
+                _bookRepo.Update(book);
+            }
+
+            slip.Term = request.Term;
+            slip.StudentId = request.StudentId;
+            slip.ParentId = request.ParentId;
+            slip.IssuedAt = ResolveTimestamp(request.IssuedDate, request.IssuedTime);
+            slip.Notes = request.Notes;
+
+            slip.Items.Clear();
+            foreach (var (bookId, quantity) in normalizedItems)
+            {
+                slip.Items.Add(new DistributionSlipItem
+                {
+                    BookId = bookId,
+                    Quantity = quantity
+                });
+            }
+
+            _slipRepo.Update(slip);
+            await _unitOfWork.SaveChangesAsync();
+
+            var response = await GetByIdAsync(slip.Id);
+            await SaveSlipPdfAsync(slip, response);
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            response.PdfFilePath = slip.PdfFilePath;
+            return response;
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     public async Task CancelAsync(int id, int userId)
     {
         var slip = await _slipRepo.Query()
@@ -338,5 +418,12 @@ public class DistributionService : IDistributionService
         var resolvedDate = date ?? DateOnly.FromDateTime(now);
         var resolvedTime = time ?? TimeOnly.FromDateTime(now);
         return DateTime.SpecifyKind(resolvedDate.ToDateTime(resolvedTime), DateTimeKind.Utc);
+    }
+
+    internal static Dictionary<int, int> NormalizeItems(IEnumerable<UpdateDistributionSlipItemRequest> items)
+    {
+        return items
+            .GroupBy(i => i.BookId)
+            .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
     }
 }

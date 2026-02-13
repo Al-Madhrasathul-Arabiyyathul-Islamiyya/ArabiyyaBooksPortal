@@ -282,6 +282,117 @@ public class TeacherIssueService : ITeacherIssueService
         }
     }
 
+    public async Task<TeacherIssueResponse> UpdateAsync(int id, UpdateTeacherIssueRequest request, int userId)
+    {
+        var issue = await _issueRepo.Query()
+            .Include(t => t.AcademicYear)
+            .Include(t => t.Teacher)
+            .Include(t => t.Items).ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(t => t.Id == id)
+            ?? throw new NotFoundException(nameof(TeacherIssue), id);
+
+        if (issue.LifecycleStatus != SlipLifecycleStatus.Processing)
+            throw new BusinessRuleException("Only processing teacher issues can be revised.");
+
+        var normalizedItems = NormalizeItems(request.Items);
+        var existingByBook = issue.Items
+            .GroupBy(i => i.BookId)
+            .ToDictionary(g => g.Key, g => g.Sum(i => i.Quantity));
+
+        var returnedByBook = issue.Items
+            .GroupBy(i => i.BookId)
+            .ToDictionary(g => g.Key, g => g.Sum(i => i.ReturnedQuantity));
+
+        foreach (var (bookId, returnedQuantity) in returnedByBook)
+        {
+            if (normalizedItems.TryGetValue(bookId, out var requestedQuantity))
+            {
+                if (requestedQuantity < returnedQuantity)
+                    throw new BusinessRuleException($"Cannot set quantity below returned quantity for book ID {bookId}.");
+            }
+            else if (returnedQuantity > 0)
+            {
+                throw new BusinessRuleException($"Cannot remove book ID {bookId} because returns already exist.");
+            }
+        }
+
+        var allBookIds = existingByBook.Keys.Union(normalizedItems.Keys).Distinct().ToList();
+        var deltaByBook = allBookIds.ToDictionary(
+            bookId => bookId,
+            bookId => normalizedItems.GetValueOrDefault(bookId, 0) - existingByBook.GetValueOrDefault(bookId, 0));
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            foreach (var (bookId, delta) in deltaByBook.Where(x => x.Value > 0))
+            {
+                var book = await _bookRepo.GetByIdAsync(bookId)
+                    ?? throw new NotFoundException(nameof(Book), bookId);
+
+                var available = book.TotalStock - book.Distributed - book.WithTeachers - book.Damaged - book.Lost;
+                if (available < delta)
+                    throw new BusinessRuleException($"Insufficient stock for book '{book.Title}'. Available: {available}, Requested additional: {delta}.");
+            }
+
+            foreach (var (bookId, delta) in deltaByBook.Where(x => x.Value != 0))
+            {
+                var book = await _bookRepo.GetByIdAsync(bookId)
+                    ?? throw new NotFoundException(nameof(Book), bookId);
+
+                book.WithTeachers += delta;
+                _bookRepo.Update(book);
+            }
+
+            var requestedBookIds = normalizedItems.Keys.ToHashSet();
+            foreach (var existingItem in issue.Items.ToList())
+            {
+                if (!requestedBookIds.Contains(existingItem.BookId))
+                {
+                    issue.Items.Remove(existingItem);
+                    continue;
+                }
+
+                existingItem.Quantity = normalizedItems[existingItem.BookId];
+            }
+
+            var existingBookIds = issue.Items.Select(i => i.BookId).ToHashSet();
+            foreach (var (bookId, quantity) in normalizedItems)
+            {
+                if (existingBookIds.Contains(bookId))
+                    continue;
+
+                issue.Items.Add(new TeacherIssueItem
+                {
+                    BookId = bookId,
+                    Quantity = quantity,
+                    ReturnedQuantity = 0
+                });
+            }
+
+            issue.TeacherId = request.TeacherId;
+            issue.IssuedAt = ResolveTimestamp(request.IssuedDate, request.IssuedTime);
+            issue.ExpectedReturnDate = request.ExpectedReturnDate;
+            issue.Notes = request.Notes;
+            issue.Status = DetermineStatus(issue);
+
+            _issueRepo.Update(issue);
+            await _unitOfWork.SaveChangesAsync();
+
+            var response = await GetByIdAsync(issue.Id);
+            await SaveIssuePdfAsync(issue, response);
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            response.PdfFilePath = issue.PdfFilePath;
+            return response;
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
     public async Task<TeacherReturnSlipResponse> GetLatestReturnSlipByIssueIdAsync(int issueId)
     {
         var slip = await _returnSlipRepo.Query()
@@ -485,5 +596,12 @@ public class TeacherIssueService : ITeacherIssueService
         var resolvedDate = date ?? DateOnly.FromDateTime(now);
         var resolvedTime = time ?? TimeOnly.FromDateTime(now);
         return DateTime.SpecifyKind(resolvedDate.ToDateTime(resolvedTime), DateTimeKind.Utc);
+    }
+
+    internal static Dictionary<int, int> NormalizeItems(IEnumerable<UpdateTeacherIssueItemRequest> items)
+    {
+        return items
+            .GroupBy(i => i.BookId)
+            .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
     }
 }

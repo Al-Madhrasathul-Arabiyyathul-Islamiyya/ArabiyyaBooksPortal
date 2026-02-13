@@ -37,6 +37,10 @@ public class TeacherIssuesController : ApiControllerBase
     public async Task<IActionResult> Create(CreateTeacherIssueRequest request)
         => CreatedResponse(await _service.CreateAsync(request, CurrentUserId));
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, UpdateTeacherIssueRequest request)
+        => OkResponse(await _service.UpdateAsync(id, request, CurrentUserId));
+
     [HttpPost("{id}/return")]
     public async Task<IActionResult> ProcessReturn(int id, ProcessTeacherReturnRequest request)
         => OkResponse(await _service.ProcessReturnAsync(id, request, CurrentUserId));

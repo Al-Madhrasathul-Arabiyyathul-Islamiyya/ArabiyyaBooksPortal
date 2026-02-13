@@ -41,6 +41,10 @@ public class DistributionsController : ApiControllerBase
     public async Task<IActionResult> Create(CreateDistributionSlipRequest request)
         => CreatedResponse(await _service.CreateAsync(request, CurrentUserId));
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, UpdateDistributionSlipRequest request)
+        => OkResponse(await _service.UpdateAsync(id, request, CurrentUserId));
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Cancel(int id)
     {

@@ -903,6 +903,29 @@ Create a distribution slip.
   | quantity | int |
 - **Response**: `DistributionSlipResponse`
 
+### PUT /api/distributions/{id}
+
+Revise a distribution slip while it is still in `Processing` state.
+
+- **Request**: `UpdateDistributionSlipRequest`
+  | Field | Type | Required |
+  |-------|------|----------|
+  | term | Term (int) | yes |
+  | studentId | int | yes |
+  | parentId | int | yes |
+  | issuedDate | DateOnly? | no |
+  | issuedTime | TimeOnly? | no |
+  | notes | string? | no |
+  | items | UpdateDistributionSlipItemRequest[] | yes |
+
+  `UpdateDistributionSlipItemRequest`:
+  | Field | Type |
+  |-------|------|
+  | bookId | int |
+  | quantity | int |
+- **Response**: `DistributionSlipResponse`
+- **Rule**: only slips with `lifecycleStatus=Processing` can be revised.
+
 ### DELETE /api/distributions/{id}
 
 Cancel a distribution slip (reverses stock).
@@ -1111,6 +1134,28 @@ Create a teacher issue.
   | bookId | int |
   | quantity | int |
 - **Response**: `TeacherIssueResponse`
+
+### PUT /api/TeacherIssues/{id}
+
+Revise a teacher issue while it is still in `Processing` state.
+
+- **Request**: `UpdateTeacherIssueRequest`
+  | Field | Type | Required |
+  |-------|------|----------|
+  | teacherId | int | yes |
+  | issuedDate | DateOnly? | no |
+  | issuedTime | TimeOnly? | no |
+  | expectedReturnDate | DateTime? | no |
+  | notes | string? | no |
+  | items | UpdateTeacherIssueItemRequest[] | yes |
+
+  `UpdateTeacherIssueItemRequest`:
+  | Field | Type |
+  |-------|------|
+  | bookId | int |
+  | quantity | int |
+- **Response**: `TeacherIssueResponse`
+- **Rule**: only slips with `lifecycleStatus=Processing` can be revised.
 
 ### POST /api/TeacherIssues/{id}/return
 
@@ -1877,6 +1922,7 @@ Frozen routes:
 - `GET /api/distributions/{id}`
 - `GET /api/distributions/by-reference/{referenceNo}`
 - `POST /api/distributions`
+- `PUT /api/distributions/{id}`
 - `DELETE /api/distributions/{id}`
 - `POST /api/distributions/{id}/finalize`
 - `GET /api/distributions/{id}/print`

@@ -13,6 +13,7 @@ public interface ITeacherIssueService
         bool includeCancelled = false);
     Task<TeacherIssueResponse> GetByIdAsync(int id);
     Task<TeacherIssueResponse> CreateAsync(CreateTeacherIssueRequest request, int userId);
+    Task<TeacherIssueResponse> UpdateAsync(int id, UpdateTeacherIssueRequest request, int userId);
     Task<TeacherIssueResponse> ProcessReturnAsync(int id, ProcessTeacherReturnRequest request, int userId);
     Task<TeacherReturnSlipResponse> GetLatestReturnSlipByIssueIdAsync(int issueId);
     Task FinalizeAsync(int id, int userId);

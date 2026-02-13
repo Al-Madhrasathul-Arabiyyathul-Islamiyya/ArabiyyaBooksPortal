@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace BooksPortal.IntegrationTests;
 
+[Collection("Integration API")]
 public class HealthCheckTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
     private readonly HttpClient _client;

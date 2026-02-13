@@ -14,6 +14,7 @@ public interface IDistributionService
     Task<DistributionSlipResponse> GetByIdAsync(int id);
     Task<DistributionSlipResponse> GetByReferenceAsync(string referenceNo);
     Task<DistributionSlipResponse> CreateAsync(CreateDistributionSlipRequest request, int userId);
+    Task<DistributionSlipResponse> UpdateAsync(int id, UpdateDistributionSlipRequest request, int userId);
     Task FinalizeAsync(int id, int userId);
     Task CancelAsync(int id, int userId);
 }

@@ -197,4 +197,18 @@ public class DistributionServiceTests
 
         _slipRepo.Received(1).SoftDelete(slip);
     }
+
+    [Fact]
+    public void NormalizeItems_GroupsDuplicateBookRows()
+    {
+        var normalized = DistributionService.NormalizeItems(
+            [
+                new UpdateDistributionSlipItemRequest { BookId = 1, Quantity = 2 },
+                new UpdateDistributionSlipItemRequest { BookId = 1, Quantity = 3 },
+                new UpdateDistributionSlipItemRequest { BookId = 2, Quantity = 1 }
+            ]);
+
+        normalized[1].Should().Be(5);
+        normalized[2].Should().Be(1);
+    }
 }

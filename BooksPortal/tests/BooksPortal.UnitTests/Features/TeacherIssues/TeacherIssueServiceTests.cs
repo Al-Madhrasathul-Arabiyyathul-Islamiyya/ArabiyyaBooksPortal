@@ -236,4 +236,18 @@ public class TeacherIssueServiceTests
         outstanding.Should().Be(0);
         // With outstanding = 0, CancelAsync skips this item (if outstanding <= 0 continue)
     }
+
+    [Fact]
+    public void NormalizeItems_GroupsDuplicateBookRows()
+    {
+        var normalized = TeacherIssueService.NormalizeItems(
+            [
+                new UpdateTeacherIssueItemRequest { BookId = 3, Quantity = 1 },
+                new UpdateTeacherIssueItemRequest { BookId = 3, Quantity = 4 },
+                new UpdateTeacherIssueItemRequest { BookId = 9, Quantity = 2 }
+            ]);
+
+        normalized[3].Should().Be(5);
+        normalized[9].Should().Be(2);
+    }
 }
