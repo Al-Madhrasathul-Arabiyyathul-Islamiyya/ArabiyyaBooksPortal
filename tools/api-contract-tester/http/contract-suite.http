@@ -763,6 +763,33 @@ Authorization: Bearer {{accessToken}}
 ?? status < 500 && status != 401 && status != 403
 
 ###
+# @name distribution_update
+# @covers PUT /api/distributions/{id}
+PUT {{baseUrl}}/api/distributions/{{distributionId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "term": "Both",
+  "studentId": {{studentId}},
+  "parentId": {{parentId}},
+  "notes": "Distribution revision from contract suite",
+  "items": [
+    { "bookId": {{bookId}}, "quantity": 1 }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name distribution_finalize
+# @covers POST /api/distributions/{id}/finalize
+POST {{baseUrl}}/api/distributions/{{distributionId}}/finalize
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
 # @name distribution_print
 # @covers GET /api/distributions/{id}/print
 GET {{baseUrl}}/api/distributions/{{distributionId}}/print
@@ -872,6 +899,24 @@ Authorization: Bearer {{accessToken}}
 ?? status < 500 && status != 401 && status != 403
 
 ###
+# @name teacher_issue_update
+# @covers PUT /api/TeacherIssues/{id}
+PUT {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "teacherId": {{teacherId}},
+  "expectedReturnDate": "{{runYear}}-12-31T00:00:00Z",
+  "notes": "Teacher issue revision from contract suite",
+  "items": [
+    { "bookId": {{bookId}}, "quantity": 1 }
+  ]
+}
+
+?? status < 500 && status != 401 && status != 403
+
+###
 # @name teacher_issue_return
 # @covers POST /api/TeacherIssues/{id}/return
 POST {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}/return
@@ -891,6 +936,22 @@ Content-Type: application/json
 # @name teacher_issue_print
 # @covers GET /api/TeacherIssues/{id}/print
 GET {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_return_print
+# @covers GET /api/teacherissues/{id}/return/print
+GET {{baseUrl}}/api/teacherissues/{{teacherIssueId}}/return/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_issue_finalize
+# @covers POST /api/TeacherIssues/{id}/finalize
+POST {{baseUrl}}/api/TeacherIssues/{{teacherIssueId}}/finalize
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
@@ -1125,6 +1186,14 @@ Authorization: Bearer {{accessToken}}
 # @name audit_logs
 # @covers GET /api/AuditLogs
 GET {{baseUrl}}/api/AuditLogs?pageNumber=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name audit_logs_revision_snapshot
+# @covers GET /api/AuditLogs
+GET {{baseUrl}}/api/AuditLogs?pageNumber=1&pageSize=50&action=REVISION_SNAPSHOT
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403

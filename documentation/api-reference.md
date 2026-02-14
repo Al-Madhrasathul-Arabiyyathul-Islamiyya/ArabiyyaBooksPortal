@@ -1585,6 +1585,9 @@ List audit logs (paginated).
 - **Query**: `?pageNumber={int}&pageSize={int}&entityType={string}&action={string}&userId={int}&from={DateTime}&to={DateTime}`
 - **Defaults**: pageNumber=1, pageSize=20
 - **Response**: `PaginatedList<AuditLogResponse>`
+- **Notable action values**:
+  - `CREATE`, `UPDATE`, `DELETE`
+  - `REVISION_SNAPSHOT` (explicit before/after aggregate snapshots for slip revisions)
 
 **AuditLogResponse**:
 
@@ -1599,6 +1602,36 @@ List audit logs (paginated).
 | userId | int? |
 | userName | string? |
 | timestamp | DateTime |
+
+#### GET `/api/AuditLogs?action=REVISION_SNAPSHOT` Example Success
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1589,
+        "action": "REVISION_SNAPSHOT",
+        "entityType": "DistributionSlip",
+        "entityId": "42",
+        "oldValues": "{\"id\":42,\"referenceNo\":\"DST2026000042\",\"items\":[{\"bookId\":21,\"quantity\":1}]}",
+        "newValues": "{\"id\":42,\"referenceNo\":\"DST2026000042\",\"items\":[{\"bookId\":21,\"quantity\":2}]}",
+        "userId": 1,
+        "userName": "admin@booksportal.local",
+        "timestamp": "2026-02-14T10:24:18Z"
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
+  "message": null,
+  "errors": null
+}
+```
 
 ---
 

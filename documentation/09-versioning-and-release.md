@@ -42,12 +42,13 @@ This document defines how versioning works for:
 
 ## Release Workflow
 
-1. Merge feature branches into `dev`.
-2. Merge `dev` into `master`.
-3. Update version numbers (backend + frontend) if release boundary reached.
-4. Commit version update on `master`.
-5. Create annotated tag on `master` (`vX.Y.Z`).
-6. Rebase `dev` onto `master`, then `frontend` onto `dev`.
+1. Merge short-lived backend/frontend branches into `dev/backend` or `dev/frontend`.
+2. Merge `dev/backend` and/or `dev/frontend` into `develop` when those changes are needed for continuation.
+3. Promote `develop` into `master` via **squash merge** for release integration.
+4. Update version numbers (backend + frontend) on `master` if a release boundary is reached.
+5. Commit version update on `master`.
+6. Create annotated tag on `master` (`vX.Y.Z`).
+7. Rebase `develop` onto `master`, then rebase `dev/backend` and `dev/frontend` onto `develop`.
 
 ## Rules
 
@@ -55,3 +56,15 @@ This document defines how versioning works for:
 - Use one commit for version bump changes.
 - Do not tag from non-`master` branches.
 - Do not skip central package version updates when adding new .NET packages.
+- Keep `AGENTS.md` local-only (gitignored).
+
+## Verification Gates
+
+- Before commit/finalization on any branch:
+  - Run all available linters.
+  - Run all available type checks.
+  - Run all relevant tests and verification scripts.
+  - If you add or modify test contracts/test cases, run them and confirm they pass.
+- Before promoting changes to `develop` or `master`:
+  - Run the full available test/verification suite for the affected area.
+  - Resolve failures first; do not promote with known failing checks.
