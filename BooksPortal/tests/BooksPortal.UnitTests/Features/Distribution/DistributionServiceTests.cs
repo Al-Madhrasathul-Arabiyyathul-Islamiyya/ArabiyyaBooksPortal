@@ -5,6 +5,7 @@ using BooksPortal.Application.Features.Distribution.Services;
 using BooksPortal.Domain.Entities;
 using BooksPortal.Domain.Enums;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
 namespace BooksPortal.UnitTests.Features.Distribution;
@@ -18,6 +19,8 @@ public class DistributionServiceTests
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
     private readonly IStaffDirectoryService _staffDirectoryService;
+    private readonly DbContext _context;
+    private readonly ICurrentUserService _currentUserService;
     private readonly DistributionService _sut;
 
     public DistributionServiceTests()
@@ -29,7 +32,18 @@ public class DistributionServiceTests
         _pdfService = Substitute.For<IPdfService>();
         _storageService = Substitute.For<ISlipStorageService>();
         _staffDirectoryService = Substitute.For<IStaffDirectoryService>();
-        _sut = new DistributionService(_slipRepo, _bookRepo, _unitOfWork, _refService, _pdfService, _storageService, _staffDirectoryService);
+        _context = Substitute.For<DbContext>(new DbContextOptions<DbContext>());
+        _currentUserService = Substitute.For<ICurrentUserService>();
+        _sut = new DistributionService(
+            _slipRepo,
+            _bookRepo,
+            _unitOfWork,
+            _refService,
+            _pdfService,
+            _storageService,
+            _staffDirectoryService,
+            _context,
+            _currentUserService);
     }
 
     private static Book CreateBook(int id, int totalStock = 100, int distributed = 0,

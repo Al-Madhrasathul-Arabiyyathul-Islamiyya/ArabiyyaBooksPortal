@@ -69,6 +69,61 @@ public class SlipRevisionIntegrationTests : IClassFixture<IntegrationTestWebAppl
         updateResponse.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
+    [Fact]
+    public async Task Distribution_Update_Processing_WritesRevisionSnapshotAudit()
+    {
+        await AuthenticateAsync();
+
+        var activeYearId = await GetActiveAcademicYearIdAsync();
+        var bookId = await EnsureOperationalBookAsync(activeYearId);
+        var studentId = await EnsureStudentWithParentAsync(activeYearId);
+        var parentId = await GetFirstParentIdAsync(studentId);
+
+        var distributionId = await CreateDistributionAsync(activeYearId, studentId, parentId, bookId);
+
+        var updateResponse = await _client.PutAsJsonAsync($"/api/Distributions/{distributionId}", new
+        {
+            term = "Both",
+            studentId,
+            parentId,
+            notes = "Revision audit integration test",
+            items = new[]
+            {
+                new { bookId, quantity = 2 }
+            }
+        });
+        updateResponse.EnsureSuccessStatusCode();
+
+        var auditMatches = await GetRevisionSnapshotAuditsAsync(nameof(BooksPortal.Domain.Entities.DistributionSlip), distributionId);
+        auditMatches.Should().NotBeEmpty("distribution revision should append explicit audit snapshot");
+    }
+
+    [Fact]
+    public async Task TeacherIssue_Update_Processing_WritesRevisionSnapshotAudit()
+    {
+        await AuthenticateAsync();
+
+        var activeYearId = await GetActiveAcademicYearIdAsync();
+        var bookId = await EnsureOperationalBookAsync(activeYearId);
+        var teacherId = await EnsureTeacherAsync();
+
+        var teacherIssueId = await CreateTeacherIssueAsync(activeYearId, teacherId, bookId);
+
+        var updateResponse = await _client.PutAsJsonAsync($"/api/TeacherIssues/{teacherIssueId}", new
+        {
+            teacherId,
+            notes = "Revision audit integration test",
+            items = new[]
+            {
+                new { bookId, quantity = 2 }
+            }
+        });
+        updateResponse.EnsureSuccessStatusCode();
+
+        var auditMatches = await GetRevisionSnapshotAuditsAsync(nameof(BooksPortal.Domain.Entities.TeacherIssue), teacherIssueId);
+        auditMatches.Should().NotBeEmpty("teacher issue revision should append explicit audit snapshot");
+    }
+
     private async Task AuthenticateAsync()
     {
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new
@@ -310,5 +365,29 @@ public class SlipRevisionIntegrationTests : IClassFixture<IntegrationTestWebAppl
         createClassSectionResponse.EnsureSuccessStatusCode();
         using var classCreateDoc = JsonDocument.Parse(await createClassSectionResponse.Content.ReadAsStringAsync());
         return classCreateDoc.RootElement.GetProperty("data").GetProperty("id").GetInt32();
+    }
+
+    private async Task<List<JsonElement>> GetRevisionSnapshotAuditsAsync(string entityType, int entityId)
+    {
+        var response = await _client.GetAsync($"/api/AuditLogs?pageNumber=1&pageSize=200&entityType={Uri.EscapeDataString(entityType)}&action=REVISION_SNAPSHOT");
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = doc.RootElement.GetProperty("data").GetProperty("items");
+
+        var matches = new List<JsonElement>();
+        foreach (var item in items.EnumerateArray())
+        {
+            if (item.GetProperty("entityId").GetString() != entityId.ToString())
+                continue;
+
+            var oldValues = item.GetProperty("oldValues").GetString();
+            var newValues = item.GetProperty("newValues").GetString();
+            oldValues.Should().NotBeNullOrWhiteSpace();
+            newValues.Should().NotBeNullOrWhiteSpace();
+            matches.Add(item);
+        }
+
+        return matches;
     }
 }

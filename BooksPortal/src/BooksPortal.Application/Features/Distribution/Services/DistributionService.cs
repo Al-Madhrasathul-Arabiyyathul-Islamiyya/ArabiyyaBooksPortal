@@ -6,6 +6,7 @@ using BooksPortal.Application.Features.Distribution.Interfaces;
 using BooksPortal.Domain.Entities;
 using BooksPortal.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BooksPortal.Application.Features.Distribution.Services;
 
@@ -18,6 +19,8 @@ public class DistributionService : IDistributionService
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
     private readonly IStaffDirectoryService _staffDirectoryService;
+    private readonly DbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
     public DistributionService(
         IRepository<DistributionSlip> slipRepo,
@@ -26,7 +29,9 @@ public class DistributionService : IDistributionService
         IReferenceNumberService refService,
         IPdfService pdfService,
         ISlipStorageService storageService,
-        IStaffDirectoryService staffDirectoryService)
+        IStaffDirectoryService staffDirectoryService,
+        DbContext context,
+        ICurrentUserService currentUserService)
     {
         _slipRepo = slipRepo;
         _bookRepo = bookRepo;
@@ -35,6 +40,8 @@ public class DistributionService : IDistributionService
         _pdfService = pdfService;
         _storageService = storageService;
         _staffDirectoryService = staffDirectoryService;
+        _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<PaginatedList<DistributionSlipResponse>> GetPagedAsync(
@@ -232,6 +239,7 @@ public class DistributionService : IDistributionService
         if (slip.LifecycleStatus != SlipLifecycleStatus.Processing)
             throw new BusinessRuleException("Only processing distribution slips can be revised.");
 
+        var beforeSnapshot = BuildRevisionSnapshot(slip);
         var normalizedItems = NormalizeItems(request.Items);
 
         var existingByBook = slip.Items
@@ -282,6 +290,7 @@ public class DistributionService : IDistributionService
             }
 
             _slipRepo.Update(slip);
+            AddRevisionSnapshotAuditLog(nameof(DistributionSlip), slip.Id.ToString(), beforeSnapshot, BuildRevisionSnapshot(slip));
             await _unitOfWork.SaveChangesAsync();
 
             var response = await GetByIdAsync(slip.Id);
@@ -425,5 +434,41 @@ public class DistributionService : IDistributionService
         return items
             .GroupBy(i => i.BookId)
             .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+    }
+
+    private static object BuildRevisionSnapshot(DistributionSlip slip)
+    {
+        return new
+        {
+            slip.Id,
+            slip.ReferenceNo,
+            slip.LifecycleStatus,
+            slip.AcademicYearId,
+            slip.Term,
+            slip.StudentId,
+            slip.ParentId,
+            slip.IssuedAt,
+            slip.Notes,
+            Items = slip.Items
+                .OrderBy(i => i.BookId)
+                .Select(i => new { i.BookId, i.Quantity })
+                .ToList()
+        };
+    }
+
+    private void AddRevisionSnapshotAuditLog(string entityType, string entityId, object oldSnapshot, object newSnapshot)
+    {
+        var actor = _currentUserService.UserEmail ?? "system";
+        _context.Set<AuditLog>().Add(new AuditLog
+        {
+            Action = "REVISION_SNAPSHOT",
+            EntityType = entityType,
+            EntityId = entityId,
+            OldValues = JsonSerializer.Serialize(oldSnapshot),
+            NewValues = JsonSerializer.Serialize(newSnapshot),
+            UserId = _currentUserService.UserId,
+            UserName = actor,
+            Timestamp = DateTime.UtcNow
+        });
     }
 }

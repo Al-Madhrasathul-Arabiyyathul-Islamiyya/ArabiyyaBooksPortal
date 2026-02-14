@@ -31,4 +31,4 @@
 - [x] Recompute and apply stock deltas atomically during revision.
 - [x] Regenerate/rewrite slip PDF after successful revision.
 - [x] Add/extend service/unit/integration tests for revision flows and lifecycle lockouts.
-- [ ] Add explicit aggregated revision audit snapshot (before/after payload blob) in addition to the existing entity-level audit logs.
+- [x] Add explicit aggregated revision audit snapshot (before/after payload blob) in addition to the existing entity-level audit logs.

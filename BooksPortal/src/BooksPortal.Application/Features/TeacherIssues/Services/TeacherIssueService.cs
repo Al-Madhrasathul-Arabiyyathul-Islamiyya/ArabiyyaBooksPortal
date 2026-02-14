@@ -6,6 +6,7 @@ using BooksPortal.Application.Features.TeacherIssues.Interfaces;
 using BooksPortal.Domain.Entities;
 using BooksPortal.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BooksPortal.Application.Features.TeacherIssues.Services;
 
@@ -19,6 +20,8 @@ public class TeacherIssueService : ITeacherIssueService
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
     private readonly IStaffDirectoryService _staffDirectoryService;
+    private readonly DbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
     public TeacherIssueService(
         IRepository<TeacherIssue> issueRepo,
@@ -28,7 +31,9 @@ public class TeacherIssueService : ITeacherIssueService
         IReferenceNumberService refService,
         IPdfService pdfService,
         ISlipStorageService storageService,
-        IStaffDirectoryService staffDirectoryService)
+        IStaffDirectoryService staffDirectoryService,
+        DbContext context,
+        ICurrentUserService currentUserService)
     {
         _issueRepo = issueRepo;
         _returnSlipRepo = returnSlipRepo;
@@ -38,6 +43,8 @@ public class TeacherIssueService : ITeacherIssueService
         _pdfService = pdfService;
         _storageService = storageService;
         _staffDirectoryService = staffDirectoryService;
+        _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<PaginatedList<TeacherIssueResponse>> GetPagedAsync(
@@ -294,6 +301,7 @@ public class TeacherIssueService : ITeacherIssueService
         if (issue.LifecycleStatus != SlipLifecycleStatus.Processing)
             throw new BusinessRuleException("Only processing teacher issues can be revised.");
 
+        var beforeSnapshot = BuildRevisionSnapshot(issue);
         var normalizedItems = NormalizeItems(request.Items);
         var existingByBook = issue.Items
             .GroupBy(i => i.BookId)
@@ -376,6 +384,7 @@ public class TeacherIssueService : ITeacherIssueService
             issue.Status = DetermineStatus(issue);
 
             _issueRepo.Update(issue);
+            AddRevisionSnapshotAuditLog(nameof(TeacherIssue), issue.Id.ToString(), beforeSnapshot, BuildRevisionSnapshot(issue));
             await _unitOfWork.SaveChangesAsync();
 
             var response = await GetByIdAsync(issue.Id);
@@ -603,5 +612,41 @@ public class TeacherIssueService : ITeacherIssueService
         return items
             .GroupBy(i => i.BookId)
             .ToDictionary(g => g.Key, g => g.Sum(x => x.Quantity));
+    }
+
+    private static object BuildRevisionSnapshot(TeacherIssue issue)
+    {
+        return new
+        {
+            issue.Id,
+            issue.ReferenceNo,
+            issue.LifecycleStatus,
+            issue.AcademicYearId,
+            issue.TeacherId,
+            issue.IssuedAt,
+            issue.ExpectedReturnDate,
+            issue.Status,
+            issue.Notes,
+            Items = issue.Items
+                .OrderBy(i => i.BookId)
+                .Select(i => new { i.BookId, i.Quantity, i.ReturnedQuantity })
+                .ToList()
+        };
+    }
+
+    private void AddRevisionSnapshotAuditLog(string entityType, string entityId, object oldSnapshot, object newSnapshot)
+    {
+        var actor = _currentUserService.UserEmail ?? "system";
+        _context.Set<AuditLog>().Add(new AuditLog
+        {
+            Action = "REVISION_SNAPSHOT",
+            EntityType = entityType,
+            EntityId = entityId,
+            OldValues = JsonSerializer.Serialize(oldSnapshot),
+            NewValues = JsonSerializer.Serialize(newSnapshot),
+            UserId = _currentUserService.UserId,
+            UserName = actor,
+            Timestamp = DateTime.UtcNow
+        });
     }
 }

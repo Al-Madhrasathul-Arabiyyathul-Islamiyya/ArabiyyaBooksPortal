@@ -5,6 +5,7 @@ using BooksPortal.Application.Features.TeacherIssues.Services;
 using BooksPortal.Domain.Entities;
 using BooksPortal.Domain.Enums;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
 namespace BooksPortal.UnitTests.Features.TeacherIssues;
@@ -19,6 +20,8 @@ public class TeacherIssueServiceTests
     private readonly IPdfService _pdfService;
     private readonly ISlipStorageService _storageService;
     private readonly IStaffDirectoryService _staffDirectoryService;
+    private readonly DbContext _context;
+    private readonly ICurrentUserService _currentUserService;
     private readonly TeacherIssueService _sut;
 
     public TeacherIssueServiceTests()
@@ -31,7 +34,19 @@ public class TeacherIssueServiceTests
         _pdfService = Substitute.For<IPdfService>();
         _storageService = Substitute.For<ISlipStorageService>();
         _staffDirectoryService = Substitute.For<IStaffDirectoryService>();
-        _sut = new TeacherIssueService(_issueRepo, _returnSlipRepo, _bookRepo, _unitOfWork, _refService, _pdfService, _storageService, _staffDirectoryService);
+        _context = Substitute.For<DbContext>(new DbContextOptions<DbContext>());
+        _currentUserService = Substitute.For<ICurrentUserService>();
+        _sut = new TeacherIssueService(
+            _issueRepo,
+            _returnSlipRepo,
+            _bookRepo,
+            _unitOfWork,
+            _refService,
+            _pdfService,
+            _storageService,
+            _staffDirectoryService,
+            _context,
+            _currentUserService);
     }
 
     private static Book CreateBook(int id = 1, int totalStock = 100, int distributed = 0,
