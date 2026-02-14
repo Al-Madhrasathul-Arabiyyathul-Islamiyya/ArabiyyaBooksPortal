@@ -10,7 +10,7 @@ This document defines how versioning works for:
 ## Version Model
 
 - Base scheme: `MAJOR.MINOR.PATCH`
-- Current baseline: `0.9.3`
+- Current baseline: `0.10.0`
 
 ### Backend (.NET)
 
@@ -32,12 +32,12 @@ This document defines how versioning works for:
 ### Frontend (Nuxt)
 
 - Frontend app version is tracked in `BooksPortalFrontEnd/package.json`:
-  - `"version": "0.9.3"`
+  - `"version": "0.10.0"`
 
 ### Git Tags (Repository Release)
 
 - Git tags represent the integrated repository release on `master`.
-- Tag format: `vMAJOR.MINOR.PATCH` (example: `v0.9.3`).
+- Tag format: `vMAJOR.MINOR.PATCH` (example: `v0.10.0`).
 - Tags are created after merges to `master` and verification.
 
 ## Release Workflow
