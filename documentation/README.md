@@ -20,6 +20,7 @@ Books Portal is a web-based textbook management system for Arabiyya school. It t
 | [08-slip-templates-and-storage.md](./08-slip-templates-and-storage.md) | Slip template settings and PDF storage |
 | [09-versioning-and-release.md](./09-versioning-and-release.md) | Versioning policy for backend/frontend and git release tags |
 | [10-frontend-validation-architecture.md](./10-frontend-validation-architecture.md) | Frontend validation architecture (Regle + Zod + error normalization) |
+| [11-backup-and-scheduled-reports-architecture.md](./11-backup-and-scheduled-reports-architecture.md) | Post-v1 scheduler architecture for backups, report exports, and admin monitoring |
 | [api-reference.md](./api-reference.md) | **Live API reference** - all endpoints, DTOs, enums |
 
 ---
