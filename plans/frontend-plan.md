@@ -538,32 +538,32 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
   - [ ] Visible only to Admin/SuperAdmin
 
 ### 7.2 Report Components
-- [ ] `app/components/reports/ExportButton.vue`
-  - [ ] Props: `url` (export endpoint), `filename`
-  - [ ] Fetches blob via API, triggers browser download
-  - [ ] Loading state during download
-- [ ] `app/components/reports/ReportFilters.vue`
-  - [ ] Reusable filter bar: academic year, subject, grade, date range, teacher
-  - [ ] Emits filter params
+- [x] `app/components/reports/ExportButton.vue`
+  - [x] Props: `url` (export endpoint), `filename`
+  - [x] Fetches blob via API, triggers browser download
+  - [x] Loading state during download
+- [x] `app/components/reports/ReportFilters.vue`
+  - [x] Reusable filter bar: academic year, subject, grade, date range, teacher
+  - [x] Emits filter params
 
 ### 7.3 Report Pages
-- [ ] `app/pages/admin/reports/index.vue` — report hub with cards linking to each report
-- [ ] `app/pages/admin/reports/stock-summary.vue`
-  - [ ] Filters: subjectId, grade
-  - [ ] DataTable: code, title, subjectName, grade, totalStock, distributed, withTeachers, damaged, lost, available
-  - [ ] ExportButton → `GET /reports/export/stock-summary`
-- [ ] `app/pages/admin/reports/distributions.vue`
-  - [ ] Filters: academicYearId (required), from date, to date
-  - [ ] DataTable: referenceNo, studentName, studentIndexNo, parentName, issuedAt, totalBooks
-  - [ ] ExportButton → `GET /reports/export/distribution-summary`
-- [ ] `app/pages/admin/reports/teacher-outstanding.vue`
-  - [ ] Filters: teacherId (optional)
-  - [ ] DataTable: referenceNo, teacherName, bookTitle, bookCode, quantity, returnedQuantity, outstanding, status, issuedAt, expectedReturnDate
-  - [ ] ExportButton → `GET /reports/export/teacher-outstanding`
-- [ ] `app/pages/admin/reports/student-history.vue`
-  - [ ] Student search/select input
-  - [ ] DataTable: type (Distribution/Return), referenceNo, date, bookTitle, bookCode, quantity, condition
-  - [ ] No export endpoint (view-only)
+- [x] `app/pages/admin/reports/index.vue` — report hub with cards linking to each report
+- [x] `app/pages/admin/reports/stock-summary.vue`
+  - [x] Filters: subjectId, grade
+  - [x] DataTable: code, title, subjectName, grade, totalStock, distributed, withTeachers, damaged, lost, available
+  - [x] ExportButton -> `GET /reports/export/stock-summary`
+- [x] `app/pages/admin/reports/distributions.vue`
+  - [x] Filters: academicYearId (required), from date, to date
+  - [x] DataTable: referenceNo, studentName, studentIndexNo, parentName, issuedAt, totalBooks
+  - [x] ExportButton -> `GET /reports/export/distribution-summary`
+- [x] `app/pages/admin/reports/teacher-outstanding.vue`
+  - [x] Filters: teacherId (optional)
+  - [x] DataTable: referenceNo, teacherName, bookTitle, bookCode, quantity, returnedQuantity, outstanding, status, issuedAt, expectedReturnDate
+  - [x] ExportButton -> `GET /reports/export/teacher-outstanding`
+- [x] `app/pages/admin/reports/student-history.vue`
+  - [x] Student search/select input
+  - [x] DataTable: type (Distribution/Return), referenceNo, date, bookTitle, bookCode, quantity, condition
+  - [x] No export endpoint (view-only)
 
 ### Phase 7 Verification
 - [ ] Dashboard loads with correct totals from API
@@ -645,3 +645,5 @@ See `documentation/api-reference.md` for all endpoints, DTOs, and auth requireme
 - [ ] Role-based access control enforced (menu visibility + route guards)
 - [ ] Responsive layout works on common screen sizes
 - [ ] No TypeScript errors, no console errors
+
+
