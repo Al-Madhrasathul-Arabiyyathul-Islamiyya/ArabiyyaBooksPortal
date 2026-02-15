@@ -1,5 +1,6 @@
 using BooksPortal.Application.Common.Exceptions;
 using BooksPortal.Application.Common.Interfaces;
+using BooksPortal.Application.Common.Models;
 using BooksPortal.Application.Features.MasterData.DTOs;
 using BooksPortal.Application.Features.MasterData.Interfaces;
 using BooksPortal.Domain.Entities;
@@ -24,23 +25,42 @@ public class ClassSectionService : IClassSectionService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<List<ClassSectionResponse>> GetAllAsync(int? academicYearId = null)
+    public async Task<PaginatedList<ClassSectionResponse>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        int? academicYearId = null,
+        int? keystageId = null,
+        int? gradeId = null,
+        string? search = null)
     {
         var query = _repository.Query()
             .Include(c => c.AcademicYear)
             .Include(c => c.Keystage)
             .Include(c => c.Grade)
-            .Include(c => c.Students)
             .AsQueryable();
 
         if (academicYearId.HasValue)
             query = query.Where(c => c.AcademicYearId == academicYearId.Value);
 
-        var items = await query
+        if (keystageId.HasValue)
+            query = query.Where(c => c.KeystageId == keystageId.Value);
+
+        if (gradeId.HasValue)
+            query = query.Where(c => c.GradeId == gradeId.Value);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(c =>
+                c.Grade.Name.Contains(term) ||
+                c.Section.Contains(term) ||
+                c.Keystage.Name.Contains(term));
+        }
+
+        var projected = query
             .OrderBy(c => c.Grade.SortOrder)
             .ThenBy(c => c.Section)
-            .ToListAsync();
-        return items.Select(c => new ClassSectionResponse
+            .Select(c => new ClassSectionResponse
         {
             Id = c.Id,
             AcademicYearId = c.AcademicYearId,
@@ -51,7 +71,9 @@ public class ClassSectionService : IClassSectionService
             Grade = c.Grade.Name,
             Section = c.Section,
             StudentCount = c.Students.Count
-        }).ToList();
+        });
+
+        return await PaginatedList<ClassSectionResponse>.CreateAsync(projected, pageNumber, pageSize);
     }
 
     public async Task<ClassSectionResponse> GetByIdAsync(int id)

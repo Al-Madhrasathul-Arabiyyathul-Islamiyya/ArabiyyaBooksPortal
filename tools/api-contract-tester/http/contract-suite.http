@@ -244,10 +244,12 @@ Content-Type: application/json
 ###
 # @name cs_list
 # @covers GET /api/ClassSections
-GET {{baseUrl}}/api/ClassSections?academicYearId={{academicYearId}}
+GET {{baseUrl}}/api/ClassSections?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name cs_get
@@ -587,18 +589,22 @@ Content-Type: application/json
 ###
 # @name book_stock_entries
 # @covers GET /api/books/{id}/stock-entries
-GET {{baseUrl}}/api/books/{{bookId}}/stock-entries
+GET {{baseUrl}}/api/books/{{bookId}}/stock-entries?pageNumber=1&pageSize=20
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name book_stock_movements
 # @covers GET /api/books/{id}/stock-movements
-GET {{baseUrl}}/api/books/{{bookId}}/stock-movements
+GET {{baseUrl}}/api/books/{{bookId}}/stock-movements?pageNumber=1&pageSize=20
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name book_adjust_stock
@@ -959,34 +965,42 @@ Authorization: Bearer {{accessToken}}
 ###
 # @name report_stock_summary
 # @covers GET /api/reports/stock-summary
-GET {{baseUrl}}/api/reports/stock-summary?subjectId={{subjectId}}&grade=G{{runKey}}
+GET {{baseUrl}}/api/reports/stock-summary?pageNumber=1&pageSize=20&subjectId={{subjectId}}&grade=G{{runKey}}
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name report_distribution_summary
 # @covers GET /api/reports/distribution-summary
-GET {{baseUrl}}/api/reports/distribution-summary?academicYearId={{academicYearId}}
+GET {{baseUrl}}/api/reports/distribution-summary?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name report_teacher_outstanding
 # @covers GET /api/reports/teacher-outstanding
-GET {{baseUrl}}/api/reports/teacher-outstanding?teacherId={{teacherId}}
+GET {{baseUrl}}/api/reports/teacher-outstanding?pageNumber=1&pageSize=20&teacherId={{teacherId}}
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name report_student_history
 # @covers GET /api/reports/student-history/{studentId}
-GET {{baseUrl}}/api/reports/student-history/{{studentId}}
+GET {{baseUrl}}/api/reports/student-history/{{studentId}}?pageNumber=1&pageSize=20
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name report_export_stock_summary
@@ -1015,10 +1029,12 @@ Authorization: Bearer {{accessToken}}
 ###
 # @name users_list
 # @covers GET /api/users
-GET {{baseUrl}}/api/users
+GET {{baseUrl}}/api/users?pageNumber=1&pageSize=20
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name users_create

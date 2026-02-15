@@ -10,6 +10,7 @@ namespace BooksPortal.API.Controllers;
 [Authorize(Roles = "SuperAdmin,Admin")]
 public class UsersController : ApiControllerBase
 {
+    private const int MaxPageSize = 100;
     private readonly IUserService _userService;
     private readonly IValidator<CreateUserRequest> _createValidator;
     private readonly IValidator<UpdateUserRequest> _updateValidator;
@@ -25,9 +26,14 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? search = null,
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? role = null)
     {
-        var result = await _userService.GetAllUsersAsync();
+        var result = await _userService.GetPagedUsersAsync(NormalizePageNumber(pageNumber), NormalizePageSize(pageSize), search, isActive, role);
         return OkResponse(result);
     }
 
@@ -73,4 +79,10 @@ public class UsersController : ApiControllerBase
         await _userService.AssignRolesAsync(id, roles);
         return OkResponse(true, "Roles assigned successfully.");
     }
+
+    private static int NormalizePageSize(int pageSize)
+        => pageSize <= 0 ? 20 : Math.Min(pageSize, MaxPageSize);
+
+    private static int NormalizePageNumber(int pageNumber)
+        => pageNumber <= 0 ? 1 : pageNumber;
 }

@@ -11,8 +11,8 @@ public interface IBookService
     Task<BookResponse> UpdateAsync(int id, CreateBookRequest request);
     Task DeleteAsync(int id);
     Task<StockEntryResponse> AddStockAsync(int bookId, AddStockRequest request, int userId);
-    Task<List<StockEntryResponse>> GetStockEntriesAsync(int bookId);
-    Task<List<StockMovementResponse>> GetStockMovementsAsync(int bookId);
+    Task<PaginatedList<StockEntryResponse>> GetStockEntriesAsync(int bookId, int pageNumber, int pageSize);
+    Task<PaginatedList<StockMovementResponse>> GetStockMovementsAsync(int bookId, int pageNumber, int pageSize);
     Task AdjustStockAsync(int bookId, AdjustStockRequest request, int userId);
     Task<List<BookResponse>> SearchAsync(string query);
 }

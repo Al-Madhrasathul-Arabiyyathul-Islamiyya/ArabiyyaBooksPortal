@@ -157,20 +157,30 @@ public class BookService : IBookService
         }
     }
 
-    public async Task<List<StockEntryResponse>> GetStockEntriesAsync(int bookId)
+    public async Task<PaginatedList<StockEntryResponse>> GetStockEntriesAsync(int bookId, int pageNumber, int pageSize)
     {
         if (!await _bookRepo.AnyAsync(b => b.Id == bookId))
             throw new NotFoundException(nameof(Book), bookId);
 
-        var entries = await _stockEntryRepo.Query()
+        var query = _stockEntryRepo.Query()
             .Where(e => e.BookId == bookId)
             .OrderByDescending(e => e.EnteredAt)
-            .ToListAsync();
+            .Select(e => new StockEntryResponse
+            {
+                Id = e.Id,
+                BookId = e.BookId,
+                AcademicYearId = e.AcademicYearId,
+                Quantity = e.Quantity,
+                Source = e.Source,
+                Notes = e.Notes,
+                EnteredById = e.EnteredById,
+                EnteredAt = e.EnteredAt
+            });
 
-        return entries.Adapt<List<StockEntryResponse>>();
+        return await PaginatedList<StockEntryResponse>.CreateAsync(query, pageNumber, pageSize);
     }
 
-    public async Task<List<StockMovementResponse>> GetStockMovementsAsync(int bookId)
+    public async Task<PaginatedList<StockMovementResponse>> GetStockMovementsAsync(int bookId, int pageNumber, int pageSize)
     {
         if (!await _bookRepo.AnyAsync(b => b.Id == bookId))
             throw new NotFoundException(nameof(Book), bookId);
@@ -180,7 +190,7 @@ public class BookService : IBookService
             .Include(b => b.StockMovements)
             .FirstOrDefaultAsync(b => b.Id == bookId);
 
-        return book!.StockMovements
+        var items = book!.StockMovements
             .OrderByDescending(m => m.ProcessedAt)
             .Select(m => new StockMovementResponse
             {
@@ -189,6 +199,14 @@ public class BookService : IBookService
                 ReferenceType = m.ReferenceType, Notes = m.Notes,
                 ProcessedById = m.ProcessedById, ProcessedAt = m.ProcessedAt
             }).ToList();
+
+        var totalCount = items.Count;
+        var pagedItems = items
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PaginatedList<StockMovementResponse>(pagedItems, totalCount, pageNumber, pageSize);
     }
 
     public async Task AdjustStockAsync(int bookId, AdjustStockRequest request, int userId)

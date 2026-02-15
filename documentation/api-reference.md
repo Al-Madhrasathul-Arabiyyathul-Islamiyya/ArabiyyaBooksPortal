@@ -320,10 +320,11 @@ All endpoints require **Bearer auth**.
 
 ### GET /api/ClassSections
 
-List class sections with optional filter.
+List class sections with optional filters (paginated).
 
-- **Query**: `?academicYearId={int}`
-- **Response**: `ClassSectionResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&keystageId={int}&gradeId={int}&search={string}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<ClassSectionResponse>`
 
 ### GET /api/ClassSections/{id}
 
@@ -771,15 +772,19 @@ Add stock entry for a book.
 
 ### GET /api/books/{id}/stock-entries
 
-List stock entries for a book.
+List stock entries for a book (paginated).
 
-- **Response**: `StockEntryResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StockEntryResponse>`
 
 ### GET /api/books/{id}/stock-movements
 
-List stock movements for a book.
+List stock movements for a book (paginated).
 
-- **Response**: `StockMovementResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StockMovementResponse>`
 
 ### POST /api/books/{id}/adjust-stock
 
@@ -1281,31 +1286,36 @@ All endpoints require **Bearer auth**.
 
 ### GET /api/reports/stock-summary
 
-Stock summary report.
+Stock summary report (paginated).
 
-- **Query**: `?subjectId={int}&grade={string}`
-- **Response**: `StockSummaryReport[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&subjectId={int}&grade={string}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StockSummaryReport>`
 
 ### GET /api/reports/distribution-summary
 
-Distribution summary report.
+Distribution summary report (paginated).
 
-- **Query**: `?academicYearId={int}&from={DateTime}&to={DateTime}`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&from={DateTime}&to={DateTime}`
 - `academicYearId` is **required**
-- **Response**: `DistributionSummaryReport[]`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<DistributionSummaryReport>`
 
 ### GET /api/reports/teacher-outstanding
 
-Teacher outstanding books report.
+Teacher outstanding books report (paginated).
 
-- **Query**: `?teacherId={int}`
-- **Response**: `TeacherOutstandingReport[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&teacherId={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<TeacherOutstandingReport>`
 
 ### GET /api/reports/student-history/{studentId}
 
-Student book history.
+Student book history (paginated).
 
-- **Response**: `StudentHistoryReport[]`
+- **Query**: `?pageNumber={int}&pageSize={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StudentHistoryReport>`
 
 ### GET /api/reports/export/stock-summary
 
@@ -1394,9 +1404,11 @@ All endpoints require **Bearer auth** + **SuperAdmin** or **Admin** role.
 
 ### GET /api/users
 
-List all users.
+List users (paginated).
 
-- **Response**: `UserResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&search={string}&isActive={bool}&role={string}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<UserResponse>`
 
 ### GET /api/users/{id}
 
@@ -2129,21 +2141,29 @@ Frozen routes:
 ### Frontend-Critical Reports
 
 Frozen routes:
-- `GET /api/reports/distribution-summary`
-- `GET /api/reports/student-history/{studentId}`
+- `GET /api/reports/distribution-summary?pageNumber={n}&pageSize={n}&academicYearId={id}`
+- `GET /api/reports/student-history/{studentId}?pageNumber={n}&pageSize={n}`
 
 #### GET `/api/reports/distribution-summary` Example Success (frozen)
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "slipId": 9,
-      "referenceNo": "DIS-2026-0001",
-      "studentName": "Student One",
-      "totalBooks": 3
-    }
-  ],
+  "data": {
+    "items": [
+      {
+        "slipId": 9,
+        "referenceNo": "DIS-2026-0001",
+        "studentName": "Student One",
+        "totalBooks": 3
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
   "message": null,
   "errors": null
 }
@@ -2153,15 +2173,23 @@ Frozen routes:
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "referenceNo": "DIS-2026-0001",
-      "bookTitle": "Sample Book",
-      "movementType": 2,
-      "quantity": 1,
-      "date": "2026-02-09T03:05:00Z"
-    }
-  ],
+  "data": {
+    "items": [
+      {
+        "referenceNo": "DIS-2026-0001",
+        "bookTitle": "Sample Book",
+        "movementType": 2,
+        "quantity": 1,
+        "date": "2026-02-09T03:05:00Z"
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
   "message": null,
   "errors": null
 }

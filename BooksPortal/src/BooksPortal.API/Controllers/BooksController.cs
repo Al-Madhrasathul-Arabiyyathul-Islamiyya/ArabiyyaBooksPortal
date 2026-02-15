@@ -10,6 +10,7 @@ namespace BooksPortal.API.Controllers;
 [Authorize]
 public class BooksController : ApiControllerBase
 {
+    private const int MaxPageSize = 100;
     private readonly IBookService _service;
     private readonly IBookBulkImportService _bulkImportService;
 
@@ -48,12 +49,12 @@ public class BooksController : ApiControllerBase
         => CreatedResponse(await _service.AddStockAsync(id, request, CurrentUserId));
 
     [HttpGet("{id}/stock-entries")]
-    public async Task<IActionResult> GetStockEntries(int id)
-        => OkResponse(await _service.GetStockEntriesAsync(id));
+    public async Task<IActionResult> GetStockEntries(int id, int pageNumber = 1, int pageSize = 20)
+        => OkResponse(await _service.GetStockEntriesAsync(id, NormalizePageNumber(pageNumber), NormalizePageSize(pageSize)));
 
     [HttpGet("{id}/stock-movements")]
-    public async Task<IActionResult> GetStockMovements(int id)
-        => OkResponse(await _service.GetStockMovementsAsync(id));
+    public async Task<IActionResult> GetStockMovements(int id, int pageNumber = 1, int pageSize = 20)
+        => OkResponse(await _service.GetStockMovementsAsync(id, NormalizePageNumber(pageNumber), NormalizePageSize(pageSize)));
 
     [HttpPost("{id}/adjust-stock")]
     [Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
@@ -90,4 +91,10 @@ public class BooksController : ApiControllerBase
         var report = await _bulkImportService.CommitAsync(stream, CurrentUserId, cancellationToken);
         return OkResponse(report);
     }
+
+    private static int NormalizePageSize(int pageSize)
+        => pageSize <= 0 ? 20 : Math.Min(pageSize, MaxPageSize);
+
+    private static int NormalizePageNumber(int pageNumber)
+        => pageNumber <= 0 ? 1 : pageNumber;
 }

@@ -601,8 +601,8 @@ try {
     $captures.Add((Invoke-CaptureRequest -Name "students-get-by-id" -Method "GET" -Uri "$baseUrl/api/students/$studentId" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "books-get-by-id" -Method "GET" -Uri "$baseUrl/api/books/$bookId" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "books-search" -Method "GET" -Uri "$baseUrl/api/books/search?q=$runKey" -Headers $authHeader))
-    $captures.Add((Invoke-CaptureRequest -Name "books-stock-entries" -Method "GET" -Uri "$baseUrl/api/books/$bookId/stock-entries" -Headers $authHeader))
-    $captures.Add((Invoke-CaptureRequest -Name "books-stock-movements" -Method "GET" -Uri "$baseUrl/api/books/$bookId/stock-movements" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "books-stock-entries" -Method "GET" -Uri "$baseUrl/api/books/$bookId/stock-entries?pageNumber=1&pageSize=20" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "books-stock-movements" -Method "GET" -Uri "$baseUrl/api/books/$bookId/stock-movements?pageNumber=1&pageSize=20" -Headers $authHeader))
 
     $captures.Add((Invoke-CaptureRequest -Name "distributions-get-by-id" -Method "GET" -Uri "$baseUrl/api/distributions/$distributionId" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "distributions-get-by-reference" -Method "GET" -Uri "$baseUrl/api/distributions/by-reference/$distributionRef" -Headers $authHeader))
@@ -615,10 +615,10 @@ try {
     $captures.Add((Invoke-CaptureRequest -Name "reference-number-formats-list" -Method "GET" -Uri "$baseUrl/api/ReferenceNumberFormats?slipType=Distribution&academicYearId=$academicYearId" -Headers $authHeader))
     $captures.Add((Invoke-CaptureRequest -Name "slip-template-settings-list" -Method "GET" -Uri "$baseUrl/api/SlipTemplateSettings" -Headers $authHeader))
 
-    $captures.Add((Invoke-CaptureRequest -Name "reports-stock-summary" -Method "GET" -Uri "$baseUrl/api/reports/stock-summary?subjectId=$subjectId&grade=G$runKey" -Headers $authHeader))
-    $captures.Add((Invoke-CaptureRequest -Name "reports-distribution-summary" -Method "GET" -Uri "$baseUrl/api/reports/distribution-summary?academicYearId=$academicYearId&term=Term1" -Headers $authHeader))
-    $captures.Add((Invoke-CaptureRequest -Name "reports-teacher-outstanding" -Method "GET" -Uri "$baseUrl/api/reports/teacher-outstanding?academicYearId=$academicYearId" -Headers $authHeader))
-    $captures.Add((Invoke-CaptureRequest -Name "reports-student-history" -Method "GET" -Uri "$baseUrl/api/reports/student-history/$studentId" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "reports-stock-summary" -Method "GET" -Uri "$baseUrl/api/reports/stock-summary?pageNumber=1&pageSize=20&subjectId=$subjectId&grade=G$runKey" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "reports-distribution-summary" -Method "GET" -Uri "$baseUrl/api/reports/distribution-summary?pageNumber=1&pageSize=20&academicYearId=$academicYearId" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "reports-teacher-outstanding" -Method "GET" -Uri "$baseUrl/api/reports/teacher-outstanding?pageNumber=1&pageSize=20&teacherId=$teacherId" -Headers $authHeader))
+    $captures.Add((Invoke-CaptureRequest -Name "reports-student-history" -Method "GET" -Uri "$baseUrl/api/reports/student-history/$studentId?pageNumber=1&pageSize=20" -Headers $authHeader))
 
     if ($tempUserId -gt 0) {
         $captures.Add((Invoke-CaptureRequest -Name "users-get-by-id" -Method "GET" -Uri "$baseUrl/api/users/$tempUserId" -Headers $authHeader))

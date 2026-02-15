@@ -1,4 +1,5 @@
 using BooksPortal.Application.Common.Interfaces;
+using BooksPortal.Application.Common.Models;
 using BooksPortal.Application.Features.Reports.DTOs;
 using BooksPortal.Application.Features.Reports.Interfaces;
 using BooksPortal.Domain.Entities;
@@ -27,97 +28,47 @@ public class ReportService : IReportService
         _returnRepo = returnRepo;
     }
 
-    public async Task<List<StockSummaryReport>> GetStockSummaryAsync(int? subjectId = null, string? grade = null)
+    public async Task<PaginatedList<StockSummaryReport>> GetStockSummaryAsync(
+        int pageNumber,
+        int pageSize,
+        int? subjectId = null,
+        string? grade = null)
     {
-        var query = _bookRepo.Query().Include(b => b.Subject).AsQueryable();
-
-        if (subjectId.HasValue)
-            query = query.Where(b => b.SubjectId == subjectId.Value);
-
-        if (!string.IsNullOrWhiteSpace(grade))
-            query = query.Where(b => b.Grade == grade);
-
-        return await query.OrderBy(b => b.Title).Select(b => new StockSummaryReport
-        {
-            BookId = b.Id,
-            Code = b.Code,
-            Title = b.Title,
-            SubjectName = b.Subject.Name,
-            Grade = b.Grade,
-            TotalStock = b.TotalStock,
-            Distributed = b.Distributed,
-            WithTeachers = b.WithTeachers,
-            Damaged = b.Damaged,
-            Lost = b.Lost,
-            Available = b.TotalStock - b.Distributed - b.WithTeachers - b.Damaged - b.Lost
-        }).ToListAsync();
+        var query = BuildStockSummaryQuery(subjectId, grade);
+        return await PaginatedList<StockSummaryReport>.CreateAsync(query, pageNumber, pageSize);
     }
 
-    public async Task<List<DistributionSummaryReport>> GetDistributionSummaryAsync(int academicYearId, DateTime? from = null, DateTime? to = null)
+    public async Task<PaginatedList<DistributionSummaryReport>> GetDistributionSummaryAsync(
+        int pageNumber,
+        int pageSize,
+        int academicYearId,
+        DateTime? from = null,
+        DateTime? to = null)
     {
-        var query = _distRepo.Query()
-            .Include(d => d.Student)
-            .Include(d => d.Parent)
-            .Include(d => d.Items)
-            .Where(d => d.AcademicYearId == academicYearId);
-
-        if (from.HasValue)
-            query = query.Where(d => d.IssuedAt >= from.Value);
-
-        if (to.HasValue)
-            query = query.Where(d => d.IssuedAt <= to.Value);
-
-        return await query.OrderByDescending(d => d.IssuedAt).Select(d => new DistributionSummaryReport
-        {
-            SlipId = d.Id,
-            ReferenceNo = d.ReferenceNo,
-            StudentName = d.Student.FullName,
-            StudentIndexNo = d.Student.IndexNo,
-            ParentName = d.Parent.FullName,
-            IssuedAt = d.IssuedAt,
-            TotalBooks = d.Items.Sum(i => i.Quantity)
-        }).ToListAsync();
+        var query = BuildDistributionSummaryQuery(academicYearId, from, to);
+        return await PaginatedList<DistributionSummaryReport>.CreateAsync(query, pageNumber, pageSize);
     }
 
-    public async Task<List<TeacherOutstandingReport>> GetTeacherOutstandingAsync(int? teacherId = null)
+    public async Task<PaginatedList<TeacherOutstandingReport>> GetTeacherOutstandingAsync(
+        int pageNumber,
+        int pageSize,
+        int? teacherId = null)
     {
-        var query = _teacherIssueRepo.Query()
-            .Include(t => t.Teacher)
-            .Include(t => t.Items).ThenInclude(i => i.Book)
-            .Where(t => t.Status != TeacherIssueStatus.Returned);
-
-        if (teacherId.HasValue)
-            query = query.Where(t => t.TeacherId == teacherId.Value);
-
-        var issues = await query.OrderByDescending(t => t.IssuedAt).ToListAsync();
-
-        return issues.SelectMany(t => t.Items
-            .Where(i => i.Quantity - i.ReturnedQuantity > 0)
-            .Select(i => new TeacherOutstandingReport
-            {
-                IssueId = t.Id,
-                ReferenceNo = t.ReferenceNo,
-                TeacherName = t.Teacher.FullName,
-                BookTitle = i.Book.Title,
-                BookCode = i.Book.Code,
-                Quantity = i.Quantity,
-                ReturnedQuantity = i.ReturnedQuantity,
-                Outstanding = i.Quantity - i.ReturnedQuantity,
-                Status = t.Status,
-                IssuedAt = t.IssuedAt,
-                ExpectedReturnDate = t.ExpectedReturnDate
-            })).ToList();
+        var query = BuildTeacherOutstandingQuery(teacherId);
+        return await PaginatedList<TeacherOutstandingReport>.CreateAsync(query, pageNumber, pageSize);
     }
 
-    public async Task<List<StudentHistoryReport>> GetStudentHistoryAsync(int studentId)
+    public async Task<PaginatedList<StudentHistoryReport>> GetStudentHistoryAsync(int pageNumber, int pageSize, int studentId)
     {
         var distributions = await _distRepo.Query()
-            .Include(d => d.Items).ThenInclude(i => i.Book)
+            .Include(d => d.Items)
+            .ThenInclude(i => i.Book)
             .Where(d => d.StudentId == studentId)
             .ToListAsync();
 
         var returns = await _returnRepo.Query()
-            .Include(r => r.Items).ThenInclude(i => i.Book)
+            .Include(r => r.Items)
+            .ThenInclude(i => i.Book)
             .Where(r => r.StudentId == studentId)
             .ToListAsync();
 
@@ -156,12 +107,19 @@ public class ReportService : IReportService
             }
         }
 
-        return history.OrderByDescending(h => h.Date).ToList();
+        history = history.OrderByDescending(h => h.Date).ToList();
+        var totalCount = history.Count;
+        var items = history
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PaginatedList<StudentHistoryReport>(items, totalCount, pageNumber, pageSize);
     }
 
     public async Task<byte[]> ExportStockSummaryAsync(int? subjectId = null, string? grade = null)
     {
-        var data = await GetStockSummaryAsync(subjectId, grade);
+        var data = await BuildStockSummaryQuery(subjectId, grade).ToListAsync();
         return GenerateExcel("Stock Summary", wb =>
         {
             var ws = wb.Worksheets.Add("Stock Summary");
@@ -198,7 +156,7 @@ public class ReportService : IReportService
 
     public async Task<byte[]> ExportDistributionSummaryAsync(int academicYearId, DateTime? from = null, DateTime? to = null)
     {
-        var data = await GetDistributionSummaryAsync(academicYearId, from, to);
+        var data = await BuildDistributionSummaryQuery(academicYearId, from, to).ToListAsync();
         return GenerateExcel("Distribution Summary", wb =>
         {
             var ws = wb.Worksheets.Add("Distributions");
@@ -227,7 +185,7 @@ public class ReportService : IReportService
 
     public async Task<byte[]> ExportTeacherOutstandingAsync(int? teacherId = null)
     {
-        var data = await GetTeacherOutstandingAsync(teacherId);
+        var data = await BuildTeacherOutstandingQuery(teacherId).ToListAsync();
         return GenerateExcel("Teacher Outstanding", wb =>
         {
             var ws = wb.Worksheets.Add("Outstanding");
@@ -277,4 +235,92 @@ public class ReportService : IReportService
         headerRange.Style.Font.Bold = true;
         headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
     }
+
+    private IQueryable<StockSummaryReport> BuildStockSummaryQuery(int? subjectId, string? grade)
+    {
+        var query = _bookRepo.Query().Include(b => b.Subject).AsQueryable();
+
+        if (subjectId.HasValue)
+            query = query.Where(b => b.SubjectId == subjectId.Value);
+
+        if (!string.IsNullOrWhiteSpace(grade))
+            query = query.Where(b => b.Grade == grade);
+
+        return query
+            .OrderBy(b => b.Title)
+            .Select(b => new StockSummaryReport
+            {
+                BookId = b.Id,
+                Code = b.Code,
+                Title = b.Title,
+                SubjectName = b.Subject.Name,
+                Grade = b.Grade,
+                TotalStock = b.TotalStock,
+                Distributed = b.Distributed,
+                WithTeachers = b.WithTeachers,
+                Damaged = b.Damaged,
+                Lost = b.Lost,
+                Available = b.TotalStock - b.Distributed - b.WithTeachers - b.Damaged - b.Lost
+            });
+    }
+
+    private IQueryable<DistributionSummaryReport> BuildDistributionSummaryQuery(int academicYearId, DateTime? from, DateTime? to)
+    {
+        var query = _distRepo.Query()
+            .Include(d => d.Student)
+            .Include(d => d.Parent)
+            .Include(d => d.Items)
+            .Where(d => d.AcademicYearId == academicYearId);
+
+        if (from.HasValue)
+            query = query.Where(d => d.IssuedAt >= from.Value);
+
+        if (to.HasValue)
+            query = query.Where(d => d.IssuedAt <= to.Value);
+
+        return query
+            .OrderByDescending(d => d.IssuedAt)
+            .Select(d => new DistributionSummaryReport
+            {
+                SlipId = d.Id,
+                ReferenceNo = d.ReferenceNo,
+                StudentName = d.Student.FullName,
+                StudentIndexNo = d.Student.IndexNo,
+                ParentName = d.Parent.FullName,
+                IssuedAt = d.IssuedAt,
+                TotalBooks = d.Items.Sum(i => i.Quantity)
+            });
+    }
+
+    private IQueryable<TeacherOutstandingReport> BuildTeacherOutstandingQuery(int? teacherId)
+    {
+        var query = _teacherIssueRepo.Query()
+            .Include(t => t.Teacher)
+            .Include(t => t.Items)
+            .ThenInclude(i => i.Book)
+            .Where(t => t.Status != TeacherIssueStatus.Returned);
+
+        if (teacherId.HasValue)
+            query = query.Where(t => t.TeacherId == teacherId.Value);
+
+        return query
+            .SelectMany(t => t.Items
+                .Where(i => i.Quantity - i.ReturnedQuantity > 0)
+                .Select(i => new TeacherOutstandingReport
+                {
+                    IssueId = t.Id,
+                    ReferenceNo = t.ReferenceNo,
+                    TeacherName = t.Teacher.FullName,
+                    BookTitle = i.Book.Title,
+                    BookCode = i.Book.Code,
+                    Quantity = i.Quantity,
+                    ReturnedQuantity = i.ReturnedQuantity,
+                    Outstanding = i.Quantity - i.ReturnedQuantity,
+                    Status = t.Status,
+                    IssuedAt = t.IssuedAt,
+                    ExpectedReturnDate = t.ExpectedReturnDate
+                }))
+            .OrderByDescending(x => x.IssuedAt);
+    }
+
 }
