@@ -118,12 +118,27 @@ const teacherOptions = computed(() =>
 
 async function loadTeachers() {
   try {
-    const response = await api.get<Teacher[]>(API.teachers.base)
-    if (response.success) {
-      teachers.value = response.data
-      return
+    const aggregated: Teacher[] = []
+    let currentPage = 1
+    let hasNext = true
+
+    while (hasNext) {
+      const response = await api.get<PaginatedList<Teacher>>(API.teachers.base, {
+        pageNumber: currentPage,
+        pageSize: 100,
+      })
+
+      if (!response.success) {
+        showError(response.message ?? 'Failed to load teachers')
+        return
+      }
+
+      aggregated.push(...response.data.items)
+      hasNext = response.data.hasNext
+      currentPage += 1
     }
-    showError(response.message ?? 'Failed to load teachers')
+
+    teachers.value = aggregated
   }
   catch (error: unknown) {
     showError(getFriendlyErrorMessage(error, 'Failed to load teachers'))

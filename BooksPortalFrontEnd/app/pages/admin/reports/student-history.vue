@@ -9,31 +9,28 @@
       </p>
     </div>
 
-    <Card>
-      <template #content>
-        <div class="flex flex-col gap-3">
-          <SlipsStudentLookup
-            v-model="selectedStudent"
-            :show-create-action="false"
-            @selected="onStudentSelected"
-            @cleared="onStudentCleared"
-          />
-          <div class="flex justify-end gap-2">
-            <Button
-              icon="pi pi-search"
-              label="Apply"
-              @click="applyFilters"
-            />
-            <Button
-              icon="pi pi-refresh"
-              severity="secondary"
-              outlined
-              @click="resetFilters"
-            />
-          </div>
-        </div>
-      </template>
-    </Card>
+    <div class="flex flex-col gap-3">
+      <SlipsStudentLookup
+        v-model="selectedStudent"
+        :show-create-action="false"
+        @selected="onStudentSelected"
+        @cleared="onStudentCleared"
+      />
+      <div class="flex justify-end gap-2">
+        <Button
+          icon="pi pi-search"
+          label="Apply"
+          :disabled="!selectedStudent"
+          @click="applyFilters"
+        />
+        <Button
+          icon="pi pi-refresh"
+          severity="secondary"
+          outlined
+          @click="resetFilters"
+        />
+      </div>
+    </div>
 
     <Message
       v-if="!selectedStudent"
