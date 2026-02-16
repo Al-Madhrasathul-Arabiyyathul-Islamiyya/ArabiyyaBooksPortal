@@ -55,6 +55,15 @@ export const SlipTypeValue = {
   TeacherReturn: 4,
 } as const
 
+export const SlipLifecycleStatus = z.enum(['Processing', 'Finalized', 'Cancelled'])
+export type SlipLifecycleStatus = z.infer<typeof SlipLifecycleStatus>
+
+export const SlipLifecycleStatusValue = {
+  Processing: 0,
+  Finalized: 1,
+  Cancelled: 2,
+} as const
+
 export const TeacherIssueStatus = z.enum(['Active', 'Partial', 'Returned', 'Overdue'])
 export type TeacherIssueStatus = z.infer<typeof TeacherIssueStatus>
 

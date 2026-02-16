@@ -74,6 +74,7 @@ export const API = {
     base: '/distributions',
     byId: (id: number) => `/distributions/${id}`,
     byReference: (referenceNo: string) => `/distributions/by-reference/${referenceNo}`,
+    finalize: (id: number) => `/distributions/${id}/finalize`,
     print: (id: number) => `/distributions/${id}/print`,
   },
   returns: {
@@ -85,6 +86,7 @@ export const API = {
   teacherIssues: {
     base: '/TeacherIssues',
     byId: (id: number) => `/TeacherIssues/${id}`,
+    finalize: (id: number) => `/TeacherIssues/${id}/finalize`,
     return: (id: number) => `/TeacherIssues/${id}/return`,
     print: (id: number) => `/TeacherIssues/${id}/print`,
   },

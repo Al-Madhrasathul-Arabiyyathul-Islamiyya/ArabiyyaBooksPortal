@@ -13,6 +13,12 @@
             >
               {{ subtitle }}
             </p>
+            <div
+              v-if="$slots['header-meta']"
+              class="mt-2"
+            >
+              <slot name="header-meta" />
+            </div>
           </div>
           <div class="flex flex-wrap gap-2">
             <slot name="actions" />

@@ -10,6 +10,16 @@
       :items="slip?.items ?? []"
       :loading="isLoading"
     >
+      <template #header-meta>
+        <span
+          v-if="slip && lifecycleLabel"
+          class="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-semibold"
+          :class="lifecycleBadgeClass"
+        >
+          <i :class="lifecycleIcon" />
+          {{ lifecycleLabel }}
+        </span>
+      </template>
       <template #actions>
         <Button
           label="Done"
@@ -19,11 +29,20 @@
           @click="navigateTo('/teacher-issues')"
         />
         <Button
+          v-if="canFinalize"
+          label="Finalize"
+          icon="pi pi-check-circle"
+          severity="success"
+          outlined
+          :loading="isFinalizeLoading"
+          @click="finalizeSlip"
+        />
+        <Button
           label="Process Return"
           icon="pi pi-replay"
           severity="warn"
           outlined
-          :disabled="totalOutstanding <= 0"
+          :disabled="!canProcessReturn"
           @click="navigateTo(`/teacher-returns?issueId=${slipId}`)"
         />
         <Button
@@ -38,7 +57,7 @@
           icon="pi pi-times-circle"
           severity="danger"
           outlined
-          :disabled="totalOutstanding <= 0"
+          :disabled="!canCancel"
           :loading="isCancelLoading"
           @click="cancelSlip"
         />
@@ -91,22 +110,46 @@ const route = useRoute()
 const api = useApi()
 const { showError, showSuccess } = useAppToast()
 const { confirmAction } = useAppConfirm()
+const { getLifecycleLabel, getLifecycleIcon, getLifecycleBadgeClass, isProcessing, isFinalized } = useSlipLifecycle()
 
 const slip = ref<TeacherIssue | null>(null)
 const isLoading = ref(false)
 const isPrintLoading = ref(false)
 const isCancelLoading = ref(false)
+const isFinalizeLoading = ref(false)
 
 const slipId = computed(() => Number(route.params.id))
 
 const totalOutstanding = computed(() =>
   slip.value?.items.reduce((sum, item) => sum + item.outstandingQuantity, 0) ?? 0,
 )
+const lifecycleLabel = computed(() => getLifecycleLabel(slip.value?.lifecycleStatus))
+const lifecycleIcon = computed(() => getLifecycleIcon(slip.value?.lifecycleStatus))
+const lifecycleBadgeClass = computed(() => getLifecycleBadgeClass(slip.value?.lifecycleStatus))
+const canFinalize = computed(() =>
+  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus),
+)
+const canCancel = computed(() =>
+  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus),
+)
+const canProcessReturn = computed(() =>
+  Boolean(slip.value) && isFinalized(slip.value?.lifecycleStatus) && totalOutstanding.value > 0,
+)
 
 const slipNotes = computed(() => {
   if (!slip.value) return null
   const status = teacherIssueStatusLabels[slip.value.status] ?? String(slip.value.status)
-  const summary = [`Status: ${status}`, `Outstanding: ${totalOutstanding.value}`]
+  const summary = [
+    `Status: ${status}`,
+    `Lifecycle: ${lifecycleLabel.value}`,
+    `Outstanding: ${totalOutstanding.value}`,
+  ]
+  if (slip.value.finalizedAt) {
+    summary.push(`Finalized: ${new Date(slip.value.finalizedAt).toLocaleString()}`)
+  }
+  if (slip.value.cancelledAt) {
+    summary.push(`Cancelled: ${new Date(slip.value.cancelledAt).toLocaleString()}`)
+  }
   if (slip.value.notes) summary.push(`Notes: ${slip.value.notes}`)
   return summary.join(' | ')
 })
@@ -147,8 +190,36 @@ async function printSlip() {
   }
 }
 
+function finalizeSlip() {
+  if (!Number.isFinite(slipId.value) || !canFinalize.value) return
+  confirmAction(
+    'Finalize this teacher issue slip? Finalized slips cannot be cancelled.',
+    async () => {
+      isFinalizeLoading.value = true
+      try {
+        const response = await api.post<string>(API.teacherIssues.finalize(slipId.value))
+        if (response.success) {
+          showSuccess(response.message ?? 'Teacher issue slip finalized')
+          await loadSlip()
+          return
+        }
+        showError(response.message ?? 'Failed to finalize slip')
+      }
+      catch (error: unknown) {
+        showError(getFriendlyErrorMessage(error, 'Failed to finalize slip'))
+      }
+      finally {
+        isFinalizeLoading.value = false
+      }
+    },
+    'Finalize Teacher Issue Slip',
+    'Finalize',
+    'Keep Editing',
+  )
+}
+
 function cancelSlip() {
-  if (!Number.isFinite(slipId.value)) return
+  if (!Number.isFinite(slipId.value) || !canCancel.value) return
   confirmAction(
     'Cancel this teacher issue slip? This will reverse stock movements.',
     async () => {

@@ -116,6 +116,38 @@
               {{ data.items.length }}
             </template>
           </Column>
+          <Column
+            header="Status"
+            style="min-width: 9rem;"
+          >
+            <template #body="{ data }">
+              <Tag
+                :value="getLifecycleLabel(data.lifecycleStatus)"
+                :severity="getLifecycleSeverity(data.lifecycleStatus)"
+              />
+            </template>
+          </Column>
+          <Column
+            header="Actions"
+            :exportable="false"
+            style="width: 8rem;"
+          >
+            <template #body="{ data }">
+              <div class="flex items-center gap-2">
+                <CommonIconActionButton
+                  icon="pi pi-eye"
+                  tooltip="Open details"
+                  @click.stop="navigateTo(`/distribution/${data.id}`)"
+                />
+                <CommonIconActionButton
+                  icon="pi pi-print"
+                  tooltip="Print slip"
+                  :loading="printLoadingSlipId === data.id"
+                  @click.stop="printSlip(data.id)"
+                />
+              </div>
+            </template>
+          </Column>
         </DataTable>
       </template>
     </Card>
@@ -137,12 +169,14 @@ definePageMeta({
 const api = useApi()
 const { showError } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
+const { getLifecycleLabel, getLifecycleSeverity } = useSlipLifecycle()
 
 const slips = ref<DistributionSlip[]>([])
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
 const isLoading = ref(false)
 const isReferenceLoading = ref(false)
+const printLoadingSlipId = ref<number | null>(null)
 const referenceMode = ref(false)
 const referenceSearch = ref('')
 
@@ -191,6 +225,7 @@ async function loadSlips() {
       academicYearId: filters.academicYearId ?? undefined,
       studentId: undefined,
       search: filters.studentSearch || undefined,
+      includeCancelled: false,
     })
     if (response.success) {
       slips.value = response.data.items
@@ -225,6 +260,19 @@ async function searchByReference() {
   }
   finally {
     isReferenceLoading.value = false
+  }
+}
+
+async function printSlip(slipId: number) {
+  printLoadingSlipId.value = slipId
+  try {
+    await api.downloadBlob(API.distributions.print(slipId), `distribution-${slipId}.pdf`, true)
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to print distribution slip'))
+  }
+  finally {
+    printLoadingSlipId.value = null
   }
 }
 

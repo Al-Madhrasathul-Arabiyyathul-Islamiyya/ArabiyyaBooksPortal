@@ -44,10 +44,10 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
   - [ ] Audit log flow verified against final API contract.
 
 ### Slice 2 - Lifecycle and revision UX completion
-- [ ] Add explicit lifecycle state handling in relevant pages:
-  - [ ] disable cancel when finalized
-  - [ ] expose finalized metadata where needed
-  - [ ] ensure list filters default to exclude cancelled where required
+- [~] Add explicit lifecycle state handling in relevant pages:
+  - [x] disable cancel when finalized on distribution/teacher-issue detail pages
+  - [x] expose finalized/cancelled metadata in distribution and teacher-issue detail views
+  - [~] ensure list filters default to exclude cancelled where required
 - [ ] Add/complete processing-state revision UX where backend supports revision.
 
 ### Slice 3 - Frontend consistency pass

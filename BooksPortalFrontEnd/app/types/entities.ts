@@ -201,6 +201,11 @@ export const DistributionSlipSchema = z.object({
   issuedAt: z.string(),
   notes: z.string().nullable(),
   pdfFilePath: z.string().nullable(),
+  lifecycleStatus: z.number().optional(),
+  finalizedById: z.number().nullable().optional(),
+  finalizedAt: z.string().nullable().optional(),
+  cancelledById: z.number().nullable().optional(),
+  cancelledAt: z.string().nullable().optional(),
   items: z.array(DistributionSlipItemSchema),
 })
 export type DistributionSlip = z.infer<typeof DistributionSlipSchema>
@@ -290,6 +295,11 @@ export const TeacherIssueSchema = z.object({
   status: z.number(),
   notes: z.string().nullable(),
   pdfFilePath: z.string().nullable(),
+  lifecycleStatus: z.number().optional(),
+  finalizedById: z.number().nullable().optional(),
+  finalizedAt: z.string().nullable().optional(),
+  cancelledById: z.number().nullable().optional(),
+  cancelledAt: z.string().nullable().optional(),
   items: z.array(TeacherIssueItemSchema),
 })
 export type TeacherIssue = z.infer<typeof TeacherIssueSchema>
