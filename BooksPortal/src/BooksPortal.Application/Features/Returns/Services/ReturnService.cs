@@ -40,7 +40,7 @@ public class ReturnService : IReturnService
         _staffDirectoryService = staffDirectoryService;
     }
 
-    public async Task<PaginatedList<ReturnSlipResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? studentId = null)
+    public async Task<PaginatedList<ReturnSlipResponse>> GetPagedAsync(int pageNumber, int pageSize, int? academicYearId = null, int? studentId = null, bool includeCancelled = false)
     {
         var query = _slipRepo.Query()
             .Include(r => r.AcademicYear)
@@ -53,6 +53,9 @@ public class ReturnService : IReturnService
 
         if (studentId.HasValue)
             query = query.Where(r => r.StudentId == studentId.Value);
+
+        if (!includeCancelled)
+            query = query.Where(r => r.LifecycleStatus != SlipLifecycleStatus.Cancelled);
 
         var projected = query.OrderByDescending(r => r.ReceivedAt).Select(r => new ReturnSlipResponse
         {
@@ -68,6 +71,11 @@ public class ReturnService : IReturnService
             ReturnedById = r.ReturnedById,
             ReceivedById = r.ReceivedById,
             ReceivedAt = r.ReceivedAt,
+            LifecycleStatus = r.LifecycleStatus,
+            FinalizedById = r.FinalizedById,
+            FinalizedAt = r.FinalizedAt,
+            CancelledById = r.CancelledById,
+            CancelledAt = r.CancelledAt,
             Notes = r.Notes,
             PdfFilePath = r.PdfFilePath,
             Items = r.Items.Select(i => new ReturnSlipItemResponse
@@ -155,7 +163,7 @@ public class ReturnService : IReturnService
 
             var response = await GetByIdAsync(slip.Id);
             var pdfBytes = await _pdfService.GenerateReturnSlipAsync(response);
-            slip.PdfFilePath = await _storageService.SaveAsync("Return", response.AcademicYearName, slip.ReferenceNo, pdfBytes);
+            slip.PdfFilePath = await _storageService.SaveAsync("Return", response.AcademicYearName, $"{slip.ReferenceNo}-{slip.LifecycleStatus}", pdfBytes);
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
@@ -169,12 +177,46 @@ public class ReturnService : IReturnService
         }
     }
 
-    public async Task CancelAsync(int id)
+    public async Task FinalizeAsync(int id, int userId)
     {
         var slip = await _slipRepo.Query()
-            .Include(r => r.Items)
+            .Include(r => r.AcademicYear)
+            .Include(r => r.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
+            .Include(r => r.Items).ThenInclude(i => i.Book)
             .FirstOrDefaultAsync(r => r.Id == id)
             ?? throw new NotFoundException(nameof(ReturnSlip), id);
+
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            throw new BusinessRuleException("Cancelled return slips cannot be finalized.");
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            return;
+
+        slip.LifecycleStatus = SlipLifecycleStatus.Finalized;
+        slip.FinalizedById = userId;
+        slip.FinalizedAt = DateTime.UtcNow;
+        _slipRepo.Update(slip);
+
+        var response = MapToResponse(slip);
+        await EnrichPartyAndStaffAsync([response]);
+        var pdfBytes = await _pdfService.GenerateReturnSlipAsync(response);
+        slip.PdfFilePath = await _storageService.SaveAsync("Return", response.AcademicYearName, $"{slip.ReferenceNo}-{slip.LifecycleStatus}", pdfBytes);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CancelAsync(int id, int userId)
+    {
+        var slip = await _slipRepo.Query()
+            .Include(r => r.AcademicYear)
+            .Include(r => r.Student).ThenInclude(s => s.ClassSection).ThenInclude(cs => cs.Grade)
+            .Include(r => r.Items)
+            .ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(r => r.Id == id)
+            ?? throw new NotFoundException(nameof(ReturnSlip), id);
+
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            throw new BusinessRuleException("Finalized return slips cannot be cancelled.");
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            return;
 
         await _unitOfWork.BeginTransactionAsync();
         try
@@ -188,7 +230,16 @@ public class ReturnService : IReturnService
                 _bookRepo.Update(book);
             }
 
-            _slipRepo.SoftDelete(slip);
+            slip.LifecycleStatus = SlipLifecycleStatus.Cancelled;
+            slip.CancelledById = userId;
+            slip.CancelledAt = DateTime.UtcNow;
+            _slipRepo.Update(slip);
+
+            var response = MapToResponse(slip);
+            await EnrichPartyAndStaffAsync([response]);
+            var pdfBytes = await _pdfService.GenerateReturnSlipAsync(response);
+            slip.PdfFilePath = await _storageService.SaveAsync("Return", response.AcademicYearName, $"{slip.ReferenceNo}-{slip.LifecycleStatus}", pdfBytes);
+
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
         }
@@ -264,6 +315,11 @@ public class ReturnService : IReturnService
             ReceivedById = slip.ReceivedById,
             ReceivedByName = string.Empty,
             ReceivedAt = slip.ReceivedAt,
+            LifecycleStatus = slip.LifecycleStatus,
+            FinalizedById = slip.FinalizedById,
+            FinalizedAt = slip.FinalizedAt,
+            CancelledById = slip.CancelledById,
+            CancelledAt = slip.CancelledAt,
             Notes = slip.Notes,
             PdfFilePath = slip.PdfFilePath,
             Items = slip.Items.Select(i => new ReturnSlipItemResponse

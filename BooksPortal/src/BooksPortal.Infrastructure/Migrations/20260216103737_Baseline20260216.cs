@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BooksPortal.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Baseline20260210 : Migration
+    public partial class Baseline20260216 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -460,6 +460,11 @@ namespace BooksPortal.Infrastructure.Migrations
                     TeacherId = table.Column<int>(type: "int", nullable: false),
                     IssuedById = table.Column<int>(type: "int", nullable: false),
                     IssuedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LifecycleStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    FinalizedById = table.Column<int>(type: "int", nullable: true),
+                    FinalizedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancelledById = table.Column<int>(type: "int", nullable: true),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ExpectedReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
@@ -644,6 +649,11 @@ namespace BooksPortal.Infrastructure.Migrations
                     TeacherIssueId = table.Column<int>(type: "int", nullable: false),
                     ReceivedById = table.Column<int>(type: "int", nullable: false),
                     ReceivedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LifecycleStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    FinalizedById = table.Column<int>(type: "int", nullable: true),
+                    FinalizedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancelledById = table.Column<int>(type: "int", nullable: true),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     PdfFilePath = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -784,6 +794,11 @@ namespace BooksPortal.Infrastructure.Migrations
                     ParentId = table.Column<int>(type: "int", nullable: false),
                     IssuedById = table.Column<int>(type: "int", nullable: false),
                     IssuedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LifecycleStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    FinalizedById = table.Column<int>(type: "int", nullable: true),
+                    FinalizedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancelledById = table.Column<int>(type: "int", nullable: true),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     PdfFilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -828,6 +843,11 @@ namespace BooksPortal.Infrastructure.Migrations
                     ReturnedById = table.Column<int>(type: "int", nullable: false),
                     ReceivedById = table.Column<int>(type: "int", nullable: false),
                     ReceivedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LifecycleStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    FinalizedById = table.Column<int>(type: "int", nullable: true),
+                    FinalizedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancelledById = table.Column<int>(type: "int", nullable: true),
+                    CancelledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     PdfFilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -1057,6 +1077,11 @@ namespace BooksPortal.Infrastructure.Migrations
                 column: "AcademicYearId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DistributionSlips_LifecycleStatus",
+                table: "DistributionSlips",
+                column: "LifecycleStatus");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DistributionSlips_ParentId",
                 table: "DistributionSlips",
                 column: "ParentId");
@@ -1126,6 +1151,11 @@ namespace BooksPortal.Infrastructure.Migrations
                 name: "IX_ReturnSlips_AcademicYearId",
                 table: "ReturnSlips",
                 column: "AcademicYearId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReturnSlips_LifecycleStatus",
+                table: "ReturnSlips",
+                column: "LifecycleStatus");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReturnSlips_ReferenceNo",
@@ -1228,6 +1258,11 @@ namespace BooksPortal.Infrastructure.Migrations
                 column: "AcademicYearId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TeacherIssues_LifecycleStatus",
+                table: "TeacherIssues",
+                column: "LifecycleStatus");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TeacherIssues_ReferenceNo",
                 table: "TeacherIssues",
                 column: "ReferenceNo",
@@ -1257,6 +1292,11 @@ namespace BooksPortal.Infrastructure.Migrations
                 name: "IX_TeacherReturnSlipItems_TeacherReturnSlipId",
                 table: "TeacherReturnSlipItems",
                 column: "TeacherReturnSlipId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeacherReturnSlips_LifecycleStatus",
+                table: "TeacherReturnSlips",
+                column: "LifecycleStatus");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeacherReturnSlips_ReferenceNo",

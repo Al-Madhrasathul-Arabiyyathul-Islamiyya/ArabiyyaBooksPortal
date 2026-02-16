@@ -1011,8 +1011,9 @@ All endpoints require **Bearer auth**.
 
 List return slips (paginated).
 
-- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&studentId={int}`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&studentId={int}&includeCancelled={bool}`
 - **Defaults**: pageNumber=1, pageSize=20
+- **Default behavior**: cancelled slips are excluded unless `includeCancelled=true`.
 - **Response**: `PaginatedList<ReturnSlipResponse>`
 
 ### GET /api/returns/{id}
@@ -1056,6 +1057,14 @@ Create a return slip.
 Cancel a return slip (reverses stock).
 
 - **Response**: `string` message
+- **Rule**: finalized slips cannot be cancelled.
+
+### POST /api/returns/{id}/finalize
+
+Finalize a return slip.
+
+- **Response**: `string` message
+- **Rule**: cancelled slips cannot be finalized.
 
 ### GET /api/returns/{id}/print
 
@@ -1085,6 +1094,11 @@ Download PDF for a return slip.
 | receivedByName | string |
 | receivedByDesignation | string? |
 | receivedAt | DateTime |
+| lifecycleStatus | SlipLifecycleStatus (int) |
+| finalizedById | int? |
+| finalizedAt | DateTime? |
+| cancelledById | int? |
+| cancelledAt | DateTime? |
 | notes | string? |
 | pdfFilePath | string? |
 | items | ReturnSlipItemResponse[] |
@@ -1268,6 +1282,11 @@ Download PDF for the latest teacher return slip created for the teacher issue.
 | receivedByName | string |
 | receivedByDesignation | string? |
 | receivedAt | DateTime |
+| lifecycleStatus | SlipLifecycleStatus (int) |
+| finalizedById | int? |
+| finalizedAt | DateTime? |
+| cancelledById | int? |
+| cancelledAt | DateTime? |
 | notes | string? |
 | pdfFilePath | string? |
 | items | TeacherReturnSlipItemResponse[] |
@@ -1281,6 +1300,55 @@ Download PDF for the latest teacher return slip created for the teacher issue.
 | bookTitle | string |
 | bookCode | string |
 | quantity | int |
+
+---
+
+## 13A. Teacher Return Slips
+
+Base path: `/api/TeacherReturns`
+
+All endpoints require **Bearer auth**.
+
+### GET /api/TeacherReturns
+
+List teacher return slips (paginated).
+
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&teacherId={int}&teacherIssueId={int}&includeCancelled={bool}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Default behavior**: cancelled slips are excluded unless `includeCancelled=true`.
+- **Response**: `PaginatedList<TeacherReturnSlipResponse>`
+
+### GET /api/TeacherReturns/{id}
+
+Get teacher return slip by ID.
+
+- **Response**: `TeacherReturnSlipResponse`
+
+### GET /api/TeacherReturns/by-reference/{referenceNo}
+
+Get teacher return slip by reference number.
+
+- **Response**: `TeacherReturnSlipResponse`
+
+### POST /api/TeacherReturns/{id}/finalize
+
+Finalize a teacher return slip.
+
+- **Response**: `string` message
+- **Rule**: cancelled slips cannot be finalized.
+
+### DELETE /api/TeacherReturns/{id}
+
+Cancel a teacher return slip (reverses teacher-return stock movements).
+
+- **Response**: `string` message
+- **Rule**: finalized slips cannot be cancelled.
+
+### GET /api/TeacherReturns/{id}/print
+
+Download PDF for a teacher return slip.
+
+- **Response**: `application/pdf` file
 
 ---
 

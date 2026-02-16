@@ -79,9 +79,9 @@ public class TeacherIssuesController : ApiControllerBase
 
         var stored = await _storageService.LoadAsync(slip.PdfFilePath);
         if (stored != null)
-            return File(stored, "application/pdf", $"TeacherReturn-{slip.ReferenceNo}.pdf");
+            return File(stored, "application/pdf", $"TeacherReturn-{slip.ReferenceNo}-{slip.LifecycleStatus}.pdf");
 
         var pdf = await _pdfService.GenerateTeacherReturnSlipAsync(slip);
-        return File(pdf, "application/pdf", $"TeacherReturn-{slip.ReferenceNo}.pdf");
+        return File(pdf, "application/pdf", $"TeacherReturn-{slip.ReferenceNo}-{slip.LifecycleStatus}.pdf");
     }
 }

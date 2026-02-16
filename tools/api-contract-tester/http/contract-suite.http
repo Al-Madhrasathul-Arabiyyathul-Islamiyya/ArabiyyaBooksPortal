@@ -838,6 +838,18 @@ GET {{baseUrl}}/api/returns?pageNumber=1&pageSize=20&academicYearId={{academicYe
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
+
+###
+# @name return_list_include_cancelled
+# @covers GET /api/returns?includeCancelled=true
+GET {{baseUrl}}/api/returns?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}&studentId={{studentId}}&includeCancelled=true
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
 
 ###
 # @name return_get
@@ -859,6 +871,14 @@ Authorization: Bearer {{accessToken}}
 # @name return_print
 # @covers GET /api/returns/{id}/print
 GET {{baseUrl}}/api/returns/{{returnId}}/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name return_finalize
+# @covers POST /api/returns/{id}/finalize
+POST {{baseUrl}}/api/returns/{{returnId}}/finalize
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
@@ -935,6 +955,62 @@ Content-Type: application/json
   ],
   "notes": "Teacher return from contract suite"
 }
+
+?? status < 500 && status != 401 && status != 403
+@teacherReturnId={{response.parsedBody.data.id}}
+@teacherReturnRef={{response.parsedBody.data.referenceNo}}
+?? response.parsedBody.data.id != null
+?? response.parsedBody.data.referenceNo != null
+
+###
+# @name teacher_returns_list
+# @covers GET /api/TeacherReturns
+GET {{baseUrl}}/api/TeacherReturns?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}&teacherId={{teacherId}}&teacherIssueId={{teacherIssueId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
+
+###
+# @name teacher_returns_list_include_cancelled
+# @covers GET /api/TeacherReturns?includeCancelled=true
+GET {{baseUrl}}/api/TeacherReturns?pageNumber=1&pageSize=20&academicYearId={{academicYearId}}&teacherId={{teacherId}}&teacherIssueId={{teacherIssueId}}&includeCancelled=true
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+?? response.parsedBody.data.items != null
+?? response.parsedBody.data.pageNumber != null
+
+###
+# @name teacher_return_get
+# @covers GET /api/TeacherReturns/{id}
+GET {{baseUrl}}/api/TeacherReturns/{{teacherReturnId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_return_get_by_ref
+# @covers GET /api/TeacherReturns/by-reference/{referenceNo}
+GET {{baseUrl}}/api/TeacherReturns/by-reference/{{teacherReturnRef}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_return_print
+# @covers GET /api/TeacherReturns/{id}/print
+GET {{baseUrl}}/api/TeacherReturns/{{teacherReturnId}}/print
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_return_finalize
+# @covers POST /api/TeacherReturns/{id}/finalize
+POST {{baseUrl}}/api/TeacherReturns/{{teacherReturnId}}/finalize
+Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403
 
@@ -1305,6 +1381,14 @@ Authorization: Bearer {{accessToken}}
 # @name return_cancel
 # @covers DELETE /api/returns/{id}
 DELETE {{baseUrl}}/api/returns/{{returnId}}
+Authorization: Bearer {{accessToken}}
+
+?? status < 500 && status != 401 && status != 403
+
+###
+# @name teacher_return_cancel
+# @covers DELETE /api/TeacherReturns/{id}
+DELETE {{baseUrl}}/api/TeacherReturns/{{teacherReturnId}}
 Authorization: Bearer {{accessToken}}
 
 ?? status < 500 && status != 401 && status != 403

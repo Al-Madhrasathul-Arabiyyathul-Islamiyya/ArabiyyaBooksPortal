@@ -1,3 +1,5 @@
+using BooksPortal.Domain.Enums;
+
 namespace BooksPortal.Application.Features.TeacherIssues.DTOs;
 
 public class TeacherReturnSlipResponse
@@ -13,6 +15,11 @@ public class TeacherReturnSlipResponse
     public string ReceivedByName { get; set; } = string.Empty;
     public string? ReceivedByDesignation { get; set; }
     public DateTime ReceivedAt { get; set; }
+    public SlipLifecycleStatus LifecycleStatus { get; set; }
+    public int? FinalizedById { get; set; }
+    public DateTime? FinalizedAt { get; set; }
+    public int? CancelledById { get; set; }
+    public DateTime? CancelledAt { get; set; }
     public string? Notes { get; set; }
     public string? PdfFilePath { get; set; }
     public List<TeacherReturnSlipItemResponse> Items { get; set; } = new();
