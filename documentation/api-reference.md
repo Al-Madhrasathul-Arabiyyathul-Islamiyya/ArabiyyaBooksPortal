@@ -54,6 +54,12 @@ Paginated endpoints return `PaginatedList<T>`:
 - **Validation run**: `tools/api-contract-tester/logs/httpyac-contract-log-8838ab0c-93e8-4237-9003-46b28cd0cdbb.json`
 - **Rule**: For the scoped endpoints, example payloads in this document are treated as frontend contracts.
 
+### Contract Alignment Notes
+
+- Pagination upgrades and consumption tracking are maintained in `plans/03-backend-pagination-enhancements.md`.
+- Slip lifecycle and revision follow-ups are tracked in `plans/04-high-priority-backend-followups.md`.
+- Frontend execution/verification closure is tracked in `plans/01-frontend-core-roadmap.md`.
+
 ---
 
 ## 1. Auth

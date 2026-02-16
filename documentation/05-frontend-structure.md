@@ -11,9 +11,10 @@ Current status:
 - Module 10 Phase 2.6: complete (routing/layout split)
 - Module 10 Phase 2.7: complete (backend contract alignment)
 - Module 10 Phase 3: complete (master data screens)
-- Module 10 Phase 4: next to start (books)
+- Module 10 Phase 4: complete (books + stock flows)
+- Module 10 Phases 5/6/7/8: implemented in large part, with verification debt and lifecycle/revision UX closure still in progress
 
-Primary implementation plan: `plans/frontend-plan.md`
+Primary implementation plan: `plans/01-frontend-core-roadmap.md`
 
 ## Technology Stack (Current)
 
@@ -40,7 +41,7 @@ Primary implementation plan: `plans/frontend-plan.md`
 - App composables are named `useAppToast` / `useAppConfirm` to avoid PrimeVue auto-import collisions.
 - `nuxt-csurf` is configured and used for state-changing requests.
 
-## UI Surface Split (Planned for Phase 3+)
+## UI Surface Split (Implemented)
 
 - `User` role should see only operational flows:
   - `/`
@@ -53,9 +54,9 @@ Primary implementation plan: `plans/frontend-plan.md`
 
 Current implementation progress:
 - Operations-focused `default` layout is in place.
-- Dedicated `admin` layout is added.
-- `/admin` and `/admin/audit-log` route shells are added with Admin/SuperAdmin guards.
-- Audit log navigation is modeled as top-level admin entry, not under settings.
+- Dedicated `admin` layout is in place.
+- Admin routes and role guards are implemented.
+- Audit log is modeled as a top-level admin navigation entry.
 
 ## Form UX Convention (Planned)
 
@@ -165,7 +166,7 @@ BooksPortalFrontEnd/
 ## Notes About Planned vs Current Structure
 
 - Older proposed component/page trees are intentionally not repeated here.
-- For future pages/components by phase, use `plans/frontend-plan.md` as the active roadmap.
+- For future pages/components by phase, use `plans/01-frontend-core-roadmap.md` as the active roadmap.
 - For latest implementation status and decisions, use basic-memory:
   - `progress/module-10-progress`
   - `architecture/frontend-setup`

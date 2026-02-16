@@ -64,10 +64,10 @@ Books Portal is a web-based textbook management system for Arabiyya school. It t
 
 | Component | Status | Version |
 |-----------|--------|---------|
-| Backend (Modules 1-9) | Complete | v0.9.0 |
-| Unit Tests | 88 passing | - |
-| Frontend | Scaffolded, dependencies installed | - |
-| Frontend Implementation | Not started | - |
+| Backend (core modules + follow-ups) | Active development | v0.10.x |
+| Backend Tests | Active (unit/integration/contract) | - |
+| Frontend Core (Phases 1-4) | Implemented | - |
+| Frontend Remaining | Verification debt + lifecycle/revision UX closure | - |
 
 ---
 
@@ -88,3 +88,9 @@ BookPortal/
   designs/                   # UI mockups
   plans/                     # Feature plans (kanban)
 ```
+
+## Planning Conventions
+
+- Canonical execution plans are in numbered files under `plans/` (`01-...`, `02-...`, ...).
+- Legacy plan filenames are kept as pointer stubs; full historical content is stored in `plans/archive/`.
+- Frontend active roadmap: `plans/01-frontend-core-roadmap.md`.

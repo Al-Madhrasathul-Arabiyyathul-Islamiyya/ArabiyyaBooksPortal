@@ -84,6 +84,6 @@ For each form page/dialog:
 - No localization/i18n rollout in this task (catalog structure should remain i18n-ready).
 
 ## Related
-- `plans/frontend-validation-migration-plan.md`
-- `plans/frontend-plan.md`
+- `plans/02-frontend-validation-migration.md`
+- `plans/01-frontend-core-roadmap.md`
 - `documentation/05-frontend-structure.md`
