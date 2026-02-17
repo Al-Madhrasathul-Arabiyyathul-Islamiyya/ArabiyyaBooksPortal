@@ -460,11 +460,13 @@ function resetForm() {
 
 async function loadClassSections() {
   try {
-    const response = await api.get<ClassSection[]>(API.classSections.base, {
+    const response = await api.get<PaginatedList<ClassSection>>(API.classSections.base, {
+      pageNumber: 1,
+      pageSize: 500,
       academicYearId: activeAcademicYearId.value ?? undefined,
     })
     if (response.success) {
-      classSections.value = response.data
+      classSections.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load classes')

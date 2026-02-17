@@ -18,15 +18,21 @@
 
     <Card class="flex min-h-0 flex-1 flex-col">
       <template #content>
-        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormsSearchInput
-            id="class-sections-search"
-            v-model="searchTerm"
-            name="class-sections-search"
-            persist-key="bp.search.admin.class-sections"
-            placeholder="Search by class, grade, section or keystage"
-            @search="handleSearch"
-          />
+        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[32rem_22rem]">
+          <FormsFormField
+            label="Search"
+            field-id="class-sections-search"
+          >
+            <FormsSearchInput
+              id="class-sections-search"
+              v-model="searchTerm"
+              name="class-sections-search"
+              persist-key="bp.search.admin.class-sections"
+              placeholder="Search by class, grade, section or keystage"
+              @search="handleSearch"
+            />
+          </FormsFormField>
+
           <FormsFormField
             label="Filter by Academic Year"
             field-id="yearFilter"
@@ -240,6 +246,7 @@
 </template>
 
 <script setup lang="ts">
+import type { PaginatedList } from '~/types/api'
 import type {
   AcademicYear,
   ClassSection,
@@ -426,12 +433,13 @@ async function loadActiveAcademicYear() {
 async function loadClassSections() {
   isLoading.value = true
   try {
-    const query = selectedAcademicYearFilter.value
-      ? `?academicYearId=${selectedAcademicYearFilter.value}`
-      : ''
-    const response = await api.get<ClassSection[]>(`${API.classSections.base}${query}`)
+    const response = await api.get<PaginatedList<ClassSection>>(API.classSections.base, {
+      pageNumber: 1,
+      pageSize: 500,
+      academicYearId: selectedAcademicYearFilter.value ?? undefined,
+    })
     if (response.success) {
-      classSections.value = response.data
+      classSections.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load class sections')

@@ -450,7 +450,10 @@ async function loadLookups() {
   try {
     const [subjectsResponse, classSectionsResponse] = await Promise.all([
       api.get<Subject[]>(API.subjects.base),
-      api.get<ClassSection[]>(API.classSections.base),
+      api.get<PaginatedList<ClassSection>>(API.classSections.base, {
+        pageNumber: 1,
+        pageSize: 500,
+      }),
     ])
 
     if (subjectsResponse.success) {
@@ -461,7 +464,7 @@ async function loadLookups() {
     }
 
     if (classSectionsResponse.success) {
-      classSections.value = classSectionsResponse.data
+      classSections.value = classSectionsResponse.data.items
     }
     else {
       showError(classSectionsResponse.message ?? 'Failed to load classes')

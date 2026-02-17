@@ -206,9 +206,12 @@ function formatJson(raw: string | null) {
 
 async function loadUsers() {
   try {
-    const response = await api.get<User[]>(API.users.base)
+    const response = await api.get<PaginatedList<User>>(API.users.base, {
+      pageNumber: 1,
+      pageSize: 500,
+    })
     if (response.success) {
-      users.value = response.data
+      users.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load users')

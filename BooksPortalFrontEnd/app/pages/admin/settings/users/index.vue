@@ -268,6 +268,7 @@
 
 <script setup lang="ts">
 import { z } from 'zod/v4'
+import type { PaginatedList } from '~/types/api'
 import type { User } from '~/types/entities'
 import { CreateUserRequestSchema, UpdateUserRequestSchema } from '~/types/forms'
 import { API, ROLES } from '~/utils/constants'
@@ -386,9 +387,12 @@ function formatDateTime(value: string) {
 async function loadUsers() {
   isLoading.value = true
   try {
-    const response = await api.get<User[]>(API.users.base)
+    const response = await api.get<PaginatedList<User>>(API.users.base, {
+      pageNumber: 1,
+      pageSize: 500,
+    })
     if (response.success) {
-      users.value = response.data
+      users.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load users')
