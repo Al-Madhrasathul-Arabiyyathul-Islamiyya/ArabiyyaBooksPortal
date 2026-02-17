@@ -1,9 +1,9 @@
 using BooksPortal.Application.Features.Settings.Services;
 using BooksPortal.Domain.Entities;
 using BooksPortal.Domain.Enums;
+using BooksPortal.Infrastructure.Data.Seeders;
 using BooksPortal.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -100,162 +100,12 @@ public static class SeedData
             }
         }
 
-        await SeedKeystagesAndGradesAsync(serviceProvider);
-        await SeedDefaultClassSectionsAsync(serviceProvider);
-        await SeedSlipTemplateSettingsAsync(serviceProvider);
-    }
-
-    private static async Task SeedKeystagesAndGradesAsync(IServiceProvider serviceProvider)
-    {
         var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
 
-        var keyStageDefinitions = new[]
-        {
-            new
-            {
-                Code = "KS1",
-                Name = "Key stage 1",
-                SortOrder = 1,
-                Grades = new[] { ("G1", "Grade 1", 1), ("G2", "Grade 2", 2), ("G3", "Grade 3", 3) }
-            },
-            new
-            {
-                Code = "KS2",
-                Name = "Key stage 2",
-                SortOrder = 2,
-                Grades = new[] { ("G4", "Grade 4", 4), ("G5", "Grade 5", 5), ("G6", "Grade 6", 6) }
-            },
-            new
-            {
-                Code = "KS3",
-                Name = "Key stage 3",
-                SortOrder = 3,
-                Grades = new[] { ("G7", "Grade 7", 7), ("G8", "Grade 8", 8) }
-            },
-            new
-            {
-                Code = "KS4",
-                Name = "Key stage 4",
-                SortOrder = 4,
-                Grades = new[] { ("G9", "Grade 9", 9), ("G10", "Grade 10", 10) }
-            },
-            new
-            {
-                Code = "KS5",
-                Name = "Key stage 5",
-                SortOrder = 5,
-                Grades = new[] { ("G11", "Grade 11", 11), ("G12", "Grade 12", 12) }
-            }
-        };
-
-        foreach (var def in keyStageDefinitions)
-        {
-            var keystage = await db.Keystages.FirstOrDefaultAsync(k => k.Code == def.Code);
-            if (keystage == null)
-            {
-                keystage = new Keystage
-                {
-                    Code = def.Code,
-                    Name = def.Name,
-                    SortOrder = def.SortOrder
-                };
-                db.Keystages.Add(keystage);
-                await db.SaveChangesAsync();
-            }
-            else
-            {
-                keystage.Name = def.Name;
-                keystage.SortOrder = def.SortOrder;
-                db.Keystages.Update(keystage);
-                await db.SaveChangesAsync();
-            }
-
-            foreach (var (gradeCode, gradeName, sortOrder) in def.Grades)
-            {
-                var grade = await db.Grades.FirstOrDefaultAsync(g => g.KeystageId == keystage.Id && g.Code == gradeCode);
-                if (grade == null)
-                {
-                    db.Grades.Add(new Grade
-                    {
-                        KeystageId = keystage.Id,
-                        Code = gradeCode,
-                        Name = gradeName,
-                        SortOrder = sortOrder
-                    });
-                }
-                else
-                {
-                    grade.Name = gradeName;
-                    grade.SortOrder = sortOrder;
-                    db.Grades.Update(grade);
-                }
-            }
-
-            await db.SaveChangesAsync();
-        }
-    }
-
-    private static async Task SeedDefaultClassSectionsAsync(IServiceProvider serviceProvider)
-    {
-        var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
-
-        var activeAcademicYear = await db.AcademicYears.FirstOrDefaultAsync(a => a.IsActive);
-        if (activeAcademicYear == null)
-        {
-            var now = DateTime.UtcNow;
-            activeAcademicYear = new AcademicYear
-            {
-                Name = $"AY {now.Year}",
-                Year = now.Year,
-                StartDate = new DateTime(now.Year, 1, 1),
-                EndDate = new DateTime(now.Year, 12, 31),
-                IsActive = true
-            };
-
-            db.AcademicYears.Add(activeAcademicYear);
-            await db.SaveChangesAsync();
-        }
-
-        var grades = await db.Grades.OrderBy(g => g.SortOrder).ToListAsync();
-        if (grades.Count == 0)
-            return;
-
-        var sectionLetters = new[] { "A", "B", "C", "D" };
-
-        foreach (var grade in grades)
-        {
-            foreach (var section in sectionLetters)
-            {
-                var exists = await db.ClassSections.AnyAsync(c =>
-                    c.AcademicYearId == activeAcademicYear.Id &&
-                    c.GradeId == grade.Id &&
-                    c.Section == section);
-
-                if (!exists)
-                {
-                    db.ClassSections.Add(new ClassSection
-                    {
-                        AcademicYearId = activeAcademicYear.Id,
-                        KeystageId = grade.KeystageId,
-                        GradeId = grade.Id,
-                        Section = section
-                    });
-                }
-            }
-        }
-
-        await db.SaveChangesAsync();
-    }
-
-    private static async Task SeedSlipTemplateSettingsAsync(IServiceProvider serviceProvider)
-    {
-        var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
-
-        if (await db.SlipTemplateSettings.AnyAsync())
-            return;
-
-        var defaults = SlipTemplateSettingService.GetDefaultLabels();
-        db.SlipTemplateSettings.AddRange(defaults);
-        await db.SaveChangesAsync();
+        await CurriculumSeeder.SeedAsync(db);
+        await ClassSectionSeeder.SeedAsync(db);
+        await SubjectAndBookSeeder.SeedAsync(db);
+        await PeopleSeeder.SeedAsync(db);
+        await SlipTemplateSettingsSeeder.SeedAsync(db);
     }
 }
