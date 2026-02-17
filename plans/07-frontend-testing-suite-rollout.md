@@ -28,7 +28,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [x] `usePagination` unit tests
 - [x] `useSlipLifecycle` unit tests
 - [ ] Add unit tests for auth store state transitions (mock API)
-- [ ] Add unit tests for validation helper edge cases
+- [x] Add unit tests for validation helper edge cases
 
 ### Module 02 - E2E auth/navigation smoke
 - [x] Playwright config and browser setup command
@@ -59,7 +59,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [ ] Dialog interaction smoke for common form containers
 
 ### Module 06 - Regression and CI wiring
-- [~] Script-level test selection commands in `package.json`
+- [x] Script-level test selection commands in `package.json`
 - [ ] Add CI docs for when to run `test:smoke` vs `test:all`
 - [ ] Add optional suite tags/grep conventions for focused runs
 - [ ] Add release checklist alignment in docs/plans
