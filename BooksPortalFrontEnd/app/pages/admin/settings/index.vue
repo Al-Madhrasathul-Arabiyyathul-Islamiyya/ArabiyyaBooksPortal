@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div>
       <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
         Settings

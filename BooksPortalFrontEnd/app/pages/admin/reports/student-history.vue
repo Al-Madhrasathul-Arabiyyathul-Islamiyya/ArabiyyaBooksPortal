@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div>
       <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
         Student History
@@ -42,7 +42,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="rows"
           :loading="isLoading"
           data-key="referenceNo"
@@ -56,22 +56,50 @@
           responsive-layout="scroll"
           @page="onPageChange"
         >
-          <Column field="type" header="Type" style="min-width: 8rem;" />
-          <Column field="referenceNo" header="Reference" style="min-width: 10rem;" />
-          <Column field="date" header="Date" style="min-width: 11rem;">
+          <Column
+            field="type"
+            header="Type"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="referenceNo"
+            header="Reference"
+            style="min-width: 10rem;"
+          />
+          <Column
+            field="date"
+            header="Date"
+            style="min-width: 11rem;"
+          >
             <template #body="{ data }">
               {{ new Date(data.date).toLocaleString() }}
             </template>
           </Column>
-          <Column field="bookCode" header="Book Code" style="min-width: 9rem;" />
-          <Column field="bookTitle" header="Book Title" style="min-width: 14rem;" />
-          <Column field="quantity" header="Quantity" style="min-width: 8rem;" />
-          <Column field="condition" header="Condition" style="min-width: 10rem;">
+          <Column
+            field="bookCode"
+            header="Book Code"
+            style="min-width: 9rem;"
+          />
+          <Column
+            field="bookTitle"
+            header="Book Title"
+            style="min-width: 14rem;"
+          />
+          <Column
+            field="quantity"
+            header="Quantity"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="condition"
+            header="Condition"
+            style="min-width: 10rem;"
+          >
             <template #body="{ data }">
               {{ data.condition ?? '-' }}
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
   </div>

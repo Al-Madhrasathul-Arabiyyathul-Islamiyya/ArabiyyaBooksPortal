@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -18,7 +18,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="keystages"
           :loading="isLoading"
           data-key="id"
@@ -58,7 +58,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -69,7 +69,7 @@
       :style="{ width: '30rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField

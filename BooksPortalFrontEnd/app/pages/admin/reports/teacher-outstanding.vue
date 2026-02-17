@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -36,7 +36,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="rows"
           :loading="isLoading"
           data-key="referenceNo"
@@ -50,14 +50,46 @@
           responsive-layout="scroll"
           @page="onPageChange"
         >
-          <Column field="referenceNo" header="Reference" style="min-width: 10rem;" />
-          <Column field="teacherName" header="Teacher" style="min-width: 12rem;" />
-          <Column field="bookCode" header="Book Code" style="min-width: 9rem;" />
-          <Column field="bookTitle" header="Book Title" style="min-width: 14rem;" />
-          <Column field="quantity" header="Issued" style="min-width: 7rem;" />
-          <Column field="returnedQuantity" header="Returned" style="min-width: 8rem;" />
-          <Column field="outstanding" header="Outstanding" style="min-width: 8rem;" />
-          <Column field="status" header="Status" style="min-width: 10rem;">
+          <Column
+            field="referenceNo"
+            header="Reference"
+            style="min-width: 10rem;"
+          />
+          <Column
+            field="teacherName"
+            header="Teacher"
+            style="min-width: 12rem;"
+          />
+          <Column
+            field="bookCode"
+            header="Book Code"
+            style="min-width: 9rem;"
+          />
+          <Column
+            field="bookTitle"
+            header="Book Title"
+            style="min-width: 14rem;"
+          />
+          <Column
+            field="quantity"
+            header="Issued"
+            style="min-width: 7rem;"
+          />
+          <Column
+            field="returnedQuantity"
+            header="Returned"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="outstanding"
+            header="Outstanding"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="status"
+            header="Status"
+            style="min-width: 10rem;"
+          >
             <template #body="{ data }">
               <Tag
                 :value="teacherIssueStatusLabels[data.status] ?? String(data.status)"
@@ -65,17 +97,25 @@
               />
             </template>
           </Column>
-          <Column field="issuedAt" header="Issued At" style="min-width: 11rem;">
+          <Column
+            field="issuedAt"
+            header="Issued At"
+            style="min-width: 11rem;"
+          >
             <template #body="{ data }">
               {{ new Date(data.issuedAt).toLocaleString() }}
             </template>
           </Column>
-          <Column field="expectedReturnDate" header="Expected Return" style="min-width: 11rem;">
+          <Column
+            field="expectedReturnDate"
+            header="Expected Return"
+            style="min-width: 11rem;"
+          >
             <template #body="{ data }">
               {{ data.expectedReturnDate ? new Date(data.expectedReturnDate).toLocaleDateString() : '-' }}
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
   </div>

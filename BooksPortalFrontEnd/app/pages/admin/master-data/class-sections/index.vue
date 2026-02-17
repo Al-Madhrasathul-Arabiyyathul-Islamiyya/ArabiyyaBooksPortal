@@ -60,7 +60,7 @@
           </FormsFormField>
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="filteredClassSections"
           :loading="isLoading"
           data-key="id"
@@ -118,7 +118,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -129,7 +129,7 @@
       :style="{ width: '34rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField

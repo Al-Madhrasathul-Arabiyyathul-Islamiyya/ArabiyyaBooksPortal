@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -97,7 +97,7 @@
               Stock Entries
             </template>
             <template #content>
-              <DataTable
+              <CommonAdminDataTable
                 :value="stockEntries"
                 :loading="isLoading"
                 size="small"
@@ -132,7 +132,7 @@
                     {{ formatDateTime(data.enteredAt) }}
                   </template>
                 </Column>
-              </DataTable>
+              </CommonAdminDataTable>
             </template>
           </Card>
 
@@ -141,7 +141,7 @@
               Stock Movements
             </template>
             <template #content>
-              <DataTable
+              <CommonAdminDataTable
                 :value="stockMovements"
                 :loading="isLoading"
                 size="small"
@@ -180,7 +180,7 @@
                     {{ formatDateTime(data.processedAt) }}
                   </template>
                 </Column>
-              </DataTable>
+              </CommonAdminDataTable>
             </template>
           </Card>
         </div>

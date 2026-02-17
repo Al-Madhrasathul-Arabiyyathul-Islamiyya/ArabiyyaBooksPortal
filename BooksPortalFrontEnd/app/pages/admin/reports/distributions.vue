@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -58,7 +58,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="rows"
           :loading="isLoading"
           data-key="slipId"
@@ -72,17 +72,41 @@
           responsive-layout="scroll"
           @page="onPageChange"
         >
-          <Column field="referenceNo" header="Reference" style="min-width: 10rem;" />
-          <Column field="studentName" header="Student" style="min-width: 14rem;" />
-          <Column field="studentIndexNo" header="Index No" style="min-width: 9rem;" />
-          <Column field="parentName" header="Parent" style="min-width: 12rem;" />
-          <Column field="issuedAt" header="Issued At" style="min-width: 11rem;">
+          <Column
+            field="referenceNo"
+            header="Reference"
+            style="min-width: 10rem;"
+          />
+          <Column
+            field="studentName"
+            header="Student"
+            style="min-width: 14rem;"
+          />
+          <Column
+            field="studentIndexNo"
+            header="Index No"
+            style="min-width: 9rem;"
+          />
+          <Column
+            field="parentName"
+            header="Parent"
+            style="min-width: 12rem;"
+          />
+          <Column
+            field="issuedAt"
+            header="Issued At"
+            style="min-width: 11rem;"
+          >
             <template #body="{ data }">
               {{ new Date(data.issuedAt).toLocaleString() }}
             </template>
           </Column>
-          <Column field="totalBooks" header="Books" style="min-width: 7rem;" />
-        </DataTable>
+          <Column
+            field="totalBooks"
+            header="Books"
+            style="min-width: 7rem;"
+          />
+        </CommonAdminDataTable>
       </template>
     </Card>
   </div>

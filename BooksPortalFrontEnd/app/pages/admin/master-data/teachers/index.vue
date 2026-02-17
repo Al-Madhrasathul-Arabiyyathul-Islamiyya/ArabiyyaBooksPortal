@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -38,7 +38,7 @@
           />
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="teachers"
           :loading="isLoading"
           data-key="id"
@@ -102,7 +102,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -113,7 +113,7 @@
       :style="{ width: '34rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField
@@ -205,7 +205,7 @@
       :header="`Manage Assignments - ${selectedTeacherName}`"
       :style="{ width: '52rem' }"
     >
-      <div class="flex flex-col gap-4">
+      <div class="flex h-full min-h-0 flex-col gap-4">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
           <FormsFormField
             label="Subject"
@@ -259,7 +259,7 @@
           {{ assignmentError }}
         </Message>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="selectedTeacherAssignments"
           data-key="id"
           size="small"
@@ -286,7 +286,7 @@
               />
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </div>
     </Dialog>
 

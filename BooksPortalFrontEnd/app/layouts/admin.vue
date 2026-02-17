@@ -64,7 +64,7 @@
         </div>
       </header>
 
-      <main class="flex-1 p-6">
+      <main class="admin-layout-main flex min-h-0 flex-1 flex-col p-6">
         <slot />
       </main>
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -58,7 +58,7 @@
           </FormsFormField>
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="students"
           :loading="isLoading"
           data-key="id"
@@ -128,7 +128,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -139,7 +139,7 @@
       :style="{ width: '52rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -252,7 +252,7 @@
             </div>
           </div>
 
-          <DataTable
+          <CommonAdminDataTable
             :value="linkedParents"
             data-key="parentId"
             size="small"
@@ -292,7 +292,7 @@
                 />
               </template>
             </Column>
-          </DataTable>
+          </CommonAdminDataTable>
         </div>
 
         <Message

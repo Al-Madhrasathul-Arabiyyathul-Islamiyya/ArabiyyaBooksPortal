@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -41,7 +41,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="rows"
           :loading="isLoading"
           data-key="bookId"
@@ -55,21 +55,60 @@
           responsive-layout="scroll"
           @page="onPageChange"
         >
-          <Column field="code" header="Code" style="min-width: 8rem;" />
-          <Column field="title" header="Title" style="min-width: 14rem;" />
-          <Column field="subjectName" header="Subject" style="min-width: 10rem;" />
-          <Column field="grade" header="Grade" style="min-width: 8rem;" />
-          <Column field="totalStock" header="Total" style="min-width: 7rem;" />
-          <Column field="distributed" header="Distributed" style="min-width: 8rem;" />
-          <Column field="withTeachers" header="With Teachers" style="min-width: 9rem;" />
-          <Column field="damaged" header="Damaged" style="min-width: 8rem;" />
-          <Column field="lost" header="Lost" style="min-width: 7rem;" />
-          <Column header="Available" style="min-width: 8rem;">
+          <Column
+            field="code"
+            header="Code"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="title"
+            header="Title"
+            style="min-width: 14rem;"
+          />
+          <Column
+            field="subjectName"
+            header="Subject"
+            style="min-width: 10rem;"
+          />
+          <Column
+            field="grade"
+            header="Grade"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="totalStock"
+            header="Total"
+            style="min-width: 7rem;"
+          />
+          <Column
+            field="distributed"
+            header="Distributed"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="withTeachers"
+            header="With Teachers"
+            style="min-width: 9rem;"
+          />
+          <Column
+            field="damaged"
+            header="Damaged"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="lost"
+            header="Lost"
+            style="min-width: 7rem;"
+          />
+          <Column
+            header="Available"
+            style="min-width: 8rem;"
+          >
             <template #body="{ data }">
               <BooksStockBadge :available="data.available" />
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
   </div>
