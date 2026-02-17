@@ -39,7 +39,23 @@
     "lint:fix": "eslint . --fix",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "analyze": "nuxt analyze"
+    "analyze": "nuxt analyze",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:install": "playwright install",
+    "test:all": "bun run test:unit && bun run test:e2e"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@nuxt/test-utils": "^4.0.0",
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/vue": "^8.1.0",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.6.1",
+    "playwright": "^1.58.2",
+    "vitest": "^4.0.18"
+  }
 }
