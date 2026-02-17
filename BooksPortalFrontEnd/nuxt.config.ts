@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/hints',
     '@nuxt/image',
-    '@nuxtjs/color-mode',
+    ...(process.env.VITEST ? [] : ['@nuxtjs/color-mode']),
     'nuxt-csurf',
     '@primevue/nuxt-module',
     '@pinia/nuxt',
