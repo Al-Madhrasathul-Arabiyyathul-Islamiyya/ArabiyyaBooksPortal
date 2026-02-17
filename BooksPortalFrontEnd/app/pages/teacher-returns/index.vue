@@ -6,7 +6,7 @@
           Teacher Returns
         </h1>
         <p class="text-sm text-surface-600 dark:text-surface-400">
-          Process partial and full returns for teacher-issued slips.
+          Track teacher return slips and process additional returns for finalized issues.
         </p>
       </div>
     </div>
@@ -24,27 +24,30 @@
             fluid
             @change="applyFilters"
           />
-          <FormsSearchInput
-            id="teacher-returns-teacher-search"
-            v-model="filters.teacherSearch"
-            name="teacher-returns-teacher-search"
-            persist-key="bp.search.operations.teacher-returns.teacher"
-            placeholder="Teacher search"
-            @search="applyFilters"
-          />
-          <Select
-            v-model="filters.status"
-            :options="statusOptions"
-            option-label="label"
-            option-value="value"
-            placeholder="Status"
-            show-clear
-            fluid
-            @change="applyFilters"
-          />
+          <div class="flex gap-2 md:col-span-2">
+            <InputText
+              v-model.trim="referenceSearch"
+              placeholder="Find by return reference no"
+              class="flex-1"
+              @keyup.enter="searchByReference"
+            />
+            <Button
+              icon="pi pi-search"
+              label="Find"
+              :loading="isReferenceLoading"
+              @click="searchByReference"
+            />
+            <Button
+              v-if="referenceMode"
+              icon="pi pi-refresh"
+              severity="secondary"
+              outlined
+              @click="clearReferenceSearch"
+            />
+          </div>
           <div class="flex items-center gap-2 text-sm text-surface-500">
             <i class="pi pi-info-circle" />
-            Select an issue and process returned items.
+            Open a teacher issue and click "Process Return" to create a new return slip.
           </div>
         </div>
       </template>
@@ -53,8 +56,8 @@
     <Card>
       <template #content>
         <DataTable
-          :value="filteredSlips"
-          :loading="isLoading"
+          :value="slips"
+          :loading="isLoading || isReferenceLoading"
           data-key="id"
           paginator
           :rows="pageSize"
@@ -69,8 +72,8 @@
         >
           <Column
             field="referenceNo"
-            header="Issue Reference"
-            style="min-width: 10rem;"
+            header="Reference"
+            style="min-width: 11rem;"
           />
           <Column
             field="teacherName"
@@ -78,51 +81,56 @@
             style="min-width: 14rem;"
           />
           <Column
-            field="issuedAt"
-            header="Issued At"
+            field="receivedAt"
+            header="Received At"
             style="min-width: 11rem;"
           >
             <template #body="{ data }">
-              {{ formatDateTime(data.issuedAt) }}
+              {{ formatDateTime(data.receivedAt) }}
+            </template>
+          </Column>
+          <Column
+            header="Items"
+            style="min-width: 6rem;"
+          >
+            <template #body="{ data }">
+              {{ data.items.length }}
             </template>
           </Column>
           <Column
             header="Status"
-            style="min-width: 10rem;"
+            style="min-width: 9rem;"
           >
             <template #body="{ data }">
               <Tag
-                :value="teacherIssueStatusLabels[data.status] ?? String(data.status)"
-                :severity="teacherIssueStatusSeverities[data.status] ?? 'secondary'"
+                :value="getLifecycleLabel(data.lifecycleStatus)"
+                :severity="getLifecycleSeverity(data.lifecycleStatus)"
               />
-            </template>
-          </Column>
-          <Column
-            header="Outstanding"
-            style="min-width: 8rem;"
-          >
-            <template #body="{ data }">
-              {{ getOutstandingQuantity(data) }}
             </template>
           </Column>
           <Column
             header="Actions"
             :exportable="false"
-            style="width: 8rem;"
+            style="width: 12rem;"
           >
             <template #body="{ data }">
               <div class="flex items-center gap-2">
                 <CommonIconActionButton
-                  icon="pi pi-replay"
-                  tooltip="Process return"
-                  severity="warn"
-                  :disabled="getOutstandingQuantity(data) === 0"
-                  @click.stop="openReturnDialog(data)"
+                  icon="pi pi-eye"
+                  tooltip="Open return details"
+                  @click.stop="navigateTo(`/teacher-returns/${data.id}`)"
                 />
                 <CommonIconActionButton
-                  icon="pi pi-eye"
-                  tooltip="Open issue details"
-                  @click.stop="navigateTo(`/teacher-issues/${data.id}`)"
+                  icon="pi pi-print"
+                  tooltip="Print return slip"
+                  :loading="printLoadingSlipId === data.id"
+                  @click.stop="printSlip(data.id)"
+                />
+                <CommonIconActionButton
+                  icon="pi pi-file"
+                  tooltip="Open associated issue"
+                  severity="info"
+                  @click.stop="navigateTo(`/teacher-issues/${data.teacherIssueId}`)"
                 />
               </div>
             </template>
@@ -156,25 +164,10 @@
           data-key="teacherIssueItemId"
           responsive-layout="scroll"
         >
-          <Column
-            field="bookCode"
-            header="Book Code"
-            style="min-width: 8rem;"
-          />
-          <Column
-            field="bookTitle"
-            header="Book Title"
-            style="min-width: 14rem;"
-          />
-          <Column
-            field="outstandingQuantity"
-            header="Outstanding"
-            style="min-width: 8rem;"
-          />
-          <Column
-            header="Return Qty"
-            style="min-width: 10rem;"
-          >
+          <Column field="bookCode" header="Book Code" style="min-width: 8rem;" />
+          <Column field="bookTitle" header="Book Title" style="min-width: 14rem;" />
+          <Column field="outstandingQuantity" header="Outstanding" style="min-width: 8rem;" />
+          <Column header="Return Qty" style="min-width: 10rem;">
             <template #body="{ data }">
               <InputNumber
                 v-model="data.quantity"
@@ -194,34 +187,16 @@
           field-id="teacherReturnNotes"
           :error="returnErrors.notes"
         >
-          <Textarea
-            id="teacherReturnNotes"
-            v-model.trim="returnForm.notes"
-            rows="3"
-            fluid
-          />
+          <Textarea id="teacherReturnNotes" v-model.trim="returnForm.notes" rows="3" fluid />
         </FormsFormField>
 
-        <Message
-          v-if="returnError"
-          severity="error"
-          :closable="false"
-        >
+        <Message v-if="returnError" severity="error" :closable="false">
           {{ returnError }}
         </Message>
 
         <div class="flex justify-end gap-2">
-          <Button
-            label="Cancel"
-            severity="secondary"
-            text
-            @click="closeReturnDialog"
-          />
-          <Button
-            label="Create Return Slip"
-            :loading="isSubmittingReturn"
-            @click="submitReturn"
-          />
+          <Button label="Cancel" severity="secondary" text @click="closeReturnDialog" />
+          <Button label="Create Return Slip" :loading="isSubmittingReturn" @click="submitReturn" />
         </div>
       </div>
     </Dialog>
@@ -229,15 +204,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Lookup, TeacherIssue } from '~/types/entities'
+import type { Lookup, TeacherIssue, TeacherReturnSlip } from '~/types/entities'
 import type { PaginatedList } from '~/types/api'
 import { z } from 'zod/v4'
 import { API, PAGINATION } from '~/utils/constants'
-import {
-  teacherIssueStatusLabels,
-  teacherIssueStatusOptions,
-  teacherIssueStatusSeverities,
-} from '~/utils/formatters'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
@@ -259,10 +229,16 @@ const api = useApi()
 const route = useRoute()
 const { showError, showSuccess } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
+const { getLifecycleLabel, getLifecycleSeverity, isFinalized } = useSlipLifecycle()
 
-const slips = ref<TeacherIssue[]>([])
+const slips = ref<TeacherReturnSlip[]>([])
 const academicYears = ref<Lookup[]>([])
 const isLoading = ref(false)
+const isReferenceLoading = ref(false)
+const printLoadingSlipId = ref<number | null>(null)
+const referenceMode = ref(false)
+const referenceSearch = ref('')
+
 const isSubmittingReturn = ref(false)
 const isReturnDialogVisible = ref(false)
 const selectedIssue = ref<TeacherIssue | null>(null)
@@ -270,8 +246,6 @@ const returnRows = ref<ReturnRow[]>([])
 
 const filters = reactive({
   academicYearId: null as number | null,
-  teacherSearch: '',
-  status: null as number | null,
 })
 
 const ReturnSchema = z.object({
@@ -296,18 +270,6 @@ const academicYearOptions = computed(() =>
     value: year.id,
   })),
 )
-
-const statusOptions = computed(() =>
-  teacherIssueStatusOptions.map(item => ({
-    label: item.label,
-    value: item.value,
-  })),
-)
-
-const filteredSlips = computed(() => {
-  if (filters.status === null) return slips.value
-  return slips.value.filter(slip => slip.status === filters.status)
-})
 
 function formatDateTime(value: string) {
   return new Date(value).toLocaleString()
@@ -338,42 +300,81 @@ async function loadLookups() {
 async function loadSlips() {
   isLoading.value = true
   try {
-    const response = await api.get<PaginatedList<TeacherIssue>>(API.teacherIssues.base, {
+    const response = await api.get<PaginatedList<TeacherReturnSlip>>(API.teacherReturns.base, {
       ...queryParams.value,
       academicYearId: filters.academicYearId ?? undefined,
-      search: filters.teacherSearch || undefined,
+      includeCancelled: false,
     })
     if (response.success) {
       slips.value = response.data.items
       totalRecords.value = response.data.totalCount
       return
     }
-    showError(response.message ?? 'Failed to load teacher issues')
+    showError(response.message ?? 'Failed to load teacher returns')
   }
   catch (error: unknown) {
-    showError(getFriendlyErrorMessage(error, 'Failed to load teacher issues'))
+    showError(getFriendlyErrorMessage(error, 'Failed to load teacher returns'))
   }
   finally {
     isLoading.value = false
   }
 }
 
+async function searchByReference() {
+  if (!referenceSearch.value) return
+  isReferenceLoading.value = true
+  try {
+    const response = await api.get<TeacherReturnSlip>(API.teacherReturns.byReference(referenceSearch.value))
+    if (response.success) {
+      slips.value = [response.data]
+      totalRecords.value = 1
+      referenceMode.value = true
+      return
+    }
+    showError(response.message ?? 'Teacher return reference not found')
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Teacher return reference not found'))
+  }
+  finally {
+    isReferenceLoading.value = false
+  }
+}
+
+async function printSlip(slipId: number) {
+  printLoadingSlipId.value = slipId
+  try {
+    await api.downloadBlob(API.teacherReturns.print(slipId), `teacher-return-${slipId}.pdf`, true)
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to print teacher return slip'))
+  }
+  finally {
+    printLoadingSlipId.value = null
+  }
+}
+
+async function clearReferenceSearch() {
+  referenceSearch.value = ''
+  referenceMode.value = false
+  reset()
+  await loadSlips()
+}
+
 async function applyFilters() {
+  referenceMode.value = false
   reset()
   await loadSlips()
 }
 
 async function onPageChange(event: { page: number, rows: number }) {
+  if (referenceMode.value) return
   onPage(event)
   await loadSlips()
 }
 
-function onRowClick(event: { data: TeacherIssue }) {
-  if (getOutstandingQuantity(event.data) === 0) {
-    void navigateTo(`/teacher-issues/${event.data.id}`)
-    return
-  }
-  openReturnDialog(event.data)
+function onRowClick(event: { data: TeacherReturnSlip }) {
+  void navigateTo(`/teacher-returns/${event.data.id}`)
 }
 
 function buildReturnRows(issue: TeacherIssue): ReturnRow[] {
@@ -405,6 +406,31 @@ function closeReturnDialog() {
   setReturnError('')
 }
 
+async function openDialogFromIssueId(issueId: number) {
+  try {
+    const response = await api.get<TeacherIssue>(API.teacherIssues.byId(issueId))
+    if (!response.success) {
+      showError(response.message ?? 'Failed to load teacher issue for return processing')
+      return
+    }
+
+    const issue = response.data
+    if (!isFinalized(issue.lifecycleStatus)) {
+      showError('Only finalized teacher issues can be processed for returns.')
+      return
+    }
+    if (getOutstandingQuantity(issue) <= 0) {
+      showError('Selected teacher issue has no outstanding items.')
+      return
+    }
+
+    openReturnDialog(issue)
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to load teacher issue for return processing'))
+  }
+}
+
 async function submitReturn() {
   if (!selectedIssue.value) return
 
@@ -422,7 +448,7 @@ async function submitReturn() {
 
   isSubmittingReturn.value = true
   try {
-    const response = await api.post<{ referenceNo: string }>(
+    const response = await api.post<{ id: number, referenceNo: string }>(
       API.teacherIssues.return(selectedIssue.value.id),
       {
         notes: returnForm.notes.trim() ? returnForm.notes.trim() : null,
@@ -433,6 +459,7 @@ async function submitReturn() {
       showSuccess(response.message ?? `Teacher return created (${response.data.referenceNo})`)
       closeReturnDialog()
       await loadSlips()
+      void navigateTo(`/teacher-returns/${response.data.id}`)
       return
     }
     setReturnError(response.message ?? 'Failed to process teacher return')
@@ -445,27 +472,13 @@ async function submitReturn() {
   }
 }
 
-watch(
-  () => route.query.issueId,
-  (value) => {
-    const issueId = Number(value)
-    if (!Number.isFinite(issueId)) return
-    const issue = slips.value.find(item => item.id === issueId)
-    if (issue && getOutstandingQuantity(issue) > 0) {
-      openReturnDialog(issue)
-    }
-  },
-)
-
 onMounted(async () => {
   await loadLookups()
   await loadSlips()
 
   const issueId = Number(route.query.issueId)
-  if (!Number.isFinite(issueId)) return
-  const issue = slips.value.find(item => item.id === issueId)
-  if (issue && getOutstandingQuantity(issue) > 0) {
-    openReturnDialog(issue)
+  if (Number.isFinite(issueId)) {
+    await openDialogFromIssueId(issueId)
   }
 })
 </script>

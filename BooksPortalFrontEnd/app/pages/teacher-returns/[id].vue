@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col gap-4">
     <SlipsSlipDetail
-      title="Return Slip"
-      :subtitle="slip ? `${slip.studentName} · ${slip.studentClassName}` : ''"
+      title="Teacher Return Slip"
+      :subtitle="slip?.teacherName ?? ''"
       :reference-no="slip?.referenceNo"
       :academic-year-name="slip?.academicYearName"
       :date="slip?.receivedAt"
@@ -22,13 +22,7 @@
       </template>
 
       <template #actions>
-        <Button
-          label="Done"
-          icon="pi pi-check"
-          severity="secondary"
-          text
-          @click="navigateTo('/returns')"
-        />
+        <Button label="Done" icon="pi pi-check" severity="secondary" text @click="navigateTo('/teacher-returns')" />
         <Button
           v-if="canFinalize"
           label="Finalize"
@@ -37,6 +31,13 @@
           outlined
           :loading="isFinalizeLoading"
           @click="finalizeSlip"
+        />
+        <Button
+          label="Open Issue"
+          icon="pi pi-file"
+          severity="info"
+          outlined
+          @click="navigateTo(`/teacher-issues/${slip?.teacherIssueId}`)"
         />
         <Button
           label="Print"
@@ -57,50 +58,23 @@
       </template>
 
       <template #items-columns>
-        <Column
-          field="bookCode"
-          header="Book Code"
-          style="min-width: 9rem;"
-        />
-        <Column
-          field="bookTitle"
-          header="Book Title"
-          style="min-width: 14rem;"
-        />
-        <Column
-          field="quantity"
-          header="Quantity"
-          style="min-width: 8rem;"
-        />
-        <Column
-          field="condition"
-          header="Condition"
-          style="min-width: 9rem;"
-        >
-          <template #body="{ data }">
-            {{ conditionLabels[data.condition] ?? data.condition }}
-          </template>
-        </Column>
-        <Column
-          field="conditionNotes"
-          header="Condition Notes"
-          style="min-width: 12rem;"
-        />
+        <Column field="bookCode" header="Book Code" style="min-width: 9rem;" />
+        <Column field="bookTitle" header="Book Title" style="min-width: 14rem;" />
+        <Column field="quantity" header="Quantity" style="min-width: 8rem;" />
       </template>
     </SlipsSlipDetail>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { ReturnSlip } from '~/types/entities'
+import type { TeacherReturnSlip } from '~/types/entities'
 import { API } from '~/utils/constants'
-import { conditionLabels } from '~/utils/formatters'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   breadcrumb: {
-    returns: 'Returns',
-    id: 'Details',
+    'teacher-returns': 'Teacher Returns',
+    'id': 'Details',
   },
 })
 
@@ -110,7 +84,7 @@ const { showError, showSuccess } = useAppToast()
 const { confirmAction } = useAppConfirm()
 const { getLifecycleLabel, getLifecycleIcon, getLifecycleBadgeClass, isProcessing } = useSlipLifecycle()
 
-const slip = ref<ReturnSlip | null>(null)
+const slip = ref<TeacherReturnSlip | null>(null)
 const isLoading = ref(false)
 const isPrintLoading = ref(false)
 const isCancelLoading = ref(false)
@@ -140,21 +114,21 @@ const detailNotes = computed(() => {
 
 async function loadSlip() {
   if (!Number.isFinite(slipId.value)) {
-    showError('Invalid return slip route.')
+    showError('Invalid teacher return route.')
     return
   }
 
   isLoading.value = true
   try {
-    const response = await api.get<ReturnSlip>(API.returns.byId(slipId.value))
+    const response = await api.get<TeacherReturnSlip>(API.teacherReturns.byId(slipId.value))
     if (response.success) {
       slip.value = response.data
       return
     }
-    showError(response.message ?? 'Failed to load return slip')
+    showError(response.message ?? 'Failed to load teacher return slip')
   }
   catch (error: unknown) {
-    showError(getFriendlyErrorMessage(error, 'Failed to load return slip'))
+    showError(getFriendlyErrorMessage(error, 'Failed to load teacher return slip'))
   }
   finally {
     isLoading.value = false
@@ -166,10 +140,10 @@ async function printSlip() {
 
   isPrintLoading.value = true
   try {
-    await api.downloadBlob(API.returns.print(slipId.value), `return-${slipId.value}.pdf`, true)
+    await api.downloadBlob(API.teacherReturns.print(slipId.value), `teacher-return-${slipId.value}.pdf`, true)
   }
   catch (error: unknown) {
-    showError(getFriendlyErrorMessage(error, 'Failed to print return slip'))
+    showError(getFriendlyErrorMessage(error, 'Failed to print teacher return slip'))
   }
   finally {
     isPrintLoading.value = false
@@ -180,13 +154,13 @@ function finalizeSlip() {
   if (!Number.isFinite(slipId.value) || !canFinalize.value) return
 
   confirmAction(
-    'Finalize this return slip? Finalized slips cannot be cancelled.',
+    'Finalize this teacher return slip? Finalized slips cannot be cancelled.',
     async () => {
       isFinalizeLoading.value = true
       try {
-        const response = await api.post<string>(API.returns.finalize(slipId.value))
+        const response = await api.post<string>(API.teacherReturns.finalize(slipId.value))
         if (response.success) {
-          showSuccess(response.message ?? 'Return slip finalized')
+          showSuccess(response.message ?? 'Teacher return slip finalized')
           await loadSlip()
           return
         }
@@ -199,7 +173,7 @@ function finalizeSlip() {
         isFinalizeLoading.value = false
       }
     },
-    'Finalize Return Slip',
+    'Finalize Teacher Return Slip',
     'Finalize',
     'Close',
   )
@@ -209,14 +183,14 @@ function cancelSlip() {
   if (!Number.isFinite(slipId.value) || !canCancel.value) return
 
   confirmAction(
-    'Cancel this return slip? This will reverse stock movements.',
+    'Cancel this teacher return slip? This will reverse return stock movements.',
     async () => {
       isCancelLoading.value = true
       try {
-        const response = await api.del<string>(API.returns.byId(slipId.value))
+        const response = await api.del<string>(API.teacherReturns.byId(slipId.value))
         if (response.success) {
-          showSuccess(response.message ?? 'Return slip cancelled')
-          void navigateTo('/returns')
+          showSuccess(response.message ?? 'Teacher return slip cancelled')
+          void navigateTo('/teacher-returns')
           return
         }
         showError(response.message ?? 'Failed to cancel slip')
@@ -228,7 +202,7 @@ function cancelSlip() {
         isCancelLoading.value = false
       }
     },
-    'Cancel Return Slip',
+    'Cancel Teacher Return Slip',
     'Cancel Slip',
     'Close',
   )

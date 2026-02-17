@@ -219,7 +219,7 @@
             {{ formError }}
           </Message>
 
-          <div class="flex justify-end gap-2">
+          <div class="sticky bottom-0 z-10 -mx-4 flex justify-end gap-2 border-t border-surface-200 bg-surface-0 px-4 py-3 dark:border-surface-700 dark:bg-surface-900">
             <Button
               type="button"
               label="Cancel"

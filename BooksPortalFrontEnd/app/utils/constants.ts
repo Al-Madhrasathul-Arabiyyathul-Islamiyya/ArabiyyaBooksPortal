@@ -81,6 +81,7 @@ export const API = {
     base: '/returns',
     byId: (id: number) => `/returns/${id}`,
     byReference: (referenceNo: string) => `/returns/by-reference/${referenceNo}`,
+    finalize: (id: number) => `/returns/${id}/finalize`,
     print: (id: number) => `/returns/${id}/print`,
   },
   teacherIssues: {
@@ -88,7 +89,15 @@ export const API = {
     byId: (id: number) => `/TeacherIssues/${id}`,
     finalize: (id: number) => `/TeacherIssues/${id}/finalize`,
     return: (id: number) => `/TeacherIssues/${id}/return`,
+    returnPrint: (id: number) => `/TeacherIssues/${id}/return/print`,
     print: (id: number) => `/TeacherIssues/${id}/print`,
+  },
+  teacherReturns: {
+    base: '/TeacherReturns',
+    byId: (id: number) => `/TeacherReturns/${id}`,
+    byReference: (referenceNo: string) => `/TeacherReturns/by-reference/${referenceNo}`,
+    finalize: (id: number) => `/TeacherReturns/${id}/finalize`,
+    print: (id: number) => `/TeacherReturns/${id}/print`,
   },
   reports: {
     stockSummary: '/reports/stock-summary',
