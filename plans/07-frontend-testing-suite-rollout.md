@@ -27,7 +27,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [x] Harness established (Vitest config + setup file)
 - [x] `usePagination` unit tests
 - [x] `useSlipLifecycle` unit tests
-- [ ] Add unit tests for auth store state transitions (mock API)
+- [x] Add unit tests for auth store state transitions (mock API)
 - [x] Add unit tests for validation helper edge cases
 
 ### Module 02 - E2E auth/navigation smoke
