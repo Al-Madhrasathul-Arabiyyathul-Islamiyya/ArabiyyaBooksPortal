@@ -6,6 +6,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 const alias = {
   '~': fileURLToPath(new URL('./app', import.meta.url)),
   '@': fileURLToPath(new URL('./app', import.meta.url)),
+  '~~': fileURLToPath(new URL('./tests', import.meta.url)),
 }
 
 export default defineConfig({

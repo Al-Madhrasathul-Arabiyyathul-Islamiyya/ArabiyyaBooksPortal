@@ -39,11 +39,14 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [ ] Add role-gate smoke (`admin` vs `user`) using seeded accounts
 
 ### Module 03 - E2E operations lifecycle smoke
-- [ ] Distribution create -> detail open -> status verify
-- [ ] Returns create -> detail open -> status verify
-- [ ] Teacher issue create -> detail open -> status verify
-- [ ] Teacher return flow -> detail open -> status verify
-- [ ] Print action availability checks
+- [x] Distribution lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
+- [x] Returns lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
+- [x] Teacher issue lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
+- [~] Teacher return lifecycle deterministic checks
+  - Current behavior appears to auto-finalize immediately after creation.
+  - Test remains intentionally failing for strict lifecycle parity verification.
+  - Defer fix to post-suite hardening pass (backend + frontend lifecycle alignment).
+- [x] Print action availability checks
 
 ### Module 04 - E2E reports/settings smoke
 - [ ] Report list load checks
