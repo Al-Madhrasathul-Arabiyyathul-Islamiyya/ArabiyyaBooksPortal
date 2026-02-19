@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     '@pinia/colada-nuxt',
     '@regle/nuxt',
     'dayjs-nuxt',
+    '@nuxt/test-utils/module',
   ],
 
   devtools: { enabled: true },
