@@ -49,11 +49,11 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [x] Print action availability checks
 
 ### Module 04 - E2E reports/settings smoke
-- [ ] Report list load checks
-- [ ] Pagination interaction checks
-- [ ] Filters apply/reset checks
-- [ ] Settings pages load and role gate checks
-- [ ] Audit log list smoke check
+- [x] Report list load checks
+- [x] Pagination interaction checks
+- [x] Filters apply/reset checks
+- [x] Settings pages load and role gate checks
+- [x] Audit log list smoke check
 
 ### Module 05 - Critical component behavior
 - [ ] Action button behavior tests
@@ -77,6 +77,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
   - `bun run test:unit -- tests/unit/<file>.spec.ts`
 - E2E subset:
   - `bun run test:e2e:auth`
+  - `bun run test:e2e:reports-settings`
   - `bun run test:e2e -- tests/e2e/<file>.spec.ts`
   - `bun run test:e2e -- --grep "auth guards"`
 

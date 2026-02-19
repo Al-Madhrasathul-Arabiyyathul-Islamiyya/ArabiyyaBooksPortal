@@ -48,6 +48,7 @@
     "test:e2e:install": "playwright install",
     "test:e2e:auth": "playwright test tests/e2e/auth-guards.spec.ts",
     "test:e2e:operations": "playwright test tests/e2e/operations-lifecycle.spec.ts",
+    "test:e2e:reports-settings": "playwright test tests/e2e/reports-settings.spec.ts",
     "test:unit:lifecycle": "vitest run tests/unit/useSlipLifecycle.spec.ts",
     "test:unit:pagination": "vitest run tests/unit/usePagination.spec.ts",
     "test:smoke": "bun run test:unit && bun run test:e2e:auth",
