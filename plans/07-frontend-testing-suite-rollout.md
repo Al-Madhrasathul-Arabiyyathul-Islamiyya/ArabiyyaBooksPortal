@@ -36,7 +36,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
   - [x] unauthenticated redirect from `/distribution`
   - [x] unauthenticated redirect from `/admin/reports/distributions`
   - [x] login page render smoke
-- [ ] Add role-gate smoke (`admin` vs `user`) using seeded accounts
+- [x] Add role-gate smoke (`admin` vs `user`) using seeded accounts
 
 ### Module 03 - E2E operations lifecycle smoke
 - [x] Distribution lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)

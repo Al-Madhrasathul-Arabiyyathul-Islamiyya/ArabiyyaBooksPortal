@@ -88,3 +88,8 @@ Per-module branches:
 - `testing/mod-06-regression-contract-and-ci`
 
 Each module branch merges into `testing/frontend-suite-core`, then core merges into `dev/frontend` once stable.
+
+## Conventions and Decisions
+- When a frontend change introduces or modifies reusable UI behavior, add/adjust component tests in the same branch (Nuxt/Vitest component-level coverage).
+- Prefer deterministic assertions tied to explicit state transitions over permissive assertions that only check generic visibility.
+- Keep test modules small and localized; avoid bundling unrelated test concerns in a single branch.
