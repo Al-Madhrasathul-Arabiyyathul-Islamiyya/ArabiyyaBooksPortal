@@ -13,7 +13,7 @@ const DataTableStub = defineComponent({
   setup(props, { attrs, slots }) {
     return () =>
       h('div', {
-        class: attrs.class,
+        'class': attrs.class,
         'data-scrollable': String(props.scrollable),
         'data-scroll-height': props.scrollHeight,
       }, slots.default?.())

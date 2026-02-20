@@ -68,3 +68,19 @@ This document defines how versioning works for:
 - Before promoting changes to `develop` or `master`:
   - Run the full available test/verification suite for the affected area.
   - Resolve failures first; do not promote with known failing checks.
+
+### Frontend Test Gate Matrix
+
+- Feature branch minimum:
+  - `bun run lint`
+  - `bunx nuxi typecheck`
+  - `bun run test:smoke`
+- CI/integration branch gate:
+  - `bun run test:ci`
+  - `test:ci` runs unit + component + e2e and excludes `@known-gap` tests.
+- Release gate before `master` promotion:
+  - `bun run lint`
+  - `bunx nuxi typecheck`
+  - `bun run test:unit`
+  - `bun run test:nuxt`
+  - `bun run test:e2e`

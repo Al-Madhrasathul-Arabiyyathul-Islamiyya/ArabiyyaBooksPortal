@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test.describe('auth guards', () => {
+test.describe('auth guards @smoke @auth', () => {
   test('unauthenticated users are redirected from distribution to login', async ({ page }) => {
     await page.goto('/distribution')
     await expect(page).toHaveURL(/\/login$/)

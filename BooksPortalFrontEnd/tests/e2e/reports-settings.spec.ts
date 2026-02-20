@@ -90,7 +90,7 @@ async function seedTeacherIssue(page: Page, csrfToken: string) {
   return { id: detail.id, referenceNo: detail.referenceNo, teacher }
 }
 
-test.describe('reports and settings smoke', () => {
+test.describe('reports and settings smoke @smoke @reports @settings', () => {
   test.setTimeout(120000)
 
   test('distribution report apply/reset and seeded reference visibility', async ({ page }) => {

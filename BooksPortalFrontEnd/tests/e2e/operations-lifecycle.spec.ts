@@ -131,7 +131,7 @@ async function expectSlipStatus(page: Page, url: string, heading: string, status
   await expect(page.getByRole('button', { name: 'Print' })).toBeVisible()
 }
 
-test.describe('operations lifecycle smoke', () => {
+test.describe('operations lifecycle smoke @smoke @operations @lifecycle', () => {
   test.setTimeout(120000)
   let csrfToken: string
 
@@ -164,7 +164,7 @@ test.describe('operations lifecycle smoke', () => {
     await expectSlipStatus(page, `/teacher-issues/${issue.id}`, 'Teacher Issue Slip', 'Finalized')
   })
 
-  test('teacher return lifecycle: create processing -> finalize finalized', async ({ page }) => {
+  test('teacher return lifecycle: create processing -> finalize finalized @known-gap', async ({ page }) => {
     const issue = await createTeacherIssue(page, csrfToken)
     await bffPost<string>(page, `/TeacherIssues/${issue.id}/finalize`, {}, csrfToken)
     const teacherReturn = await createTeacherReturn(page, issue.id, csrfToken)

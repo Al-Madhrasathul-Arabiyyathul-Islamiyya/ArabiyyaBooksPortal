@@ -63,26 +63,34 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 
 ### Module 06 - Regression and CI wiring
 - [x] Script-level test selection commands in `package.json`
-- [ ] Add CI docs for when to run `test:smoke` vs `test:all`
-- [ ] Add optional suite tags/grep conventions for focused runs
-- [ ] Add release checklist alignment in docs/plans
+- [x] Add CI docs for when to run `test:smoke` vs `test:all`
+- [x] Add optional suite tags/grep conventions for focused runs
+- [x] Add release checklist alignment in docs/plans
 
 ## Run Commands
 - Full unit: `bun run test:unit`
+- Full component (Nuxt project): `bun run test:nuxt`
 - Full e2e: `bun run test:e2e`
 - Smoke gate: `bun run test:smoke`
+- CI gate (excludes tagged known gaps): `bun run test:ci`
 - Unit subset:
   - `bun run test:unit:lifecycle`
   - `bun run test:unit:pagination`
   - `bun run test:unit -- tests/unit/<file>.spec.ts`
+  - `bun run test:unit:grep -- "<pattern>"`
+  - `bun run test:nuxt:grep -- "<pattern>"`
 - E2E subset:
   - `bun run test:e2e:auth`
   - `bun run test:e2e:reports-settings`
+  - `bun run test:e2e:smoke`
+  - `bun run test:e2e:ci`
   - `bun run test:e2e -- tests/e2e/<file>.spec.ts`
   - `bun run test:e2e -- --grep "auth guards"`
+  - `bun run test:e2e:grep -- "<pattern>"`
 
 ## Acceptance Criteria
-- [ ] Modules 01-06 complete or explicitly deferred with rationale.
+- [x] Modules 01-06 complete or explicitly deferred with rationale.
 - [ ] `test:smoke` stable and used as minimum merge gate.
 - [ ] `test:all` stable before release promotion.
-- [ ] Documentation and plan status synced with implemented coverage.
+  - Known deferred gap: `@known-gap` teacher-return lifecycle parity is intentionally pending backend/frontend alignment.
+- [x] Documentation and plan status synced with implemented coverage.

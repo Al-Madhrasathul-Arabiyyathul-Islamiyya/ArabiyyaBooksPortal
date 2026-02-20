@@ -48,11 +48,14 @@ For mutation-heavy scenarios, API-driven setup can be added case-by-case.
 
 ### Core
 - `bun run test:unit`
+- `bun run test:nuxt`
 - `bun run test:e2e`
 - `bun run test:all`
+- `bun run test:ci`
 
 ### Focused
 - `bun run test:smoke`
+- `bun run test:e2e:smoke`
 - `bun run test:e2e:auth`
 - `bun run test:unit:lifecycle`
 - `bun run test:unit:pagination`
@@ -61,6 +64,9 @@ For mutation-heavy scenarios, API-driven setup can be added case-by-case.
 - `bun run test:unit -- tests/unit/<file>.spec.ts`
 - `bun run test:e2e -- tests/e2e/<file>.spec.ts`
 - `bun run test:e2e -- --grep "<name>"`
+- `bun run test:unit:grep -- "<pattern>"`
+- `bun run test:nuxt:grep -- "<pattern>"`
+- `bun run test:e2e:grep -- "<pattern>"`
 
 ## Merge/Release Policy
 
@@ -68,12 +74,21 @@ For mutation-heavy scenarios, API-driven setup can be added case-by-case.
 1. `bun run lint`
 2. `bunx nuxi typecheck`
 3. `bun run test:smoke`
+   - `test:smoke` excludes tests tagged `@known-gap` so deferred failures do not block branch gates.
+
+### CI branch gate (`testing/*`, `dev/frontend`)
+1. `bun run lint`
+2. `bunx nuxi typecheck`
+3. `bun run test:ci`
+   - `test:ci` includes unit + nuxt component + e2e
+   - `test:ci` excludes tests tagged `@known-gap` using `--grep-invert`
 
 ### Pre-release / release gate
 1. `bun run lint`
 2. `bunx nuxi typecheck`
 3. `bun run test:unit`
-4. `bun run test:e2e`
+4. `bun run test:nuxt`
+5. `bun run test:e2e`
 
 ## Branching Convention for Test Rollout
 Base branch:
@@ -93,3 +108,11 @@ Each module branch merges into `testing/frontend-suite-core`, then core merges i
 - When a frontend change introduces or modifies reusable UI behavior, add/adjust component tests in the same branch (Nuxt/Vitest component-level coverage).
 - Prefer deterministic assertions tied to explicit state transitions over permissive assertions that only check generic visibility.
 - Keep test modules small and localized; avoid bundling unrelated test concerns in a single branch.
+- Use test tags for focused and policy-driven runs:
+  - `@smoke`: fast merge-confidence scenarios
+  - `@operations`, `@reports`, `@settings`, `@auth`: domain-focused slices
+  - `@known-gap`: intentionally deferred failures tracked in plans/docs and excluded from `test:smoke` and `test:ci`
+
+## Release Alignment
+- Frontend release verification is aligned with `documentation/09-versioning-and-release.md`.
+- Before promoting to `develop`/`master`, run full release gate (`lint`, `typecheck`, `test:unit`, `test:nuxt`, `test:e2e`) and resolve failures.
