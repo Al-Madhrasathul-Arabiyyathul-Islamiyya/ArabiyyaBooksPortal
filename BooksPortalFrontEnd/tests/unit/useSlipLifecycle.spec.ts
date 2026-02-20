@@ -23,4 +23,28 @@ describe('useSlipLifecycle', () => {
     expect(lifecycle.isFinalized(SlipLifecycleStatusValue.Finalized)).toBe(true)
     expect(lifecycle.isCancelled(SlipLifecycleStatusValue.Cancelled)).toBe(true)
   })
+
+  it('maps label/severity/icon for all lifecycle states', () => {
+    expect(lifecycle.getLifecycleLabel('processing')).toBe('Processing')
+    expect(lifecycle.getLifecycleSeverity('processing')).toBe('warn')
+    expect(lifecycle.getLifecycleIcon('processing')).toContain('clock')
+
+    expect(lifecycle.getLifecycleLabel('finalized')).toBe('Finalized')
+    expect(lifecycle.getLifecycleSeverity('finalized')).toBe('success')
+    expect(lifecycle.getLifecycleIcon('finalized')).toContain('check-circle')
+
+    expect(lifecycle.getLifecycleLabel('cancelled')).toBe('Cancelled')
+    expect(lifecycle.getLifecycleSeverity('cancelled')).toBe('danger')
+    expect(lifecycle.getLifecycleIcon('cancelled')).toContain('times-circle')
+  })
+
+  it('returns deterministic badge classes for each lifecycle state', () => {
+    const processingClass = lifecycle.getLifecycleBadgeClass(SlipLifecycleStatusValue.Processing)
+    const finalizedClass = lifecycle.getLifecycleBadgeClass(SlipLifecycleStatusValue.Finalized)
+    const cancelledClass = lifecycle.getLifecycleBadgeClass(SlipLifecycleStatusValue.Cancelled)
+
+    expect(processingClass).toContain('amber')
+    expect(finalizedClass).toContain('green')
+    expect(cancelledClass).toContain('red')
+  })
 })

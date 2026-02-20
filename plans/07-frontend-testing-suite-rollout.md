@@ -56,10 +56,10 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [x] Audit log list smoke check
 
 ### Module 05 - Critical component behavior
-- [ ] Action button behavior tests
-- [ ] Lifecycle badge/icon rendering tests
-- [ ] Common table shell sticky behavior tests (if componentized)
-- [ ] Dialog interaction smoke for common form containers
+- [x] Action button behavior tests
+- [x] Lifecycle badge/icon rendering tests
+- [x] Common table shell sticky behavior tests (if componentized)
+- [x] Dialog interaction smoke for common form containers
 
 ### Module 06 - Regression and CI wiring
 - [x] Script-level test selection commands in `package.json`
