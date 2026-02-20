@@ -434,6 +434,7 @@ async function openDialogFromIssueId(issueId: number) {
 async function submitReturn() {
   if (!selectedIssue.value) return
 
+  const teacherIssueId = selectedIssue.value.id
   const selectedItems = returnRows.value
     .filter(row => row.quantity > 0)
     .map(row => ({
@@ -448,18 +449,27 @@ async function submitReturn() {
 
   isSubmittingReturn.value = true
   try {
-    const response = await api.post<{ id: number, referenceNo: string }>(
-      API.teacherIssues.return(selectedIssue.value.id),
+    const response = await api.post(
+      API.teacherIssues.return(teacherIssueId),
       {
         notes: returnForm.notes.trim() ? returnForm.notes.trim() : null,
         items: selectedItems,
       },
     )
     if (response.success) {
-      showSuccess(response.message ?? `Teacher return created (${response.data.referenceNo})`)
+      showSuccess(response.message ?? 'Teacher return slip created')
       closeReturnDialog()
       await loadSlips()
-      void navigateTo(`/teacher-returns/${response.data.id}`)
+      const latestResponse = await api.get<PaginatedList<TeacherReturnSlip>>(API.teacherReturns.base, {
+        pageNumber: 1,
+        pageSize: 1,
+        teacherIssueId,
+        includeCancelled: true,
+      })
+
+      if (latestResponse.success && latestResponse.data.items.length > 0) {
+        void navigateTo(`/teacher-returns/${latestResponse.data.items[0]!.id}`)
+      }
       return
     }
     setReturnError(response.message ?? 'Failed to process teacher return')

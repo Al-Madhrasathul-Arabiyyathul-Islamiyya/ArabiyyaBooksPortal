@@ -116,12 +116,20 @@ async function createTeacherReturn(page: Page, teacherIssueId: number, csrfToken
   const returnItem = issue.items.find(item => item.outstandingQuantity > 0)
   expect(returnItem, 'Expected outstanding item after finalizing teacher issue').toBeTruthy()
 
-  const created = await bffPost<TeacherReturnCreateResponse>(page, `/TeacherIssues/${teacherIssueId}/return`, {
+  await bffPost<TeacherIssueCreateResponse>(page, `/TeacherIssues/${teacherIssueId}/return`, {
     notes: 'e2e teacher return lifecycle smoke',
     items: [{ teacherIssueItemId: returnItem!.id, quantity: 1 }],
   }, csrfToken)
 
-  return { id: created.id }
+  const slips = await bffGet<Paginated<TeacherReturnCreateResponse>>(page, '/TeacherReturns', {
+    pageNumber: 1,
+    pageSize: 1,
+    teacherIssueId,
+    includeCancelled: true,
+  })
+
+  expect(slips.items.length, 'Expected teacher return list to include the new slip').toBeGreaterThan(0)
+  return { id: slips.items[0]!.id }
 }
 
 async function expectSlipStatus(page: Page, url: string, heading: string, status: 'Processing' | 'Finalized' | 'Cancelled') {
@@ -164,7 +172,7 @@ test.describe('operations lifecycle smoke @smoke @operations @lifecycle', () => 
     await expectSlipStatus(page, `/teacher-issues/${issue.id}`, 'Teacher Issue Slip', 'Finalized')
   })
 
-  test('teacher return lifecycle: create processing -> finalize finalized @known-gap', async ({ page }) => {
+  test('teacher return lifecycle: create processing -> finalize finalized', async ({ page }) => {
     const issue = await createTeacherIssue(page, csrfToken)
     await bffPost<string>(page, `/TeacherIssues/${issue.id}/finalize`, {}, csrfToken)
     const teacherReturn = await createTeacherReturn(page, issue.id, csrfToken)
