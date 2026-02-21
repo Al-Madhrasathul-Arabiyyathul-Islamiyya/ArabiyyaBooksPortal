@@ -18,6 +18,7 @@
     "@regle/rules": "^1.18.3",
     "@regle/schemas": "^1.18.3",
     "@tailwindcss/vite": "^4.1.18",
+    "chart.js": "^4.5.1",
     "dayjs-nuxt": "2.1.11",
     "eslint": "^9.0.0",
     "nuxt": "^4.3.0",
