@@ -11,7 +11,7 @@ namespace BooksPortal.Infrastructure.Data;
 
 public static class SeedData
 {
-    public static async Task SeedAsync(IServiceProvider serviceProvider)
+    public static async Task SeedAsync(IServiceProvider serviceProvider, bool isDevelopment)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
         var userManager = serviceProvider.GetRequiredService<UserManager<Staff>>();
@@ -50,6 +50,10 @@ public static class SeedData
         }
 
         await EnsureSeededAccountAsync(userManager, superAdmin, UserRole.SuperAdmin, "SuperAdmin");
+
+        if (!isDevelopment)
+            return;
+
         await EnsureSeededAccountAsync(userManager, admin, UserRole.Admin, "Admin");
         await EnsureSeededAccountAsync(userManager, user, UserRole.User, "User");
 

@@ -98,7 +98,7 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<BooksPortalDbContext>();
     await dbContext.Database.MigrateAsync();
-    await SeedData.SeedAsync(scope.ServiceProvider);
+    await SeedData.SeedAsync(scope.ServiceProvider, app.Environment.IsDevelopment());
 }
 
 // Middleware pipeline

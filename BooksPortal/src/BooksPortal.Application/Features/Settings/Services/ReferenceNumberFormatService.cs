@@ -48,8 +48,24 @@ public class ReferenceNumberFormatService : IReferenceNumberFormatService
 
     public async Task<ReferenceNumberFormatResponse> CreateAsync(CreateReferenceNumberFormatRequest request)
     {
-        if (await _repository.AnyAsync(f => f.SlipType == request.SlipType && f.AcademicYearId == request.AcademicYearId))
+        var existing = await _repository.QueryIgnoringFilters()
+            .FirstOrDefaultAsync(f => f.SlipType == request.SlipType && f.AcademicYearId == request.AcademicYearId);
+
+        if (existing is not null && !existing.IsDeleted)
             throw new BusinessRuleException($"A format already exists for {request.SlipType} in this academic year.");
+
+        if (existing is not null && existing.IsDeleted)
+        {
+            existing.IsDeleted = false;
+            existing.DeletedAt = null;
+            existing.FormatTemplate = request.FormatTemplate;
+            existing.PaddingWidth = request.PaddingWidth;
+
+            _repository.Update(existing);
+            await _unitOfWork.SaveChangesAsync();
+
+            return await GetByIdAsync(existing.Id);
+        }
 
         var entity = new ReferenceNumberFormat
         {
@@ -70,7 +86,10 @@ public class ReferenceNumberFormatService : IReferenceNumberFormatService
         var entity = await _repository.GetByIdAsync(id)
             ?? throw new NotFoundException(nameof(ReferenceNumberFormat), id);
 
-        if (await _repository.AnyAsync(f => f.SlipType == request.SlipType && f.AcademicYearId == request.AcademicYearId && f.Id != id))
+        var conflicting = await _repository.QueryIgnoringFilters()
+            .AnyAsync(f => f.SlipType == request.SlipType && f.AcademicYearId == request.AcademicYearId && f.Id != id);
+
+        if (conflicting)
             throw new BusinessRuleException($"A format already exists for {request.SlipType} in this academic year.");
 
         entity.SlipType = request.SlipType;
