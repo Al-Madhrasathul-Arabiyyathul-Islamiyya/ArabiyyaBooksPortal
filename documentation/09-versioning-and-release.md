@@ -84,3 +84,20 @@ This document defines how versioning works for:
   - `bun run test:unit`
   - `bun run test:nuxt`
   - `bun run test:e2e`
+
+## Native Git Hooks (No Husky)
+
+Repository-standard hooks are stored in `.githooks/` and do not require Node/Husky at root level.
+
+- Install once per clone:
+  - PowerShell: `pwsh -File tools/git-hooks/install-hooks.ps1`
+  - Bash: `bash tools/git-hooks/install-hooks.sh`
+- Hook behavior:
+  - `pre-commit`:
+    - Formats backend staged files using `dotnet format --include ...`.
+    - Formats frontend staged files using `bunx eslint --fix ...`.
+  - `pre-push`:
+    - If backend files changed, runs backend build and tests.
+    - If frontend files changed, runs frontend lint, typecheck, unit tests, and Nuxt tests.
+
+This ensures project-specific formatting/tests run automatically based on changed paths.

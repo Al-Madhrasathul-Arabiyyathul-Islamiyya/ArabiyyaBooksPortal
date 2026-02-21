@@ -1,5 +1,19 @@
 # Books Portal - Database Schema
 
+## Migration Safety Policy
+
+Effective policy for all future schema changes:
+
+- Prefer non-destructive, in-place upgradable migrations.
+- Avoid destructive operations (drop/rename/alter with data loss risk) unless there is no safe alternative.
+- Favor additive evolution:
+  - add nullable/new columns first,
+  - backfill data,
+  - switch application reads/writes,
+  - then retire old fields in a later migration window.
+- Prefer pivot/join tables over destructive reshaping of high-volume tables when modeling changes permit.
+- Every migration should preserve existing production data and support rolling forward without manual data loss operations.
+
 ## Entity Relationship Overview
 
 ```
