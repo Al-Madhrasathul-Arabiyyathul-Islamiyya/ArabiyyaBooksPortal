@@ -31,11 +31,10 @@
           />
           <Select
             v-model="filters.academicYearId"
-            :options="academicYearOptions"
+            :options="academicYearFilterOptions"
             option-label="label"
             option-value="value"
             placeholder="Filter by academic year"
-            show-clear
             fluid
             @change="void loadReferenceFormats()"
           >
@@ -374,6 +373,32 @@ const academicYearOptions = computed(() =>
   })),
 )
 
+const academicYearFilterOptions = computed(() => [
+  { label: 'All Academic Years', value: null as number | null, isActive: false },
+  ...academicYearOptions.value,
+])
+
+const slipTypeNameMap: Record<string, number> = {
+  distribution: 1,
+  return: 2,
+  teacherissue: 3,
+  teacherreturn: 4,
+}
+
+function normalizeSlipType(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isInteger(value)) {
+    return value
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return null
+    const parsed = Number(trimmed)
+    if (Number.isInteger(parsed)) return parsed
+    return slipTypeNameMap[trimmed.toLowerCase()] ?? null
+  }
+  return null
+}
+
 function previewTemplate(template: string, paddingWidth: number, sequenceNo = 1) {
   const sequence = String(sequenceNo).padStart(paddingWidth ?? 6, '0')
   return template
@@ -436,7 +461,10 @@ async function loadReferenceFormats() {
       academicYearId: filters.academicYearId ?? undefined,
     })
     if (response.success) {
-      formats.value = response.data
+      formats.value = response.data.map(item => ({
+        ...item,
+        slipType: normalizeSlipType(item.slipType) ?? item.slipType,
+      }))
       return
     }
     showError(response.message ?? 'Failed to load reference formats')
@@ -459,7 +487,7 @@ function openEditDialog(item: ReferenceNumberFormat) {
   resetForm()
   isEditing.value = true
   selectedId.value = item.id
-  form.slipType = item.slipType
+  form.slipType = normalizeSlipType(item.slipType)
   form.academicYearId = item.academicYearId
   form.formatTemplate = item.formatTemplate
   form.paddingWidth = item.paddingWidth
@@ -559,9 +587,7 @@ async function resetFilters() {
 }
 
 onMounted(async () => {
-  await Promise.all([
-    loadAcademicYears(),
-    loadReferenceFormats(),
-  ])
+  await loadAcademicYears()
+  await loadReferenceFormats()
 })
 </script>
