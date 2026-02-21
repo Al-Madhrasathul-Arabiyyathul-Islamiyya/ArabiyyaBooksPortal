@@ -22,7 +22,13 @@
       </template>
 
       <template #actions>
-        <Button label="Done" icon="pi pi-check" severity="secondary" text @click="navigateTo('/teacher-returns')" />
+        <Button
+          label="Done"
+          icon="pi pi-check"
+          severity="secondary"
+          text
+          @click="navigateTo('/teacher-returns')"
+        />
         <Button
           v-if="canFinalize"
           label="Finalize"
@@ -58,9 +64,21 @@
       </template>
 
       <template #items-columns>
-        <Column field="bookCode" header="Book Code" style="min-width: 9rem;" />
-        <Column field="bookTitle" header="Book Title" style="min-width: 14rem;" />
-        <Column field="quantity" header="Quantity" style="min-width: 8rem;" />
+        <Column
+          field="bookCode"
+          header="Book Code"
+          style="min-width: 9rem;"
+        />
+        <Column
+          field="bookTitle"
+          header="Book Title"
+          style="min-width: 14rem;"
+        />
+        <Column
+          field="quantity"
+          header="Quantity"
+          style="min-width: 8rem;"
+        />
       </template>
     </SlipsSlipDetail>
   </div>

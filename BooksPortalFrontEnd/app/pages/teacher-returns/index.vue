@@ -164,10 +164,25 @@
           data-key="teacherIssueItemId"
           responsive-layout="scroll"
         >
-          <Column field="bookCode" header="Book Code" style="min-width: 8rem;" />
-          <Column field="bookTitle" header="Book Title" style="min-width: 14rem;" />
-          <Column field="outstandingQuantity" header="Outstanding" style="min-width: 8rem;" />
-          <Column header="Return Qty" style="min-width: 10rem;">
+          <Column
+            field="bookCode"
+            header="Book Code"
+            style="min-width: 8rem;"
+          />
+          <Column
+            field="bookTitle"
+            header="Book Title"
+            style="min-width: 14rem;"
+          />
+          <Column
+            field="outstandingQuantity"
+            header="Outstanding"
+            style="min-width: 8rem;"
+          />
+          <Column
+            header="Return Qty"
+            style="min-width: 10rem;"
+          >
             <template #body="{ data }">
               <InputNumber
                 v-model="data.quantity"
@@ -187,16 +202,34 @@
           field-id="teacherReturnNotes"
           :error="returnErrors.notes"
         >
-          <Textarea id="teacherReturnNotes" v-model.trim="returnForm.notes" rows="3" fluid />
+          <Textarea
+            id="teacherReturnNotes"
+            v-model.trim="returnForm.notes"
+            rows="3"
+            fluid
+          />
         </FormsFormField>
 
-        <Message v-if="returnError" severity="error" :closable="false">
+        <Message
+          v-if="returnError"
+          severity="error"
+          :closable="false"
+        >
           {{ returnError }}
         </Message>
 
         <div class="flex justify-end gap-2">
-          <Button label="Cancel" severity="secondary" text @click="closeReturnDialog" />
-          <Button label="Create Return Slip" :loading="isSubmittingReturn" @click="submitReturn" />
+          <Button
+            label="Cancel"
+            severity="secondary"
+            text
+            @click="closeReturnDialog"
+          />
+          <Button
+            label="Create Return Slip"
+            :loading="isSubmittingReturn"
+            @click="submitReturn"
+          />
         </div>
       </div>
     </Dialog>
