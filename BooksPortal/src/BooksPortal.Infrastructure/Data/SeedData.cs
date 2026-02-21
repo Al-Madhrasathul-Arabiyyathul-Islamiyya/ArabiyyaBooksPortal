@@ -56,6 +56,7 @@ public static class SeedData
         var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
 
         await CurriculumSeeder.SeedAsync(db);
+        await ReferenceNumberFormatSeeder.SeedAsync(db);
         await ClassSectionSeeder.SeedAsync(db);
         await SubjectAndBookSeeder.SeedAsync(db);
         await PeopleSeeder.SeedAsync(db);
