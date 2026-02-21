@@ -187,6 +187,7 @@ import {
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
+  title: 'Teacher Issuance',
   breadcrumb: {
     'teacher-issues': 'Teacher Issues',
   },

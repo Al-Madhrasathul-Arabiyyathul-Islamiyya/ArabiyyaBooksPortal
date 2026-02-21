@@ -81,6 +81,8 @@ const { public: { appTitle } } = useRuntimeConfig()
 const userMenuRef = ref()
 const expandedKeys = ref<Record<string, boolean>>({})
 
+useLayoutPageHead('admin')
+
 function toggleColorMode() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }

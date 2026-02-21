@@ -2,6 +2,14 @@ import Aura from '@primeuix/themes/aura'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
+  app: {
+    head: {
+      title: 'Arabiyya Academic Books Portal',
+      meta: [
+        { name: 'application-name', content: 'Arabiyya Academic Books Portal' },
+      ],
+    },
+  },
 
   modules: [
     '@nuxt/eslint',
@@ -34,7 +42,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: 'http://localhost:5071/api',
-      appTitle: 'Arabiyya Books Portal',
+      appTitle: 'Arabiyya Academic Books Portal',
     },
   },
 

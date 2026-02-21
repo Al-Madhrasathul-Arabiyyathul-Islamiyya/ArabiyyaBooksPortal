@@ -167,6 +167,8 @@ const appStore = useAppStore()
 const route = useRoute()
 const { public: { appTitle } } = useRuntimeConfig()
 
+useLayoutPageHead('client')
+
 const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
 const userMenuRef = ref()
 

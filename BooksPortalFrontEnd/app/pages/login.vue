@@ -93,6 +93,21 @@ definePageMeta({
 
 const { login } = useAuth()
 const { public: { appTitle } } = useRuntimeConfig()
+const loginTitle = computed(() => `Login - ${appTitle}`)
+
+useHead(() => ({
+  title: loginTitle.value,
+}))
+
+useSeoMeta({
+  title: loginTitle,
+  ogTitle: loginTitle,
+  twitterTitle: loginTitle,
+  description: () => `Login page for ${appTitle}.`,
+  ogDescription: () => `Login page for ${appTitle}.`,
+  twitterDescription: () => `Login page for ${appTitle}.`,
+})
+
 const {
   state: form,
   errors,

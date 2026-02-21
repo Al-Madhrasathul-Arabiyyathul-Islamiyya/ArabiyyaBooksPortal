@@ -211,6 +211,7 @@ import { API, PAGINATION } from '~/utils/constants'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
+  title: 'Teacher Returns',
   breadcrumb: {
     'teacher-returns': 'Teacher Returns',
   },

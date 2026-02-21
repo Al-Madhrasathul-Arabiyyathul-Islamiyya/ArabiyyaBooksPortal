@@ -33,7 +33,7 @@
           @click="finalizeSlip"
         />
         <Button
-          label="Open Issue"
+          label="Open Issuance"
           icon="pi pi-file"
           severity="info"
           outlined
