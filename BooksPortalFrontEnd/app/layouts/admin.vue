@@ -87,6 +87,8 @@ const setupReadinessStore = useSetupReadinessStore()
 
 useLayoutPageHead('admin')
 
+useLayoutPageHead('admin')
+
 function toggleColorMode() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
