@@ -29,6 +29,14 @@
           @click="navigateTo('/distribution')"
         />
         <Button
+          v-if="canFinalize"
+          label="Edit"
+          icon="pi pi-pencil"
+          severity="secondary"
+          outlined
+          @click="navigateTo(`/distribution/create?reviseId=${slipId}`)"
+        />
+        <Button
           label="Print"
           icon="pi pi-print"
           outlined

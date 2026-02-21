@@ -183,6 +183,9 @@ function autoSelectLinkedParent() {
   const mapped = toParentEntityFromLinked(primary.parentId)
   if (mapped) {
     emit('selected', mapped)
+    if (!searchTerm.value.trim()) {
+      searchTerm.value = mapped.fullName
+    }
   }
 }
 

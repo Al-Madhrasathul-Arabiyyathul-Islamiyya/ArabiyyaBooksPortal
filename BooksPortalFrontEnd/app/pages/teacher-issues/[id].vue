@@ -30,6 +30,14 @@
         />
         <Button
           v-if="canFinalize"
+          label="Edit"
+          icon="pi pi-pencil"
+          severity="secondary"
+          outlined
+          @click="navigateTo(`/teacher-issues/create?reviseId=${slipId}`)"
+        />
+        <Button
+          v-if="canFinalize"
           label="Finalize"
           icon="pi pi-check-circle"
           severity="success"
