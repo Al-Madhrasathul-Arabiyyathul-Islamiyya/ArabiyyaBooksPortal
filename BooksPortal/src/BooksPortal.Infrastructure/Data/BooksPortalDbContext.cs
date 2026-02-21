@@ -164,7 +164,8 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
 
     private async Task OnAfterSaveChanges(List<AuditEntry> auditEntries, CancellationToken cancellationToken)
     {
-        if (auditEntries.Count == 0) return;
+        if (auditEntries.Count == 0)
+            return;
 
         foreach (var entry in auditEntries)
         {

@@ -29,10 +29,16 @@ public class BookServiceTests
     {
         return new Book
         {
-            Id = id, Code = $"BK{id:D3}", Title = $"Book {id}",
-            SubjectId = 1, Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
-            TotalStock = totalStock, Distributed = distributed,
-            WithTeachers = withTeachers, Damaged = damaged, Lost = lost
+            Id = id,
+            Code = $"BK{id:D3}",
+            Title = $"Book {id}",
+            SubjectId = 1,
+            Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
+            TotalStock = totalStock,
+            Distributed = distributed,
+            WithTeachers = withTeachers,
+            Damaged = damaged,
+            Lost = lost
         };
     }
 

@@ -61,17 +61,17 @@ public class ClassSectionService : IClassSectionService
             .OrderBy(c => c.Grade.SortOrder)
             .ThenBy(c => c.Section)
             .Select(c => new ClassSectionResponse
-        {
-            Id = c.Id,
-            AcademicYearId = c.AcademicYearId,
-            AcademicYearName = c.AcademicYear.Name,
-            KeystageId = c.KeystageId,
-            KeystageName = c.Keystage.Name,
-            GradeId = c.GradeId,
-            Grade = c.Grade.Name,
-            Section = c.Section,
-            StudentCount = c.Students.Count
-        });
+            {
+                Id = c.Id,
+                AcademicYearId = c.AcademicYearId,
+                AcademicYearName = c.AcademicYear.Name,
+                KeystageId = c.KeystageId,
+                KeystageName = c.Keystage.Name,
+                GradeId = c.GradeId,
+                Grade = c.Grade.Name,
+                Section = c.Section,
+                StudentCount = c.Students.Count
+            });
 
         return await PaginatedList<ClassSectionResponse>.CreateAsync(projected, pageNumber, pageSize);
     }

@@ -670,7 +670,8 @@ public class TeacherIssueService : ITeacherIssueService
             foreach (var item in issue.Items)
             {
                 var outstanding = item.OutstandingQuantity;
-                if (outstanding <= 0) continue;
+                if (outstanding <= 0)
+                    continue;
 
                 var book = await _bookRepo.GetByIdAsync(item.BookId)
                     ?? throw new NotFoundException(nameof(Book), item.BookId);

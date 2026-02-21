@@ -68,12 +68,22 @@ public class BookService : IBookService
 
         return new BookResponse
         {
-            Id = book.Id, ISBN = book.ISBN, Code = book.Code, Title = book.Title,
-            Author = book.Author, Edition = book.Edition, Publisher = book.Publisher,
-            PublishedYear = book.PublishedYear, SubjectId = book.SubjectId,
-            SubjectName = book.Subject.Name, Grade = book.Grade,
-            TotalStock = book.TotalStock, Distributed = book.Distributed,
-            WithTeachers = book.WithTeachers, Damaged = book.Damaged, Lost = book.Lost
+            Id = book.Id,
+            ISBN = book.ISBN,
+            Code = book.Code,
+            Title = book.Title,
+            Author = book.Author,
+            Edition = book.Edition,
+            Publisher = book.Publisher,
+            PublishedYear = book.PublishedYear,
+            SubjectId = book.SubjectId,
+            SubjectName = book.Subject.Name,
+            Grade = book.Grade,
+            TotalStock = book.TotalStock,
+            Distributed = book.Distributed,
+            WithTeachers = book.WithTeachers,
+            Damaged = book.Damaged,
+            Lost = book.Lost
         };
     }
 
@@ -194,10 +204,15 @@ public class BookService : IBookService
             .OrderByDescending(m => m.ProcessedAt)
             .Select(m => new StockMovementResponse
             {
-                Id = m.Id, BookId = m.BookId, MovementType = m.MovementType,
-                Quantity = m.Quantity, ReferenceId = m.ReferenceId,
-                ReferenceType = m.ReferenceType, Notes = m.Notes,
-                ProcessedById = m.ProcessedById, ProcessedAt = m.ProcessedAt
+                Id = m.Id,
+                BookId = m.BookId,
+                MovementType = m.MovementType,
+                Quantity = m.Quantity,
+                ReferenceId = m.ReferenceId,
+                ReferenceType = m.ReferenceType,
+                Notes = m.Notes,
+                ProcessedById = m.ProcessedById,
+                ProcessedAt = m.ProcessedAt
             }).ToList();
 
         var totalCount = items.Count;
@@ -246,10 +261,19 @@ public class BookService : IBookService
 
         return books.Select(b => new BookResponse
         {
-            Id = b.Id, ISBN = b.ISBN, Code = b.Code, Title = b.Title,
-            Author = b.Author, SubjectId = b.SubjectId, SubjectName = b.Subject.Name,
-            Grade = b.Grade, TotalStock = b.TotalStock, Distributed = b.Distributed,
-            WithTeachers = b.WithTeachers, Damaged = b.Damaged, Lost = b.Lost
+            Id = b.Id,
+            ISBN = b.ISBN,
+            Code = b.Code,
+            Title = b.Title,
+            Author = b.Author,
+            SubjectId = b.SubjectId,
+            SubjectName = b.Subject.Name,
+            Grade = b.Grade,
+            TotalStock = b.TotalStock,
+            Distributed = b.Distributed,
+            WithTeachers = b.WithTeachers,
+            Damaged = b.Damaged,
+            Lost = b.Lost
         }).ToList();
     }
 }
