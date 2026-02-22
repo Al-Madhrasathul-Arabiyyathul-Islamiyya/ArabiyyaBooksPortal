@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using BooksPortal.Application.Common.Exceptions;
 
 namespace BooksPortal.Application.Features.BulkImport.Services;
 
@@ -7,7 +8,14 @@ internal static class BulkImportWorksheetReader
     public static XLWorkbook OpenWorkbook(Stream stream)
     {
         stream.Position = 0;
-        return new XLWorkbook(stream);
+        try
+        {
+            return new XLWorkbook(stream);
+        }
+        catch (Exception)
+        {
+            throw new BadRequestException("Uploaded file is not a valid Excel workbook (.xlsx).");
+        }
     }
 
     public static Dictionary<string, int> ReadHeaderMap(IXLWorksheet worksheet)

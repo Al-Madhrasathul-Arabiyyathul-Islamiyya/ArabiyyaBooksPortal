@@ -36,6 +36,9 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.Configure<ImportTemplateCacheOptions>(
+    builder.Configuration.GetSection(ImportTemplateCacheOptions.SectionName));
+builder.Services.AddScoped<ImportTemplateCacheService>();
 
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
@@ -99,6 +102,9 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<BooksPortalDbContext>();
     await dbContext.Database.MigrateAsync();
     await SeedData.SeedAsync(scope.ServiceProvider, app.Environment.IsDevelopment());
+
+    var templateCache = scope.ServiceProvider.GetRequiredService<ImportTemplateCacheService>();
+    await templateCache.InitializeAsync();
 }
 
 // Middleware pipeline

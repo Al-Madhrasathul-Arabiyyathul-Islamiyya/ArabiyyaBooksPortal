@@ -43,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IBookBulkImportService, BookBulkImportService>();
         services.AddScoped<ITeacherBulkImportService, TeacherBulkImportService>();
         services.AddScoped<IStudentBulkImportService, StudentBulkImportService>();
+        services.AddScoped<IParentBulkImportService, ParentBulkImportService>();
         services.AddScoped<IImportTemplateService, ImportTemplateService>();
         services.AddScoped<IDistributionService, DistributionService>();
         services.AddScoped<IReturnService, ReturnService>();

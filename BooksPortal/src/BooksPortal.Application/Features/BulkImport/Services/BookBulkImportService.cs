@@ -17,7 +17,6 @@ public class BookBulkImportService : IBookBulkImportService
         "SubjectCode",
         "Publisher",
         "PublishedYear",
-        "AcademicYearId",
         "Quantity"
     ];
 
@@ -139,6 +138,17 @@ public class BookBulkImportService : IBookBulkImportService
             });
         }
 
+        if (!headers.ContainsKey("AcademicYearId") && !headers.ContainsKey("AcademicYear"))
+        {
+            report.Issues.Add(new BulkImportRowIssue
+            {
+                RowNumber = 1,
+                Field = "AcademicYear",
+                Code = "MissingHeader",
+                Message = "Required header 'AcademicYear' (or legacy 'AcademicYearId') is missing."
+            });
+        }
+
         if (report.Issues.Count > 0)
         {
             report.CanCommit = false;
@@ -161,7 +171,9 @@ public class BookBulkImportService : IBookBulkImportService
             var publisher = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Publisher");
             var publishedYearRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "PublishedYear");
             var grade = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Grade");
-            var academicYearIdRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "AcademicYearId");
+            var academicYearRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "AcademicYearId");
+            if (string.IsNullOrWhiteSpace(academicYearRaw))
+                academicYearRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "AcademicYear");
             var quantityRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Quantity");
             var source = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Source");
             var notes = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Notes");
@@ -173,7 +185,6 @@ public class BookBulkImportService : IBookBulkImportService
                 continue;
 
             var publishedYear = int.TryParse(publishedYearRaw, out var parsedPublishedYear) ? parsedPublishedYear : 0;
-            var academicYearId = int.TryParse(academicYearIdRaw, out var parsedAcademicYearId) ? parsedAcademicYearId : 0;
             var quantity = int.TryParse(quantityRaw, out var parsedQuantity) ? parsedQuantity : 0;
 
             var request = new CreateBookRequest
@@ -200,7 +211,7 @@ public class BookBulkImportService : IBookBulkImportService
                 });
             }
 
-            rows.Add(new BookImportRow(rowNumber, request, subjectCode, academicYearId, quantity, source, notes));
+            rows.Add(new BookImportRow(rowNumber, request, subjectCode, academicYearRaw, quantity, source, notes));
         }
 
         report.TotalRows = rows.Count;
@@ -211,14 +222,27 @@ public class BookBulkImportService : IBookBulkImportService
                 .Where(s => subjectCodes.Contains(s.Code))
                 .ToDictionaryAsync(s => s.Code, s => s.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
-        var academicYearIds = rows.Select(r => r.AcademicYearId).Where(id => id > 0).Distinct().ToList();
-        var existingAcademicYearIds = academicYearIds.Count == 0
-            ? new List<int>()
+        var academicYearTokens = rows
+            .Select(r => r.AcademicYearRaw.Trim())
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var numericAcademicYearTokens = academicYearTokens
+            .Where(token => int.TryParse(token, out _))
+            .Select(int.Parse)
+            .Distinct()
+            .ToList();
+
+        var academicYearRows = academicYearTokens.Count == 0
+            ? new List<AcademicYearLookup>()
             : await _academicYearRepository.Query()
-                .Where(a => academicYearIds.Contains(a.Id))
-                .Select(a => a.Id)
+                .Where(a =>
+                    numericAcademicYearTokens.Contains(a.Id) ||
+                    numericAcademicYearTokens.Contains(a.Year) ||
+                    academicYearTokens.Contains(a.Name))
+                .Select(a => new AcademicYearLookup(a.Id, a.Year, a.Name))
                 .ToListAsync(cancellationToken);
-        var academicYearSet = existingAcademicYearIds.ToHashSet();
 
         var codes = rows.Select(r => r.Request.Code).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         var existingCodes = codes.Count == 0
@@ -246,14 +270,15 @@ public class BookBulkImportService : IBookBulkImportService
                 row.Request.SubjectId = subjectId;
             }
 
-            if (row.AcademicYearId <= 0 || !academicYearSet.Contains(row.AcademicYearId))
+            row.AcademicYearId = ResolveAcademicYearId(row.AcademicYearRaw, academicYearRows);
+            if (row.AcademicYearId <= 0)
             {
                 report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = row.RowNumber,
-                    Field = "AcademicYearId",
+                    Field = "AcademicYear",
                     Code = "NotFound",
-                    Message = $"Academic year '{row.AcademicYearId}' was not found."
+                    Message = $"Academic year '{row.AcademicYearRaw}' was not found."
                 });
             }
 
@@ -312,13 +337,32 @@ public class BookBulkImportService : IBookBulkImportService
         return (rows.Where(r => !rowIssueSet.Contains(r.RowNumber)).ToList(), report);
     }
 
+    private static int ResolveAcademicYearId(string rawValue, IReadOnlyCollection<AcademicYearLookup> candidates)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+            return 0;
+
+        if (int.TryParse(rawValue, out var parsed))
+        {
+            var byId = candidates.FirstOrDefault(c => c.Id == parsed);
+            if (byId is not null)
+                return byId.Id;
+
+            var byYear = candidates.FirstOrDefault(c => c.Year == parsed);
+            return byYear?.Id ?? 0;
+        }
+
+        var byName = candidates.FirstOrDefault(c => string.Equals(c.Name, rawValue, StringComparison.OrdinalIgnoreCase));
+        return byName?.Id ?? 0;
+    }
+
     private sealed class BookImportRow
     {
         public BookImportRow(
             int rowNumber,
             CreateBookRequest request,
             string subjectCode,
-            int academicYearId,
+            string academicYearRaw,
             int quantity,
             string source,
             string notes)
@@ -326,7 +370,7 @@ public class BookBulkImportService : IBookBulkImportService
             RowNumber = rowNumber;
             Request = request;
             SubjectCode = subjectCode;
-            AcademicYearId = academicYearId;
+            AcademicYearRaw = academicYearRaw;
             Quantity = quantity;
             Source = source;
             Notes = notes;
@@ -335,9 +379,12 @@ public class BookBulkImportService : IBookBulkImportService
         public int RowNumber { get; }
         public CreateBookRequest Request { get; }
         public string SubjectCode { get; }
-        public int AcademicYearId { get; }
+        public string AcademicYearRaw { get; }
+        public int AcademicYearId { get; set; }
         public int Quantity { get; }
         public string Source { get; }
         public string Notes { get; }
     }
+
+    private sealed record AcademicYearLookup(int Id, int Year, string Name);
 }

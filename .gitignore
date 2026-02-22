@@ -15,3 +15,6 @@ frontend.log
 
 # API contract tester runtime logs
 tools/api-contract-tester/logs/
+
+# Runtime-generated import templates
+BooksPortal/src/BooksPortal.API/App_Data/

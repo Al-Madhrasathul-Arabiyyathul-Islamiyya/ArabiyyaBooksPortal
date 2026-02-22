@@ -11,11 +11,13 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
 {
     private readonly string _dbName = $"BooksPortalIntegration_{Guid.NewGuid():N}";
     private readonly string _connectionString;
+    private readonly string _templatePath;
     private int _cleanupAttempted;
 
     public IntegrationTestWebApplicationFactory()
     {
         _connectionString = ResolveConnectionString(TestSettings.Current.DatabaseConnection, _dbName);
+        _templatePath = Path.Combine(Path.GetTempPath(), "BooksPortal", "import-templates", _dbName);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -25,7 +27,8 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
         {
             configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:DefaultConnection"] = _connectionString
+                ["ConnectionStrings:DefaultConnection"] = _connectionString,
+                ["ImportTemplateCache:StoragePath"] = _templatePath
             });
         });
     }
@@ -84,6 +87,18 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
         try
         {
             await command.ExecuteNonQueryAsync();
+        }
+        catch
+        {
+            // Test cleanup must not mask test failures.
+        }
+
+        try
+        {
+            if (Directory.Exists(_templatePath))
+            {
+                Directory.Delete(_templatePath, recursive: true);
+            }
         }
         catch
         {

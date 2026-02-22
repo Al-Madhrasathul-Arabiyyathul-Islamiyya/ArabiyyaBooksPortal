@@ -1,4 +1,4 @@
-using BooksPortal.Application.Features.BulkImport.Interfaces;
+using BooksPortal.API.Services;
 using BooksPortal.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,31 +9,46 @@ namespace BooksPortal.API.Controllers;
 [Route("api/import-templates")]
 public class ImportTemplatesController : ApiControllerBase
 {
-    private readonly IImportTemplateService _service;
+    private readonly ImportTemplateCacheService _cacheService;
 
-    public ImportTemplatesController(IImportTemplateService service)
+    public ImportTemplatesController(ImportTemplateCacheService cacheService)
     {
-        _service = service;
+        _cacheService = cacheService;
     }
 
     [HttpGet("books")]
-    public IActionResult GetBooksTemplate()
+    public async Task<IActionResult> GetBooksTemplate(CancellationToken cancellationToken)
     {
-        var bytes = _service.CreateBooksTemplate();
-        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "books-import-template.xlsx");
+        var template = await _cacheService.GetTemplateAsync("books", cancellationToken);
+        return template is null
+            ? FailResponse("Books template is unavailable.")
+            : File(template.Value.Bytes, template.Value.ContentType, template.Value.FileName);
     }
 
     [HttpGet("teachers")]
-    public IActionResult GetTeachersTemplate()
+    public async Task<IActionResult> GetTeachersTemplate(CancellationToken cancellationToken)
     {
-        var bytes = _service.CreateTeachersTemplate();
-        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "teachers-import-template.xlsx");
+        var template = await _cacheService.GetTemplateAsync("teachers", cancellationToken);
+        return template is null
+            ? FailResponse("Teachers template is unavailable.")
+            : File(template.Value.Bytes, template.Value.ContentType, template.Value.FileName);
     }
 
     [HttpGet("students")]
-    public IActionResult GetStudentsTemplate()
+    public async Task<IActionResult> GetStudentsTemplate(CancellationToken cancellationToken)
     {
-        var bytes = _service.CreateStudentsTemplate();
-        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "students-import-template.xlsx");
+        var template = await _cacheService.GetTemplateAsync("students", cancellationToken);
+        return template is null
+            ? FailResponse("Students template is unavailable.")
+            : File(template.Value.Bytes, template.Value.ContentType, template.Value.FileName);
+    }
+
+    [HttpGet("parents")]
+    public async Task<IActionResult> GetParentsTemplate(CancellationToken cancellationToken)
+    {
+        var template = await _cacheService.GetTemplateAsync("parents", cancellationToken);
+        return template is null
+            ? FailResponse("Parents template is unavailable.")
+            : File(template.Value.Bytes, template.Value.ContentType, template.Value.FileName);
     }
 }

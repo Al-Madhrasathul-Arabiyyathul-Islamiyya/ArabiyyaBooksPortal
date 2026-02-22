@@ -5,4 +5,5 @@ public interface IImportTemplateService
     byte[] CreateBooksTemplate();
     byte[] CreateTeachersTemplate();
     byte[] CreateStudentsTemplate();
+    byte[] CreateParentsTemplate();
 }

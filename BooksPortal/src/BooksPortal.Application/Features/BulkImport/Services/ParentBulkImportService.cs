@@ -8,24 +8,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BooksPortal.Application.Features.BulkImport.Services;
 
-public class StudentBulkImportService : IStudentBulkImportService
+public class ParentBulkImportService : IParentBulkImportService
 {
-    private static readonly string[] RequiredHeaders = ["FullName", "IndexNo", "NationalId", "ClassSectionId"];
+    private static readonly string[] RequiredHeaders = ["FullName", "NationalId"];
 
-    private readonly IRepository<Student> _studentRepository;
-    private readonly IRepository<ClassSection> _classSectionRepository;
     private readonly IRepository<Parent> _parentRepository;
+    private readonly IRepository<Student> _studentRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public StudentBulkImportService(
-        IRepository<Student> studentRepository,
-        IRepository<ClassSection> classSectionRepository,
+    public ParentBulkImportService(
         IRepository<Parent> parentRepository,
+        IRepository<Student> studentRepository,
         IUnitOfWork unitOfWork)
     {
-        _studentRepository = studentRepository;
-        _classSectionRepository = classSectionRepository;
         _parentRepository = parentRepository;
+        _studentRepository = studentRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -46,24 +43,24 @@ public class StudentBulkImportService : IStudentBulkImportService
         {
             foreach (var row in parsed.Rows)
             {
-                var student = new Student
+                var parent = new Parent
                 {
                     FullName = row.Request.FullName,
-                    IndexNo = row.Request.IndexNo,
                     NationalId = row.Request.NationalId,
-                    ClassSectionId = row.Request.ClassSectionId
+                    Phone = string.IsNullOrWhiteSpace(row.Request.Phone) ? null : row.Request.Phone,
+                    Relationship = string.IsNullOrWhiteSpace(row.Request.Relationship) ? null : row.Request.Relationship
                 };
 
-                if (row.ParentId.HasValue)
+                if (row.StudentId.HasValue)
                 {
-                    student.StudentParents.Add(new StudentParent
+                    parent.StudentParents.Add(new StudentParent
                     {
-                        ParentId = row.ParentId.Value,
+                        StudentId = row.StudentId.Value,
                         IsPrimary = true
                     });
                 }
 
-                _studentRepository.Add(student);
+                _parentRepository.Add(parent);
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -77,7 +74,7 @@ public class StudentBulkImportService : IStudentBulkImportService
 
         return new BulkImportReport
         {
-            Entity = "Student",
+            Entity = "Parent",
             TotalRows = parsed.Rows.Count,
             ValidRows = parsed.Rows.Count,
             InvalidRows = 0,
@@ -87,21 +84,21 @@ public class StudentBulkImportService : IStudentBulkImportService
             Rows = parsed.Rows.Select(r => new BulkImportRowResult
             {
                 RowNumber = r.RowNumber,
-                Key = r.Request.IndexNo,
+                Key = r.Request.NationalId,
                 Success = true,
                 Note = "Inserted"
             }).ToList()
         };
     }
 
-    private async Task<(List<StudentImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
+    private async Task<(List<ParentImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
     {
         using var workbook = BulkImportWorksheetReader.OpenWorkbook(stream);
         var worksheet = workbook.Worksheets.FirstOrDefault()
             ?? throw new InvalidOperationException("Workbook does not contain any worksheets.");
 
         var headers = BulkImportWorksheetReader.ReadHeaderMap(worksheet);
-        var report = new BulkImportReport { Entity = "Student" };
+        var report = new BulkImportReport { Entity = "Parent" };
 
         foreach (var header in RequiredHeaders.Where(h => !headers.ContainsKey(h)))
         {
@@ -121,35 +118,31 @@ public class StudentBulkImportService : IStudentBulkImportService
         }
 
         var lastRow = BulkImportWorksheetReader.LastDataRow(worksheet);
-        var rows = new List<StudentImportRow>();
-        var seenIndexNumbers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var validator = new CreateStudentRequestValidator();
+        var rows = new List<ParentImportRow>();
+        var seenNationalIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var validator = new CreateParentRequestValidator();
 
         for (var rowNumber = 2; rowNumber <= lastRow; rowNumber++)
         {
             var fullName = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "FullName");
-            var indexNo = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "IndexNo");
             var nationalId = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "NationalId");
-            var classSectionIdRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "ClassSectionId");
-            var parentNationalId = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "ParentNationalId");
+            var phone = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Phone");
+            var relationship = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Relationship");
+            var studentIndexNo = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "StudentIndexNo");
 
             if (string.IsNullOrWhiteSpace(fullName) &&
-                string.IsNullOrWhiteSpace(indexNo) &&
                 string.IsNullOrWhiteSpace(nationalId) &&
-                string.IsNullOrWhiteSpace(classSectionIdRaw) &&
-                string.IsNullOrWhiteSpace(parentNationalId))
+                string.IsNullOrWhiteSpace(phone) &&
+                string.IsNullOrWhiteSpace(relationship) &&
+                string.IsNullOrWhiteSpace(studentIndexNo))
                 continue;
 
-            var classSectionId = int.TryParse(classSectionIdRaw, out var parsedClassSectionId)
-                ? parsedClassSectionId
-                : 0;
-
-            var request = new CreateStudentRequest
+            var request = new CreateParentRequest
             {
                 FullName = fullName,
-                IndexNo = indexNo,
                 NationalId = nationalId,
-                ClassSectionId = classSectionId
+                Phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
+                Relationship = string.IsNullOrWhiteSpace(relationship) ? null : relationship
             };
 
             var validationResult = validator.Validate(request);
@@ -164,95 +157,70 @@ public class StudentBulkImportService : IStudentBulkImportService
                 });
             }
 
-            if (!seenIndexNumbers.Add(request.IndexNo))
+            if (!seenNationalIds.Add(request.NationalId))
             {
                 report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = rowNumber,
-                    Field = nameof(CreateStudentRequest.IndexNo),
+                    Field = nameof(CreateParentRequest.NationalId),
                     Code = "DuplicateInFile",
-                    Message = $"Index number '{request.IndexNo}' is duplicated in file."
+                    Message = $"National ID '{request.NationalId}' is duplicated in file."
                 });
             }
 
-            rows.Add(new StudentImportRow(rowNumber, request, string.IsNullOrWhiteSpace(parentNationalId) ? null : parentNationalId));
+            rows.Add(new ParentImportRow(rowNumber, request, string.IsNullOrWhiteSpace(studentIndexNo) ? null : studentIndexNo));
         }
 
         report.TotalRows = rows.Count;
 
-        var indexNos = rows.Select(r => r.Request.IndexNo).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        if (indexNos.Count > 0)
+        var nationalIds = rows.Select(r => r.Request.NationalId).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        if (nationalIds.Count > 0)
         {
-            var existingIndexNos = await _studentRepository.Query()
-                .Where(s => indexNos.Contains(s.IndexNo))
-                .Select(s => s.IndexNo)
+            var existingIds = await _parentRepository.Query()
+                .Where(p => nationalIds.Contains(p.NationalId))
+                .Select(p => p.NationalId)
                 .ToListAsync(cancellationToken);
 
-            var existingSet = existingIndexNos.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            foreach (var row in rows.Where(r => existingSet.Contains(r.Request.IndexNo)))
+            var existingSet = existingIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var row in rows.Where(r => existingSet.Contains(r.Request.NationalId)))
             {
                 report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = row.RowNumber,
-                    Field = nameof(CreateStudentRequest.IndexNo),
+                    Field = nameof(CreateParentRequest.NationalId),
                     Code = "Conflict",
-                    Message = $"Student with index number '{row.Request.IndexNo}' already exists."
+                    Message = $"Parent with national ID '{row.Request.NationalId}' already exists."
                 });
             }
         }
 
-        var classSectionIds = rows
-            .Select(r => r.Request.ClassSectionId)
-            .Where(id => id > 0)
-            .Distinct()
-            .ToList();
-
-        var existingClassSectionIds = classSectionIds.Count == 0
-            ? new List<int>()
-            : await _classSectionRepository.Query()
-                .Where(cs => classSectionIds.Contains(cs.Id))
-                .Select(cs => cs.Id)
-                .ToListAsync(cancellationToken);
-
-        var existingClassSectionSet = existingClassSectionIds.ToHashSet();
-        foreach (var row in rows.Where(r => r.Request.ClassSectionId > 0 && !existingClassSectionSet.Contains(r.Request.ClassSectionId)))
-        {
-            report.Issues.Add(new BulkImportRowIssue
-            {
-                RowNumber = row.RowNumber,
-                Field = nameof(CreateStudentRequest.ClassSectionId),
-                Code = "NotFound",
-                Message = $"Class section with ID '{row.Request.ClassSectionId}' was not found."
-            });
-        }
-
-        var parentNationalIds = rows
-            .Where(r => !string.IsNullOrWhiteSpace(r.ParentNationalId))
-            .Select(r => r.ParentNationalId!)
+        var studentIndexNumbers = rows
+            .Where(r => !string.IsNullOrWhiteSpace(r.StudentIndexNo))
+            .Select(r => r.StudentIndexNo!)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        var parentsByNationalId = parentNationalIds.Count == 0
+        var studentsByIndex = studentIndexNumbers.Count == 0
             ? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-            : await _parentRepository.Query()
-                .Where(p => parentNationalIds.Contains(p.NationalId))
-                .ToDictionaryAsync(p => p.NationalId, p => p.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
+            : await _studentRepository.Query()
+                .Where(s => studentIndexNumbers.Contains(s.IndexNo))
+                .ToDictionaryAsync(s => s.IndexNo, s => s.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
-        foreach (var row in rows.Where(r => !string.IsNullOrWhiteSpace(r.ParentNationalId)))
+        foreach (var row in rows.Where(r => !string.IsNullOrWhiteSpace(r.StudentIndexNo)))
         {
-            if (!parentsByNationalId.TryGetValue(row.ParentNationalId!, out var parentId))
+            if (!studentsByIndex.TryGetValue(row.StudentIndexNo!, out var studentId))
             {
                 report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = row.RowNumber,
-                    Field = "ParentNationalId",
+                    Field = "StudentIndexNo",
                     Code = "NotFound",
-                    Message = $"Parent with national ID '{row.ParentNationalId}' was not found."
+                    Message = $"Student with index number '{row.StudentIndexNo}' was not found."
                 });
                 continue;
             }
 
-            row.ParentId = parentId;
+            row.StudentId = studentId;
         }
 
         var rowIssueSet = report.Issues
@@ -267,7 +235,7 @@ public class StudentBulkImportService : IStudentBulkImportService
         report.Rows = rows.Select(r => new BulkImportRowResult
         {
             RowNumber = r.RowNumber,
-            Key = r.Request.IndexNo,
+            Key = r.Request.NationalId,
             Success = !rowIssueSet.Contains(r.RowNumber),
             Note = rowIssueSet.Contains(r.RowNumber) ? "Validation failed" : "Valid"
         }).ToList();
@@ -275,18 +243,18 @@ public class StudentBulkImportService : IStudentBulkImportService
         return (rows.Where(r => !rowIssueSet.Contains(r.RowNumber)).ToList(), report);
     }
 
-    private sealed class StudentImportRow
+    private sealed class ParentImportRow
     {
-        public StudentImportRow(int rowNumber, CreateStudentRequest request, string? parentNationalId)
+        public ParentImportRow(int rowNumber, CreateParentRequest request, string? studentIndexNo)
         {
             RowNumber = rowNumber;
             Request = request;
-            ParentNationalId = parentNationalId;
+            StudentIndexNo = studentIndexNo;
         }
 
         public int RowNumber { get; }
-        public CreateStudentRequest Request { get; }
-        public string? ParentNationalId { get; }
-        public int? ParentId { get; set; }
+        public CreateParentRequest Request { get; }
+        public string? StudentIndexNo { get; }
+        public int? StudentId { get; set; }
     }
 }
