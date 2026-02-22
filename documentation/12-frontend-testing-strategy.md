@@ -68,6 +68,14 @@ For mutation-heavy scenarios, API-driven setup can be added case-by-case.
 - `bun run test:nuxt:grep -- "<pattern>"`
 - `bun run test:e2e:grep -- "<pattern>"`
 
+### Playwright Runtime Defaults
+- Local `Playwright` runs now start both frontend (`:3000`) and backend (`:5071`) web servers by default when `PLAYWRIGHT_BASE_URL` is not provided.
+- To run browser tests against an already-running external backend/frontend pair, set:
+  - `PLAYWRIGHT_BASE_URL=<frontend-url>`
+  - `PLAYWRIGHT_API_BASE=<backend-api-base>`
+- To keep local frontend auto-start but skip backend auto-start, set:
+  - `PLAYWRIGHT_SKIP_BACKEND=1`
+
 ## Merge/Release Policy
 
 ### Minimum merge gate (feature branches)

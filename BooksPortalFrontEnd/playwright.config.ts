@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 const hasExternalBaseUrl = !!process.env.PLAYWRIGHT_BASE_URL
 const shouldStartBackend = !hasExternalBaseUrl
-  && (process.env.PLAYWRIGHT_START_BACKEND === '1' || process.env.E2E_ROLE_GATES === '1')
+  && process.env.PLAYWRIGHT_SKIP_BACKEND !== '1'
 
 export default defineConfig({
   testDir: './tests/e2e',

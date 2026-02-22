@@ -56,12 +56,12 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [~] Ensure all user-facing errors are backend-normalized friendly messages.
 
 ### Slice 4 - Pre-release verification bundle
-- [~] Lint/typecheck/build pass.
+- [x] Lint/typecheck/build pass.
 - [~] End-to-end operational smoke pass:
   - [x] Admin + User role routing and guards
   - [x] Slip generation and PDF open/download
   - [x] Reports export paths
-- [ ] Update plan/docs/basic-memory with final status.
+- [x] Update plan/docs/basic-memory with final status.
 
 ## Acceptance Criteria
 - [ ] All open checkboxes in slices 1-4 are completed or explicitly deferred with rationale.

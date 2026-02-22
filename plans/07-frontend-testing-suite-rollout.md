@@ -85,6 +85,13 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
   - `bun run test:e2e -- --grep "auth guards"`
   - `bun run test:e2e:grep -- "<pattern>"`
 
+### Playwright env controls
+- Default local behavior: frontend + backend web servers are auto-started by Playwright.
+- Opt out of backend auto-start:
+  - `PLAYWRIGHT_SKIP_BACKEND=1 bun run test:e2e:smoke`
+- External environment mode:
+  - set `PLAYWRIGHT_BASE_URL` and `PLAYWRIGHT_API_BASE` to use pre-running services.
+
 ## Acceptance Criteria
 - [x] Modules 01-06 complete or explicitly deferred with rationale.
 - [x] `test:smoke` stable and used as minimum merge gate.
