@@ -42,10 +42,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [x] Distribution lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
 - [x] Returns lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
 - [x] Teacher issue lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
-- [~] Teacher return lifecycle deterministic checks
-  - Current behavior appears to auto-finalize immediately after creation.
-  - Test remains intentionally failing for strict lifecycle parity verification.
-  - Defer fix to post-suite hardening pass (backend + frontend lifecycle alignment).
+- [x] Teacher return lifecycle deterministic checks (`create -> Processing -> finalize -> Finalized`)
 - [x] Print action availability checks
 
 ### Module 04 - E2E reports/settings smoke
@@ -90,7 +87,6 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 
 ## Acceptance Criteria
 - [x] Modules 01-06 complete or explicitly deferred with rationale.
-- [ ] `test:smoke` stable and used as minimum merge gate.
-- [ ] `test:all` stable before release promotion.
-  - Known deferred gap: `@known-gap` teacher-return lifecycle parity is intentionally pending backend/frontend alignment.
+- [x] `test:smoke` stable and used as minimum merge gate.
+- [~] `test:all` stable before release promotion.
 - [x] Documentation and plan status synced with implemented coverage.
