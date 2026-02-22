@@ -17,7 +17,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
   - [x] Books forms (create/edit + stock dialogs)
   - [x] Slips forms/pages complete migration
   - [x] Settings forms complete migration
-- [~] Remove residual ad-hoc page-level validators and error extractors (cleanup pass still pending).
+- [x] Remove residual ad-hoc page-level validators and error extractors.
 
 ### V4 Validation Pass
 - [ ] Regle-first pass on all operational and admin forms.

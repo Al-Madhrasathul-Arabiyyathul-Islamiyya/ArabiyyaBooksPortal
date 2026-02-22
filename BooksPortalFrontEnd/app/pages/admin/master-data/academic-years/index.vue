@@ -195,6 +195,7 @@ import {
   UpdateAcademicYearRequestSchema,
 } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -295,8 +296,7 @@ async function loadAcademicYears() {
     showError(response.message ?? 'Failed to load academic years')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load academic years')
+    showError(getFriendlyErrorMessage(error, 'Failed to load academic years'))
   }
   finally {
     isLoading.value = false
@@ -401,8 +401,7 @@ function handleActivate(item: AcademicYear) {
         showError(response.message ?? 'Failed to activate academic year')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to activate academic year')
+        showError(getFriendlyErrorMessage(error, 'Failed to activate academic year'))
       }
     },
     'Activate Academic Year',
@@ -425,8 +424,7 @@ function handleDelete(item: AcademicYear) {
         showError(response.message ?? 'Failed to delete academic year')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete academic year')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete academic year'))
       }
     },
   )

@@ -2,7 +2,7 @@ import type { Ref } from 'vue'
 import type { z } from 'zod/v4'
 import { useRegleSchema } from '@regle/schemas'
 import { normalizeBackendErrors } from '~/utils/validation/backend-errors'
-import { toValidationMessage } from '~/utils/validation/messages'
+import { toZodFieldErrors } from '~/utils/validation/zod-errors'
 
 type FormState = Record<string, unknown>
 type RegleFieldStatus = {
@@ -72,14 +72,7 @@ export function useAppValidation<TState extends FormState>(
   }
 
   function mapZodErrors(result: z.ZodError) {
-    const mapped: Record<string, string[]> = {}
-    for (const issue of result.issues) {
-      const field = String(issue.path[0] ?? '')
-      if (!field) continue
-      if (!mapped[field]) mapped[field] = []
-      mapped[field].push(toValidationMessage(issue) ?? 'Invalid value.')
-    }
-    externalErrors.value = mapped
+    externalErrors.value = toZodFieldErrors(result)
   }
 
   async function validateWithSchema(values: unknown) {

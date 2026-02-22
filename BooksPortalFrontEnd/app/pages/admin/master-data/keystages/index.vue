@@ -149,6 +149,7 @@
 import type { Keystage } from '~/types/entities'
 import { CreateKeystageRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -215,8 +216,7 @@ async function loadKeystages() {
     showError(response.message ?? 'Failed to load keystages')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load keystages')
+    showError(getFriendlyErrorMessage(error, 'Failed to load keystages'))
   }
   finally {
     isLoading.value = false
@@ -309,8 +309,7 @@ function handleDelete(item: Keystage) {
         showError(response.message ?? 'Failed to delete keystage')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete keystage')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete keystage'))
       }
     },
   )

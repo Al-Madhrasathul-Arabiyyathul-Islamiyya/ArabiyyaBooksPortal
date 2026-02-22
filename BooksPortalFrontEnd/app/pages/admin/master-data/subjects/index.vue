@@ -129,6 +129,7 @@
 import type { Subject } from '~/types/entities'
 import { CreateSubjectRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -184,8 +185,7 @@ async function loadSubjects() {
     showError(response.message ?? 'Failed to load subjects')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load subjects')
+    showError(getFriendlyErrorMessage(error, 'Failed to load subjects'))
   }
   finally {
     isLoading.value = false
@@ -264,8 +264,7 @@ function handleDelete(item: Subject) {
         showError(response.message ?? 'Failed to delete subject')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete subject')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete subject'))
       }
     },
   )

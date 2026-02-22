@@ -41,6 +41,21 @@ describe('normalizeBackendErrors', () => {
       data: { status: 409, message: 'Duplicate key' },
     })
     expect(conflict.globalErrors[0]).toBe('Duplicate key')
+
+    const serverError = normalizeBackendErrors({
+      data: { status: 500, message: 'Unhandled exception with stack trace' },
+    })
+    expect(serverError.globalErrors[0]).toContain('There was an issue while processing your request')
+  })
+
+  it('hides technical server internals from users', () => {
+    const result = normalizeBackendErrors({
+      data: {
+        message: 'Microsoft.Data.SqlClient.SqlException: Cannot insert duplicate key row',
+      },
+    })
+
+    expect(result.globalErrors[0]).toContain('There was an issue while processing your request')
   })
 
   it('returns friendly fallback message helper', () => {

@@ -86,6 +86,7 @@
 <script setup lang="ts">
 import { LoginRequestSchema } from '~/types/forms'
 import { toFriendlyLoginError } from '~/utils/auth-errors'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'auth',
@@ -146,8 +147,8 @@ async function handleLogin() {
     }
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string }, message?: string }
-    setGlobalError(toFriendlyLoginError(fetchError.data?.message || fetchError.message))
+    const safeMessage = getFriendlyErrorMessage(error, 'Login failed')
+    setGlobalError(toFriendlyLoginError(safeMessage))
   }
   finally {
     isLoading.value = false

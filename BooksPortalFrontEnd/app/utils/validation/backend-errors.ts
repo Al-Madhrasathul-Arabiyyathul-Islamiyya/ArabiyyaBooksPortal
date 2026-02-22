@@ -18,6 +18,25 @@ interface FetchErrorShape {
   statusCode?: number
 }
 
+const GENERIC_OPERATION_ERROR
+  = 'There was an issue while processing your request. Please try again later. If this continues, contact IT support.'
+
+function isTechnicalServerMessage(message: string): boolean {
+  const lowered = message.toLowerCase()
+  return (
+    lowered.includes('sql')
+    || lowered.includes('stack trace')
+    || lowered.includes('stacktrace')
+    || lowered.includes('exception')
+    || lowered.includes('inner exception')
+    || lowered.includes('cannot insert duplicate key')
+    || lowered.includes('microsoft.data.sqlclient')
+    || lowered.includes('entityframeworkcore')
+    || lowered.includes('dbupdateexception')
+    || lowered.includes(' at ')
+  )
+}
+
 export function normalizeBackendErrors(error: unknown): NormalizedValidationErrors {
   const fieldErrors: Record<string, string[]> = {}
   const globalErrors: string[] = []
@@ -84,7 +103,10 @@ export function normalizeBackendErrors(error: unknown): NormalizedValidationErro
       globalErrors.push('You do not have permission to perform this action.')
     }
     else if (statusCode && statusCode >= 500 && globalErrors.length === 0) {
-      globalErrors.push('A server error occurred. Please try again.')
+      globalErrors.push(GENERIC_OPERATION_ERROR)
+    }
+    else if (isTechnicalServerMessage(message) && globalErrors.length === 0) {
+      globalErrors.push(GENERIC_OPERATION_ERROR)
     }
     else if (looksLikeTransportMessage && globalErrors.length === 0) {
       globalErrors.push('The request could not be completed. Please review the form and try again.')

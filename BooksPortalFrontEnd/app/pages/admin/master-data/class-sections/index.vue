@@ -255,6 +255,7 @@ import type {
 } from '~/types/entities'
 import { CreateClassSectionRequestSchema } from '~/types/forms'
 import { API, PAGINATION } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 interface SelectOption {
   label: string
@@ -413,8 +414,7 @@ async function loadLookups() {
     }
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load class section lookups')
+    showError(getFriendlyErrorMessage(error, 'Failed to load class section lookups'))
   }
 }
 
@@ -445,8 +445,7 @@ async function loadClassSections() {
     showError(response.message ?? 'Failed to load class sections')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load class sections')
+    showError(getFriendlyErrorMessage(error, 'Failed to load class sections'))
   }
   finally {
     isLoading.value = false
@@ -543,8 +542,7 @@ function handleDelete(item: ClassSection) {
         showError(response.message ?? 'Failed to delete class section')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete class section')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete class section'))
       }
     },
   )
@@ -578,8 +576,7 @@ watch(
       showError(response.message ?? 'Failed to load grades')
     }
     catch (error: unknown) {
-      const fetchError = error as { data?: { message?: string } }
-      showError(fetchError.data?.message ?? 'Failed to load grades')
+      showError(getFriendlyErrorMessage(error, 'Failed to load grades'))
     }
   },
 )

@@ -172,6 +172,7 @@ import type { SlipTemplateSetting } from '~/types/entities'
 import { UpdateSlipTemplateSettingRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
+import { toZodFieldErrors } from '~/utils/validation/zod-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -306,7 +307,7 @@ function requestSaveSetting(id: number) {
   rowErrors.value[id] = {}
   const parsed = RowSchema.safeParse(current)
   if (!parsed.success) {
-    const fieldErrors = parsed.error.flatten().fieldErrors
+    const fieldErrors = toZodFieldErrors(parsed.error)
     rowErrors.value[id] = {
       value: fieldErrors.value?.[0],
       sortOrder: fieldErrors.sortOrder?.[0],
