@@ -449,14 +449,43 @@ Validate student import payload before commit.
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `FullName`, `IndexNo`, `NationalId`, `ClassSectionId`
+  - Optional: `ParentNationalId` (links student to parent by parent national ID)
 
 ### POST /api/students/bulk/commit
 
-Commit student import payload in a single transaction (reject-on-conflict, no upsert).
+Commit student import payload with per-row processing.
+
+- Existing rows (matched by `IndexNo`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
 
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+
+### POST /api/students/bulk/commit-async
+
+Start async student bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/students/bulk/jobs/{jobId}
+
+Get async student bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/students/bulk/jobs/{jobId}/report
+
+Download async student bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 **StudentResponse**:
 
@@ -530,6 +559,51 @@ Delete a parent.
 - **Auth**: Bearer + **SuperAdmin** role
 - **Response**: `string` message
 - **Behavior**: returns business-rule error if the parent is referenced by existing records.
+
+### POST /api/parents/bulk/validate
+
+Validate parent import payload before commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `FullName`, `NationalId`
+  - Optional: `Phone`, `Relationship`, `StudentIndexNo` (links parent to student by student index)
+
+### POST /api/parents/bulk/commit
+
+Commit parent import payload with per-row processing.
+
+- Existing rows (matched by `NationalId`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+
+### POST /api/parents/bulk/commit-async
+
+Start async parent bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/parents/bulk/jobs/{jobId}
+
+Get async parent bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/parents/bulk/jobs/{jobId}/report
+
+Download async parent bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 **ParentResponse**:
 
@@ -614,14 +688,42 @@ Validate teacher import payload before commit.
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `FullName`, `NationalId`, `Email`, `Phone`
 
 ### POST /api/teachers/bulk/commit
 
-Commit teacher import payload in a single transaction (reject-on-conflict, no upsert).
+Commit teacher import payload with per-row processing.
+
+- Existing rows (matched by `NationalId`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
 
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+
+### POST /api/teachers/bulk/commit-async
+
+Start async teacher bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/teachers/bulk/jobs/{jobId}
+
+Get async teacher bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/teachers/bulk/jobs/{jobId}/report
+
+Download async teacher bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 **TeacherResponse**:
 
@@ -740,14 +842,44 @@ Validate book import payload before commit.
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `Code`, `Title`, `SubjectCode`, `Publisher`, `PublishedYear`, `Quantity`
+  - Required one-of: `AcademicYear` or legacy `AcademicYearId`
+  - Optional: `ISBN`, `Author`, `Edition`, `Grade`, `Source`, `Notes`
 
 ### POST /api/books/bulk/commit
 
-Commit book import payload in a single transaction (reject-on-conflict, no upsert).
+Commit book import payload with per-row processing.
+
+- Existing rows (matched by `Code`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
 
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+
+### POST /api/books/bulk/commit-async
+
+Start async book bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/books/bulk/jobs/{jobId}
+
+Get async book bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/books/bulk/jobs/{jobId}/report
+
+Download async book bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 ### PUT /api/books/{id}
 
@@ -2279,7 +2411,82 @@ pwsh ./tools/api-contract-tester/run-backend-verification.ps1
 
 The frontend freeze is considered current only when this run passes and the scoped example payloads remain accurate.
 
-## 20. Enums
+## 20. Import Templates
+
+Base path: `/api/import-templates`
+
+All endpoints require **Bearer auth** with **SuperAdmin** or **Admin** role.
+
+Templates are generated at API startup, cached on disk, and served as static `.xlsx` files.
+All templates are header-only (no sample rows), with auto-sized columns.
+
+### GET /api/import-templates/books
+
+- **Response**: `books-import-template.xlsx`
+
+### GET /api/import-templates/students
+
+- **Response**: `students-import-template.xlsx`
+
+### GET /api/import-templates/teachers
+
+- **Response**: `teachers-import-template.xlsx`
+
+### GET /api/import-templates/parents
+
+- **Response**: `parents-import-template.xlsx`
+
+## 21. Bulk Import Models
+
+### BulkImportReport
+
+| Field | Type |
+|-------|------|
+| entity | string |
+| totalRows | int |
+| validRows | int |
+| invalidRows | int |
+| insertedRows | int |
+| updatedRows | int |
+| failedRows | int |
+| canCommit | bool |
+| rows | BulkImportRowResult[] |
+| issues | BulkImportRowIssue[] |
+
+### BulkImportRowResult
+
+| Field | Type |
+|-------|------|
+| rowNumber | int |
+| key | string |
+| success | bool |
+| status | string (`Valid`/`Inserted`/`Updated`/`Failed`) |
+| note | string? |
+
+### BulkImportRowIssue
+
+| Field | Type |
+|-------|------|
+| rowNumber | int |
+| field | string |
+| code | string |
+| message | string |
+
+### BulkImportJobSnapshot
+
+| Field | Type |
+|-------|------|
+| id | guid |
+| entity | string (`book`/`student`/`teacher`/`parent`) |
+| status | string (`Queued`/`Running`/`Completed`/`Failed`) |
+| error | string? |
+| totalRows | int |
+| processedRows | int |
+| startedAtUtc | datetime |
+| completedAtUtc | datetime? |
+| reportReady | bool |
+
+## 22. Enums
 
 ### Term
 | Value | Name |
