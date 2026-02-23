@@ -8,7 +8,7 @@ namespace BooksPortal.API.Services;
 public sealed class BookBulkImportJobStore
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ConcurrentDictionary<Guid, BookBulkImportJobRecord> _jobs = new();
+    private readonly ConcurrentDictionary<Guid, BulkImportJobRecord> _jobs = new();
 
     public BookBulkImportJobStore(IServiceScopeFactory scopeFactory)
     {
@@ -16,11 +16,76 @@ public sealed class BookBulkImportJobStore
     }
 
     public Guid Start(byte[] fileBytes, int userId)
+        => StartInternal(
+            "book",
+            fileBytes,
+            async (scope, stream, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IBookBulkImportService>();
+                return await service.ValidateAsync(stream, cancellationToken);
+            },
+            async (scope, stream, progress, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IBookBulkImportService>();
+                return await service.CommitAsync(stream, userId, progress, cancellationToken);
+            });
+
+    public Guid StartStudents(byte[] fileBytes)
+        => StartInternal(
+            "student",
+            fileBytes,
+            async (scope, stream, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IStudentBulkImportService>();
+                return await service.ValidateAsync(stream, cancellationToken);
+            },
+            async (scope, stream, progress, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IStudentBulkImportService>();
+                return await service.CommitAsync(stream, progress, cancellationToken);
+            });
+
+    public Guid StartTeachers(byte[] fileBytes)
+        => StartInternal(
+            "teacher",
+            fileBytes,
+            async (scope, stream, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<ITeacherBulkImportService>();
+                return await service.ValidateAsync(stream, cancellationToken);
+            },
+            async (scope, stream, progress, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<ITeacherBulkImportService>();
+                return await service.CommitAsync(stream, progress, cancellationToken);
+            });
+
+    public Guid StartParents(byte[] fileBytes)
+        => StartInternal(
+            "parent",
+            fileBytes,
+            async (scope, stream, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IParentBulkImportService>();
+                return await service.ValidateAsync(stream, cancellationToken);
+            },
+            async (scope, stream, progress, cancellationToken) =>
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IParentBulkImportService>();
+                return await service.CommitAsync(stream, progress, cancellationToken);
+            });
+
+    private Guid StartInternal(
+        string entity,
+        byte[] fileBytes,
+        Func<IServiceScope, Stream, CancellationToken, Task<BulkImportReport>> validate,
+        Func<IServiceScope, Stream, IProgress<int>, CancellationToken, Task<BulkImportReport>> commit)
     {
         var id = Guid.NewGuid();
-        var job = new BookBulkImportJobRecord
+        var job = new BulkImportJobRecord
         {
             Id = id,
+            Entity = entity,
             Status = "Queued",
             StartedAtUtc = DateTime.UtcNow
         };
@@ -32,19 +97,17 @@ public sealed class BookBulkImportJobStore
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var service = scope.ServiceProvider.GetRequiredService<IBookBulkImportService>();
-
                 await using var validateStream = new MemoryStream(fileBytes);
-                var validation = await service.ValidateAsync(validateStream);
+                var validation = await validate(scope, validateStream, CancellationToken.None);
                 job.TotalRows = validation.TotalRows;
 
                 var progress = new Progress<int>(processed => job.ProcessedRows = processed);
                 await using var commitStream = new MemoryStream(fileBytes);
-                var report = await service.CommitAsync(commitStream, userId, progress);
+                var report = await commit(scope, commitStream, progress, CancellationToken.None);
                 job.Report = report;
                 job.ProcessedRows = report.Rows.Count;
                 job.TotalRows = report.TotalRows;
-                job.ReportFileName = $"book-bulk-import-report-{id:N}.xlsx";
+                job.ReportFileName = $"{entity}-bulk-import-report-{id:N}.xlsx";
                 job.ReportFileBytes = BuildWorkbook(report);
                 job.Status = "Completed";
             }
@@ -62,14 +125,15 @@ public sealed class BookBulkImportJobStore
         return id;
     }
 
-    public BookBulkImportJobSnapshot? Get(Guid id)
+    public BulkImportJobSnapshot? Get(Guid id)
     {
         if (!_jobs.TryGetValue(id, out var job))
             return null;
 
-        return new BookBulkImportJobSnapshot
+        return new BulkImportJobSnapshot
         {
             Id = job.Id,
+            Entity = job.Entity,
             Status = job.Status,
             Error = job.Error,
             TotalRows = job.TotalRows,
@@ -125,9 +189,10 @@ public sealed class BookBulkImportJobStore
     }
 }
 
-public sealed class BookBulkImportJobSnapshot
+public sealed class BulkImportJobSnapshot
 {
     public Guid Id { get; set; }
+    public string Entity { get; set; } = string.Empty;
     public string Status { get; set; } = "Queued";
     public string? Error { get; set; }
     public int TotalRows { get; set; }
@@ -137,9 +202,10 @@ public sealed class BookBulkImportJobSnapshot
     public bool ReportReady { get; set; }
 }
 
-internal sealed class BookBulkImportJobRecord
+internal sealed class BulkImportJobRecord
 {
     public Guid Id { get; set; }
+    public string Entity { get; set; } = string.Empty;
     public string Status { get; set; } = "Queued";
     public string? Error { get; set; }
     public int TotalRows { get; set; }

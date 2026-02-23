@@ -282,6 +282,88 @@ public class BulkImportEndpointContractIntegrationTests : IClassFixture<Integrat
         reportBytes.Length.Should().BeGreaterThan(0);
     }
 
+    [Fact]
+    public async Task Students_BulkCommitAsync_ShouldCompleteAndProduceReport()
+    {
+        await AuthenticateAsync();
+
+        var classSectionId = await EnsureClassSectionAsync();
+        var indexNo = $"IDX-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var workbookBytes = CreateWorkbook(
+            "Students",
+            ["FullName", "IndexNo", "NationalId", "ClassSectionId", "ParentNationalId"],
+            [$"Student {indexNo}", indexNo, $"S-{Guid.NewGuid():N}"[..10], classSectionId.ToString(), ""]);
+
+        using var startResponse = await PostWorkbookAsync("/api/students/bulk/commit-async", "students-async.xlsx", workbookBytes);
+        startResponse.EnsureSuccessStatusCode();
+        using var startDoc = JsonDocument.Parse(await startResponse.Content.ReadAsStringAsync());
+        var jobId = startDoc.RootElement.GetProperty("data").GetProperty("jobId").GetGuid();
+
+        var status = await WaitForJobCompletionAsync($"/api/students/bulk/jobs/{jobId}");
+        status.GetProperty("reportReady").GetBoolean().Should().BeTrue();
+        status.GetProperty("entity").GetString()?.ToLowerInvariant().Should().Be("student");
+
+        using var reportResponse = await _client.GetAsync($"/api/students/bulk/jobs/{jobId}/report");
+        reportResponse.EnsureSuccessStatusCode();
+        (await reportResponse.Content.ReadAsByteArrayAsync()).Length.Should().BeGreaterThan(0);
+
+        await AssertStudentExistsAsync(indexNo);
+    }
+
+    [Fact]
+    public async Task Teachers_BulkCommitAsync_ShouldCompleteAndProduceReport()
+    {
+        await AuthenticateAsync();
+
+        var nationalId = $"T-{Guid.NewGuid():N}"[..10];
+        var workbookBytes = CreateWorkbook(
+            "Teachers",
+            ["FullName", "NationalId", "Email", "Phone"],
+            [$"Teacher {nationalId}", nationalId, $"{nationalId.ToLowerInvariant()}@local.test", "7712345"]);
+
+        using var startResponse = await PostWorkbookAsync("/api/teachers/bulk/commit-async", "teachers-async.xlsx", workbookBytes);
+        startResponse.EnsureSuccessStatusCode();
+        using var startDoc = JsonDocument.Parse(await startResponse.Content.ReadAsStringAsync());
+        var jobId = startDoc.RootElement.GetProperty("data").GetProperty("jobId").GetGuid();
+
+        var status = await WaitForJobCompletionAsync($"/api/teachers/bulk/jobs/{jobId}");
+        status.GetProperty("reportReady").GetBoolean().Should().BeTrue();
+        status.GetProperty("entity").GetString()?.ToLowerInvariant().Should().Be("teacher");
+
+        using var reportResponse = await _client.GetAsync($"/api/teachers/bulk/jobs/{jobId}/report");
+        reportResponse.EnsureSuccessStatusCode();
+        (await reportResponse.Content.ReadAsByteArrayAsync()).Length.Should().BeGreaterThan(0);
+
+        await AssertTeacherExistsAsync(nationalId);
+    }
+
+    [Fact]
+    public async Task Parents_BulkCommitAsync_ShouldCompleteAndProduceReport()
+    {
+        await AuthenticateAsync();
+
+        var nationalId = $"P-{Guid.NewGuid():N}"[..10];
+        var workbookBytes = CreateWorkbook(
+            "Parents",
+            ["FullName", "NationalId", "Phone", "Relationship", "StudentIndexNo"],
+            [$"Parent {nationalId}", nationalId, "7700099", "Father", ""]);
+
+        using var startResponse = await PostWorkbookAsync("/api/parents/bulk/commit-async", "parents-async.xlsx", workbookBytes);
+        startResponse.EnsureSuccessStatusCode();
+        using var startDoc = JsonDocument.Parse(await startResponse.Content.ReadAsStringAsync());
+        var jobId = startDoc.RootElement.GetProperty("data").GetProperty("jobId").GetGuid();
+
+        var status = await WaitForJobCompletionAsync($"/api/parents/bulk/jobs/{jobId}");
+        status.GetProperty("reportReady").GetBoolean().Should().BeTrue();
+        status.GetProperty("entity").GetString()?.ToLowerInvariant().Should().Be("parent");
+
+        using var reportResponse = await _client.GetAsync($"/api/parents/bulk/jobs/{jobId}/report");
+        reportResponse.EnsureSuccessStatusCode();
+        (await reportResponse.Content.ReadAsByteArrayAsync()).Length.Should().BeGreaterThan(0);
+
+        await AssertParentExistsAsync(nationalId);
+    }
+
     private async Task AuthenticateAsync()
     {
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new
@@ -467,5 +549,67 @@ public class BulkImportEndpointContractIntegrationTests : IClassFixture<Integrat
         results.EnumerateArray().Any(item =>
             string.Equals(item.GetProperty("code").GetString(), code, StringComparison.OrdinalIgnoreCase))
             .Should().BeFalse($"book '{code}' should not be inserted when commit is rejected");
+    }
+
+    private async Task<JsonElement> WaitForJobCompletionAsync(string endpoint)
+    {
+        JsonDocument? finalStatus = null;
+        for (var i = 0; i < 40; i++)
+        {
+            using var statusResponse = await _client.GetAsync(endpoint);
+            statusResponse.EnsureSuccessStatusCode();
+            var statusDoc = JsonDocument.Parse(await statusResponse.Content.ReadAsStringAsync());
+            var status = statusDoc.RootElement.GetProperty("data").GetProperty("status").GetString();
+            if (string.Equals(status, "Completed", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(status, "Failed", StringComparison.OrdinalIgnoreCase))
+            {
+                finalStatus = statusDoc;
+                break;
+            }
+
+            await Task.Delay(250);
+        }
+
+        finalStatus.Should().NotBeNull();
+        finalStatus!.RootElement.GetProperty("data").GetProperty("status").GetString().Should().Be("Completed");
+        var snapshot = finalStatus.RootElement.GetProperty("data").Clone();
+        finalStatus.Dispose();
+        return snapshot;
+    }
+
+    private async Task AssertStudentExistsAsync(string indexNo)
+    {
+        var response = await _client.GetAsync($"/api/students?pageNumber=1&pageSize=20&search={Uri.EscapeDataString(indexNo)}");
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = doc.RootElement.GetProperty("data").GetProperty("items");
+        items.EnumerateArray().Any(item =>
+            string.Equals(item.GetProperty("indexNo").GetString(), indexNo, StringComparison.OrdinalIgnoreCase))
+            .Should().BeTrue();
+    }
+
+    private async Task AssertTeacherExistsAsync(string nationalId)
+    {
+        var response = await _client.GetAsync($"/api/teachers?pageNumber=1&pageSize=20&search={Uri.EscapeDataString(nationalId)}");
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = doc.RootElement.GetProperty("data").GetProperty("items");
+        items.EnumerateArray().Any(item =>
+            string.Equals(item.GetProperty("nationalId").GetString(), nationalId, StringComparison.OrdinalIgnoreCase))
+            .Should().BeTrue();
+    }
+
+    private async Task AssertParentExistsAsync(string nationalId)
+    {
+        var response = await _client.GetAsync($"/api/parents?pageNumber=1&pageSize=20&search={Uri.EscapeDataString(nationalId)}");
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var items = doc.RootElement.GetProperty("data").GetProperty("items");
+        items.EnumerateArray().Any(item =>
+            string.Equals(item.GetProperty("nationalId").GetString(), nationalId, StringComparison.OrdinalIgnoreCase))
+            .Should().BeTrue();
     }
 }

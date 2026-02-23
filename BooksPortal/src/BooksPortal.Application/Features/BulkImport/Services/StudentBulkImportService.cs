@@ -35,7 +35,10 @@ public class StudentBulkImportService : IStudentBulkImportService
         return parsed.Report;
     }
 
-    public async Task<BulkImportReport> CommitAsync(Stream stream, CancellationToken cancellationToken = default)
+    public async Task<BulkImportReport> CommitAsync(
+        Stream stream,
+        IProgress<int>? processedRowsProgress = null,
+        CancellationToken cancellationToken = default)
     {
         var parsed = await ParseAsync(stream, cancellationToken);
         if (parsed.Rows.Count == 0)
@@ -48,6 +51,7 @@ public class StudentBulkImportService : IStudentBulkImportService
             .Where(s => indexNumbers.Contains(s.IndexNo))
             .ToDictionaryAsync(s => s.IndexNo, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
+        var processedRows = 0;
         foreach (var row in parsed.Rows)
         {
             var rowResult = rowsByRowNumber[row.RowNumber];
@@ -103,6 +107,11 @@ public class StudentBulkImportService : IStudentBulkImportService
                     Code = "CommitFailed",
                     Message = ex.Message
                 });
+            }
+            finally
+            {
+                processedRows++;
+                processedRowsProgress?.Report(processedRows);
             }
         }
 
