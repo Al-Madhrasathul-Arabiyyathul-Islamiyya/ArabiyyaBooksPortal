@@ -59,6 +59,13 @@ BooksPortalFrontEnd/
 - External backend base URL: `runtimeConfig.public.apiBase` in `nuxt.config.ts`
 - Frontend app calls internal BFF routes under `/api/bff`
 - BFF routes proxy to backend with server-managed auth cookies and refresh flow
+- Session cookie/skew settings are runtime-configurable under `runtimeConfig.auth.session`:
+  - `accessCookieMaxAgeSeconds`
+  - `refreshCookieMaxAgeSeconds`
+  - `expiryCookieMaxAgeSeconds`
+  - `expirySkewSeconds`
+  - `cookieSecure`
+- Runtime config can be overridden by env vars when deployed (for example: `NUXT_PUBLIC_API_BASE`, `NUXT_AUTH_SESSION_EXPIRY_SKEW_SECONDS`).
 
 ## Route Surface Model (Planned)
 

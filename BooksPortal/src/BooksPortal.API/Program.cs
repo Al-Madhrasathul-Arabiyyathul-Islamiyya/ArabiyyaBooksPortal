@@ -6,12 +6,11 @@ using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Common.Models;
 using BooksPortal.Infrastructure;
 using BooksPortal.Infrastructure.Data;
+using BooksPortal.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Infrastructure;
 using Serilog;
-using System.Text;
 using System.Text.Json.Serialization;
 
 QuestPDF.Settings.License = LicenseType.Community;
@@ -44,6 +43,8 @@ builder.Services.AddScoped<ImportTemplateCacheService>();
 // JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+var jwtSigningCredentialsProvider = new JwtSigningCredentialsProvider(jwtSettings);
+builder.Services.AddSingleton<IJwtSigningCredentialsProvider>(jwtSigningCredentialsProvider);
 
 // Authentication
 builder.Services.AddAuthentication(options =>
@@ -53,17 +54,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.Issuer,
-            ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-            ClockSkew = TimeSpan.Zero
-        };
+        options.TokenValidationParameters = jwtSigningCredentialsProvider.CreateTokenValidationParameters(validateLifetime: true);
     });
 
 builder.Services.AddAuthorization();
@@ -86,9 +77,12 @@ builder.Services.AddSwaggerGen();
 // CORS
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+        ?? ["http://localhost:3000"];
+
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

@@ -41,7 +41,36 @@ Development uses trusted authentication:
 Server=.;Database=BooksPortalDev;Trusted_Connection=True;TrustServerCertificate=True;
 ```
 
-Configure in `src/BooksPortal.API/appsettings.Development.json`.
+Configure in `src/BooksPortal.API/appsettings.json` (or via environment variables).
+
+## Auth and JWT Configuration
+
+JWT and session-related settings are configured via `JwtSettings`:
+
+- `JwtSettings:ExpiryInMinutes` (default `240`)
+- `JwtSettings:RefreshTokenExpiryInDays` (default `7`)
+- `JwtSettings:ClockSkewSeconds` (default `30`)
+- `JwtSettings:SigningMode` (`Symmetric` or `Certificate`)
+- `JwtSettings:Secret` (used in `Symmetric` mode)
+- `JwtSettings:CertificateBase64` / `JwtSettings:CertificatePath` / `JwtSettings:CertificatePassword` (used in `Certificate` mode)
+
+The API supports dual signing mode:
+
+- `Symmetric` for local/CI convenience
+- `Certificate` for deployment environments
+
+All values can be overridden by environment variables (e.g. `JwtSettings__ExpiryInMinutes=240`).
+
+## CORS Configuration
+
+Allowed frontend origins are configured in:
+
+- `Cors:AllowedOrigins` (array)
+
+Override with environment variables, for example:
+
+- `Cors__AllowedOrigins__0=http://localhost:3000`
+- `Cors__AllowedOrigins__1=https://your-frontend.example.com`
 
 ## Project Structure
 
