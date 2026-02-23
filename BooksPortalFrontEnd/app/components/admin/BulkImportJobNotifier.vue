@@ -23,13 +23,23 @@
         <h3 class="text-sm font-semibold">
           Bulk Import Jobs
         </h3>
-        <Button
-          label="Refresh"
-          size="small"
-          text
-          icon="pi pi-refresh"
-          @click="pollOnce"
-        />
+        <div class="flex items-center gap-2">
+          <Button
+            v-if="completedCount > 0"
+            label="Clear Completed"
+            size="small"
+            text
+            icon="pi pi-times"
+            @click="clearCompleted"
+          />
+          <Button
+            label="Refresh"
+            size="small"
+            text
+            icon="pi pi-refresh"
+            @click="pollOnce"
+          />
+        </div>
       </div>
 
       <div
@@ -50,10 +60,22 @@
         >
           <div class="mb-1 flex items-center justify-between gap-2">
             <span class="text-sm font-medium">{{ job.entityLabel }} import</span>
-            <Tag
-              :severity="statusSeverity(job.status)"
-              :value="job.status"
-            />
+            <div class="flex items-center gap-2">
+              <Tag
+                :severity="statusSeverity(job.status)"
+                :value="job.status"
+              />
+              <Button
+                v-if="canDismiss(job.status)"
+                v-tooltip.left="'Dismiss notification'"
+                icon="pi pi-times"
+                size="small"
+                text
+                rounded
+                aria-label="Dismiss notification"
+                @click="dismiss(job.id)"
+              />
+            </div>
           </div>
           <p class="mb-2 text-xs text-surface-500">
             {{ job.fileName }}
@@ -96,7 +118,7 @@
 
 <script setup lang="ts">
 const popoverRef = ref()
-const { jobs, runningJobs, hasUnreadCompleted, pollOnce, downloadReport } = useBulkImportJobs()
+const { jobs, runningJobs, hasUnreadCompleted, pollOnce, downloadReport, dismissJob, clearCompleted } = useBulkImportJobs()
 
 const completedCount = computed(() =>
   jobs.value.filter(job => job.status === 'Completed' || job.status === 'Failed').length,
@@ -116,8 +138,16 @@ function progressPercent(job: { processedRows: number, totalRows: number }) {
   return Math.min(100, Math.round((job.processedRows / job.totalRows) * 100))
 }
 
+function canDismiss(status: string) {
+  return status === 'Completed' || status === 'Failed'
+}
+
 function togglePanel(event: Event) {
   popoverRef.value.toggle(event)
+}
+
+function dismiss(jobId: string) {
+  dismissJob(jobId)
 }
 
 async function download(job: {
