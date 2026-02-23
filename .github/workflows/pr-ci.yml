@@ -1,0 +1,184 @@
+name: PR CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend Lint/Typecheck/Tests
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    defaults:
+      run:
+        working-directory: BooksPortalFrontEnd
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bunx nuxi typecheck
+
+      - name: Unit tests
+        run: bun run test:unit
+
+      - name: Nuxt component tests
+        run: bun run test:nuxt
+
+  backend:
+    name: Backend Build/Unit Tests
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    defaults:
+      run:
+        working-directory: BooksPortal
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore BooksPortal.slnx
+
+      - name: Build
+        run: dotnet build BooksPortal.slnx --no-restore --configuration Release
+
+      - name: Unit tests
+        run: dotnet test tests/BooksPortal.UnitTests/BooksPortal.UnitTests.csproj --no-build --configuration Release --verbosity minimal
+
+  backend-integration-master:
+    name: Backend Integration Tests (master PR only)
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.base.ref == 'master' }}
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1' || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    defaults:
+      run:
+        working-directory: BooksPortal
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Wait for SQL Server port
+        run: |
+          for i in {1..60}; do
+            (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1 && exit 0
+            sleep 2
+          done
+          echo "SQL Server did not become ready in time"
+          exit 1
+
+      - name: Restore
+        run: dotnet restore BooksPortal.slnx
+
+      - name: Integration tests
+        env:
+          INTEGRATION_TEST_CONNECTION_STRING: Server=127.0.0.1,1433;User Id=sa;Password=YourStrong!Passw0rd;Encrypt=True;TrustServerCertificate=True;
+          INTEGRATION_TEST_ADMIN_EMAIL: admin@booksportal.local
+          INTEGRATION_TEST_ADMIN_PASSWORD: Admin@123456
+        run: dotnet test tests/BooksPortal.IntegrationTests/BooksPortal.IntegrationTests.csproj --configuration Release --verbosity minimal
+
+  frontend-e2e-master:
+    name: Frontend E2E (master PR only)
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.base.ref == 'master' }}
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1' || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    defaults:
+      run:
+        working-directory: BooksPortalFrontEnd
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Wait for SQL Server port
+        run: |
+          for i in {1..60}; do
+            (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1 && exit 0
+            sleep 2
+          done
+          echo "SQL Server did not become ready in time"
+          exit 1
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bun run test:e2e:install
+
+      - name: Run e2e tests
+        env:
+          PLAYWRIGHT_START_BACKEND: '1'
+          PLAYWRIGHT_SKIP_BACKEND: '0'
+          ConnectionStrings__DefaultConnection: Server=127.0.0.1,1433;User Id=sa;Password=YourStrong!Passw0rd;Encrypt=True;TrustServerCertificate=True;Database=BooksPortalCi;
+          E2E_ADMIN_EMAIL: admin@booksportal.local
+          E2E_ADMIN_PASSWORD: Admin@123456
+          E2E_USER_EMAIL: user@booksportal.local
+          E2E_USER_PASSWORD: Admin@123456
+        run: bun run test:e2e:ci

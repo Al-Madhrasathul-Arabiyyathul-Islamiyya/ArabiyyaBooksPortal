@@ -128,8 +128,8 @@ public class SlipRevisionIntegrationTests : IClassFixture<IntegrationTestWebAppl
     {
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new
         {
-            email = "admin@booksportal.local",
-            password = "Admin@123456"
+            email = TestSettings.Current.AdminEmail,
+            password = TestSettings.Current.AdminPassword
         });
         loginResponse.EnsureSuccessStatusCode();
 
