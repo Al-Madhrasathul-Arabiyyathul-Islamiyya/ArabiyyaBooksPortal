@@ -337,6 +337,7 @@ definePageMeta({
 
 const api = useApi()
 const bulkImport = useBulkImport()
+const bulkJobs = useBulkImportJobs()
 const { showError, showSuccess, showInfo } = useAppToast()
 const { confirmDelete } = useAppConfirm()
 const { isSuperAdmin } = useAuth()
@@ -545,22 +546,20 @@ async function commitTeacherBulk(file: File) {
   bulkError.value = ''
   isBulkCommitting.value = true
   try {
-    const response = await bulkImport.commitFile(file, {
-      validate: API.teachers.bulkValidate,
-      commit: API.teachers.bulkCommit,
-      template: API.importTemplates.teachers,
-      templateFileName: 'teachers-import-template.xlsx',
+    const response = await bulkJobs.queueJob(file, 'Teachers', {
+      commitAsync: API.teachers.bulkCommitAsync,
+      jobStatus: API.teachers.bulkJob,
+      jobReport: API.teachers.bulkJobReport,
     })
     if (response.success) {
-      bulkReport.value = response.data
-      showSuccess('Teacher import committed')
-      await loadTeachers()
+      showSuccess('Teacher import started. You can monitor progress from the header notifier.')
+      isBulkDialogVisible.value = false
       return
     }
-    bulkError.value = response.message ?? 'Commit failed'
+    bulkError.value = response.message ?? 'Failed to start import'
   }
   catch (error: unknown) {
-    bulkError.value = getFriendlyErrorMessage(error, 'Commit failed')
+    bulkError.value = getFriendlyErrorMessage(error, 'Failed to start import')
   }
   finally {
     isBulkCommitting.value = false

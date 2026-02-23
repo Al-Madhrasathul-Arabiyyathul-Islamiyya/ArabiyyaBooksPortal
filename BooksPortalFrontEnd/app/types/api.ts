@@ -49,6 +49,7 @@ export interface BulkImportRowResult {
   rowNumber: number
   key: string
   success: boolean
+  status?: 'Valid' | 'Inserted' | 'Updated' | 'Failed' | string
   note: string | null
 }
 
@@ -65,8 +66,23 @@ export interface BulkImportReport {
   validRows: number
   invalidRows: number
   insertedRows: number
+  updatedRows?: number
   failedRows: number
   canCommit: boolean
   rows: BulkImportRowResult[]
   issues: BulkImportRowIssue[]
+}
+
+export type BulkImportJobStatus = 'Queued' | 'Running' | 'Completed' | 'Failed'
+
+export interface BulkImportJobSnapshot {
+  id: string
+  entity: string
+  status: BulkImportJobStatus | string
+  error?: string | null
+  totalRows: number
+  processedRows: number
+  startedAtUtc: string
+  completedAtUtc?: string | null
+  reportReady: boolean
 }

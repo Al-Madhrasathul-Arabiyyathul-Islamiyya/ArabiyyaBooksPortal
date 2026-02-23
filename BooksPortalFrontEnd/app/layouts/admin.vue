@@ -42,6 +42,7 @@
           {{ appTitle }}
         </h1>
         <div class="flex items-center gap-3">
+          <AdminBulkImportJobNotifier />
           <Button
             :icon="colorMode.value === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
             text

@@ -379,6 +379,7 @@ const { confirmDelete } = useAppConfirm()
 const { isSuperAdmin } = useAuth()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
 const bulkImport = useBulkImport()
+const bulkJobs = useBulkImportJobs()
 
 const books = ref<Book[]>([])
 const subjects = ref<Lookup[]>([])
@@ -773,22 +774,20 @@ async function commitBookBulk(file: File) {
   bulkError.value = ''
   isBulkCommitting.value = true
   try {
-    const response = await bulkImport.commitFile(file, {
-      validate: API.books.bulkValidate,
-      commit: API.books.bulkCommit,
-      template: API.importTemplates.books,
-      templateFileName: 'books-import-template.xlsx',
+    const response = await bulkJobs.queueJob(file, 'Books', {
+      commitAsync: API.books.bulkCommitAsync,
+      jobStatus: API.books.bulkJob,
+      jobReport: API.books.bulkJobReport,
     })
     if (response.success) {
-      bulkReport.value = response.data
-      showSuccess('Book import committed')
-      await loadBooks()
+      showSuccess('Book import started. You can monitor progress from the header notifier.')
+      isBulkDialogVisible.value = false
       return
     }
-    bulkError.value = response.message ?? 'Commit failed'
+    bulkError.value = response.message ?? 'Failed to start import'
   }
   catch (error: unknown) {
-    bulkError.value = getFriendlyErrorMessage(error, 'Commit failed')
+    bulkError.value = getFriendlyErrorMessage(error, 'Failed to start import')
   }
   finally {
     isBulkCommitting.value = false
