@@ -156,6 +156,17 @@ export function useBulkImportJobs() {
     }))
   }
 
+  function dismissJob(jobId: string) {
+    const job = jobs.value.find(item => item.id === jobId)
+    if (!job) return
+    if (job.status === 'Queued' || job.status === 'Running') return
+    jobs.value = jobs.value.filter(item => item.id !== jobId)
+  }
+
+  function clearCompleted() {
+    jobs.value = jobs.value.filter(job => job.status === 'Queued' || job.status === 'Running')
+  }
+
   function togglePanel() {
     isPanelVisible.value = !isPanelVisible.value
     if (isPanelVisible.value) {
@@ -173,5 +184,7 @@ export function useBulkImportJobs() {
     downloadReport,
     togglePanel,
     markAllAcknowledged,
+    dismissJob,
+    clearCompleted,
   }
 }

@@ -1,6 +1,6 @@
 import type { FetchError } from 'ofetch'
 import type { H3Event } from 'h3'
-import { appendHeader, createError, getHeader, getMethod, getQuery, readBody, send, setResponseStatus } from 'h3'
+import { appendHeader, createError, getHeader, getMethod, getQuery, readBody, readRawBody, send, setResponseStatus } from 'h3'
 import { clearSessionTokens, getSessionTokens, isExpiryExpired, setSessionTokens } from './auth-session'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -105,9 +105,24 @@ export async function requireAccessToken(event: H3Event): Promise<string> {
 export async function proxyAuthorizedBackendRequest(event: H3Event, apiPath: string) {
   const method = getMethod(event).toUpperCase() as HttpMethod
   const accepts = getHeader(event, 'accept') ?? ''
-  const binary = accepts.includes('application/pdf') || apiPath.toLowerCase().includes('/print')
+  const path = apiPath.toLowerCase()
+  const binary = accepts.includes('application/pdf')
+    || accepts.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    || accepts.includes('application/octet-stream')
+    || path.includes('/print')
+    || path.includes('/import-templates/')
+    || (path.includes('/bulk/jobs/') && path.endsWith('/report'))
+    || path.includes('/reports/export/')
   const hasBody = method === 'POST' || method === 'PUT' || method === 'PATCH'
-  const body = hasBody ? await readBody(event) : undefined
+  const requestContentType = (getHeader(event, 'content-type') ?? '').toLowerCase()
+  const hasMultipartBody = requestContentType.includes('multipart/form-data')
+  const body = hasBody
+    ? (
+        hasMultipartBody
+          ? await readRawBody(event, false)
+          : await readBody(event)
+      )
+    : undefined
 
   let token = await requireAccessToken(event)
 
