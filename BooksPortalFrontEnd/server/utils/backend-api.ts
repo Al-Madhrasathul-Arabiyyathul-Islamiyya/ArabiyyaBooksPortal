@@ -1,7 +1,7 @@
 import type { FetchError } from 'ofetch'
 import type { H3Event } from 'h3'
 import { appendHeader, createError, getHeader, getMethod, getQuery, readBody, readRawBody, send, setResponseStatus } from 'h3'
-import { clearSessionTokens, getSessionTokens, isExpiryExpired, setSessionTokens } from './auth-session'
+import { clearSessionTokens, getExpirySkewSeconds, getSessionTokens, isExpiryExpired, setSessionTokens } from './auth-session'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 const refreshInFlight = new Map<string, Promise<boolean>>()
@@ -87,7 +87,7 @@ export async function requireAccessToken(event: H3Event): Promise<string> {
     throw createError({ statusCode: 401, statusMessage: 'Not authenticated' })
   }
 
-  if (isExpiryExpired(session.expiresAt)) {
+  if (isExpiryExpired(session.expiresAt, getExpirySkewSeconds(event))) {
     const refreshed = await refreshServerSession(event)
     if (!refreshed) {
       throw createError({ statusCode: 401, statusMessage: 'Session expired' })

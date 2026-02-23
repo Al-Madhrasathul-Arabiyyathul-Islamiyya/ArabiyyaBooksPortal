@@ -40,6 +40,15 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    auth: {
+      session: {
+        accessCookieMaxAgeSeconds: 60 * 60 * 24 * 7,
+        refreshCookieMaxAgeSeconds: 60 * 60 * 24 * 30,
+        expiryCookieMaxAgeSeconds: 60 * 60 * 24 * 7,
+        expirySkewSeconds: 30,
+        cookieSecure: !import.meta.dev,
+      },
+    },
     public: {
       apiBase: 'http://localhost:5071/api',
       appTitle: 'Arabiyya Academic Books Portal',
