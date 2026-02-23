@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace BooksPortal.IntegrationTests;
@@ -9,8 +10,7 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         var dbName = $"BooksPortalIntegration_{Guid.NewGuid():N}";
-        var connectionString =
-            $"Server=.;Database={dbName};Trusted_Connection=True;TrustServerCertificate=True;";
+        var connectionString = ResolveConnectionString(TestSettings.Current.DatabaseConnection, dbName);
 
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, configBuilder) =>
@@ -20,5 +20,15 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
                 ["ConnectionStrings:DefaultConnection"] = connectionString
             });
         });
+    }
+
+    private static string ResolveConnectionString(string baseConnection, string databaseName)
+    {
+        var builder = new SqlConnectionStringBuilder(baseConnection)
+        {
+            InitialCatalog = databaseName,
+            TrustServerCertificate = true
+        };
+        return builder.ConnectionString;
     }
 }
