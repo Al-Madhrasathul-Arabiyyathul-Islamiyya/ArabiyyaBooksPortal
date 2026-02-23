@@ -35,24 +35,38 @@ public class ParentBulkImportService : IParentBulkImportService
     public async Task<BulkImportReport> CommitAsync(Stream stream, CancellationToken cancellationToken = default)
     {
         var parsed = await ParseAsync(stream, cancellationToken);
-        if (!parsed.Report.CanCommit)
+        if (parsed.Rows.Count == 0)
             return parsed.Report;
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        var rowsByRowNumber = parsed.Report.Rows.ToDictionary(r => r.RowNumber);
+        var nationalIds = parsed.Rows.Select(r => r.Request.NationalId).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var existingByNationalId = await _parentRepository.Query()
+            .Include(p => p.StudentParents)
+            .Where(p => nationalIds.Contains(p.NationalId))
+            .ToDictionaryAsync(p => p.NationalId, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        foreach (var row in parsed.Rows)
         {
-            foreach (var row in parsed.Rows)
+            var rowResult = rowsByRowNumber[row.RowNumber];
+            try
             {
-                var parent = new Parent
+                var isUpdate = existingByNationalId.TryGetValue(row.Request.NationalId, out var parent);
+                if (parent is null)
                 {
-                    FullName = row.Request.FullName,
-                    NationalId = row.Request.NationalId,
-                    Phone = string.IsNullOrWhiteSpace(row.Request.Phone) ? null : row.Request.Phone,
-                    Relationship = string.IsNullOrWhiteSpace(row.Request.Relationship) ? null : row.Request.Relationship
-                };
+                    parent = new Parent
+                    {
+                        NationalId = row.Request.NationalId
+                    };
+                    _parentRepository.Add(parent);
+                }
+
+                parent.FullName = row.Request.FullName;
+                parent.Phone = string.IsNullOrWhiteSpace(row.Request.Phone) ? null : row.Request.Phone;
+                parent.Relationship = string.IsNullOrWhiteSpace(row.Request.Relationship) ? null : row.Request.Relationship;
 
                 if (row.StudentId.HasValue)
                 {
+                    parent.StudentParents.Clear();
                     parent.StudentParents.Add(new StudentParent
                     {
                         StudentId = row.StudentId.Value,
@@ -60,35 +74,38 @@ public class ParentBulkImportService : IParentBulkImportService
                     });
                 }
 
-                _parentRepository.Add(parent);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                rowResult.Success = true;
+                rowResult.Status = isUpdate ? "Updated" : "Inserted";
+                rowResult.Note = isUpdate ? "Updated existing parent." : "Inserted new parent.";
+
+                if (isUpdate)
+                    parsed.Report.UpdatedRows++;
+                else
+                    parsed.Report.InsertedRows++;
+
+                existingByNationalId[row.Request.NationalId] = parent;
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-        }
-        catch
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
-
-        return new BulkImportReport
-        {
-            Entity = "Parent",
-            TotalRows = parsed.Rows.Count,
-            ValidRows = parsed.Rows.Count,
-            InvalidRows = 0,
-            InsertedRows = parsed.Rows.Count,
-            FailedRows = 0,
-            CanCommit = true,
-            Rows = parsed.Rows.Select(r => new BulkImportRowResult
+            catch (Exception ex)
             {
-                RowNumber = r.RowNumber,
-                Key = r.Request.NationalId,
-                Success = true,
-                Note = "Inserted"
-            }).ToList()
-        };
+                rowResult.Success = false;
+                rowResult.Status = "Failed";
+                rowResult.Note = ex.Message;
+                parsed.Report.FailedRows++;
+                parsed.Report.Issues.Add(new BulkImportRowIssue
+                {
+                    RowNumber = row.RowNumber,
+                    Field = "Commit",
+                    Code = "CommitFailed",
+                    Message = ex.Message
+                });
+            }
+        }
+
+        parsed.Report.CanCommit = parsed.Report.Rows.Any(r => r.Success);
+        parsed.Report.ValidRows = parsed.Report.Rows.Count(r => r.Success);
+        return parsed.Report;
     }
 
     private async Task<(List<ParentImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
@@ -173,27 +190,6 @@ public class ParentBulkImportService : IParentBulkImportService
 
         report.TotalRows = rows.Count;
 
-        var nationalIds = rows.Select(r => r.Request.NationalId).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        if (nationalIds.Count > 0)
-        {
-            var existingIds = await _parentRepository.Query()
-                .Where(p => nationalIds.Contains(p.NationalId))
-                .Select(p => p.NationalId)
-                .ToListAsync(cancellationToken);
-
-            var existingSet = existingIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            foreach (var row in rows.Where(r => existingSet.Contains(r.Request.NationalId)))
-            {
-                report.Issues.Add(new BulkImportRowIssue
-                {
-                    RowNumber = row.RowNumber,
-                    Field = nameof(CreateParentRequest.NationalId),
-                    Code = "Conflict",
-                    Message = $"Parent with national ID '{row.Request.NationalId}' already exists."
-                });
-            }
-        }
-
         var studentIndexNumbers = rows
             .Where(r => !string.IsNullOrWhiteSpace(r.StudentIndexNo))
             .Select(r => r.StudentIndexNo!)
@@ -231,12 +227,13 @@ public class ParentBulkImportService : IParentBulkImportService
         report.InvalidRows = rowIssueSet.Count;
         report.ValidRows = Math.Max(0, report.TotalRows - report.InvalidRows);
         report.FailedRows = report.InvalidRows;
-        report.CanCommit = report.Issues.Count == 0 && report.TotalRows > 0;
+        report.CanCommit = report.ValidRows > 0;
         report.Rows = rows.Select(r => new BulkImportRowResult
         {
             RowNumber = r.RowNumber,
             Key = r.Request.NationalId,
             Success = !rowIssueSet.Contains(r.RowNumber),
+            Status = rowIssueSet.Contains(r.RowNumber) ? "Failed" : "Valid",
             Note = rowIssueSet.Contains(r.RowNumber) ? "Validation failed" : "Valid"
         }).ToList();
 

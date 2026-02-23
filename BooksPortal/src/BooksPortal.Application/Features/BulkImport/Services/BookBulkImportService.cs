@@ -46,34 +46,48 @@ public class BookBulkImportService : IBookBulkImportService
         return parsed.Report;
     }
 
-    public async Task<BulkImportReport> CommitAsync(Stream stream, int userId, CancellationToken cancellationToken = default)
+    public async Task<BulkImportReport> CommitAsync(
+        Stream stream,
+        int userId,
+        IProgress<int>? processedRowsProgress = null,
+        CancellationToken cancellationToken = default)
     {
         var parsed = await ParseAsync(stream, cancellationToken);
-        if (!parsed.Report.CanCommit)
+        if (parsed.Rows.Count == 0)
             return parsed.Report;
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        var rowsByRowNumber = parsed.Report.Rows.ToDictionary(r => r.RowNumber);
+        var rowCodes = parsed.Rows.Select(r => r.Request.Code).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var existingBooksByCode = await _bookRepository.Query()
+            .Where(b => rowCodes.Contains(b.Code))
+            .ToDictionaryAsync(b => b.Code, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        var processedRows = 0;
+        foreach (var row in parsed.Rows)
         {
-            var insertedRows = new List<BulkImportRowResult>();
-
-            foreach (var row in parsed.Rows)
+            var rowResult = rowsByRowNumber[row.RowNumber];
+            try
             {
-                var entity = new Book
+                var isUpdate = existingBooksByCode.TryGetValue(row.Request.Code, out var entity);
+                if (entity is null)
                 {
-                    ISBN = string.IsNullOrWhiteSpace(row.Request.ISBN) ? null : row.Request.ISBN,
-                    Code = row.Request.Code,
-                    Title = row.Request.Title,
-                    Author = string.IsNullOrWhiteSpace(row.Request.Author) ? null : row.Request.Author,
-                    Edition = string.IsNullOrWhiteSpace(row.Request.Edition) ? null : row.Request.Edition,
-                    Publisher = row.Request.Publisher,
-                    PublishedYear = row.Request.PublishedYear,
-                    SubjectId = row.Request.SubjectId,
-                    Grade = string.IsNullOrWhiteSpace(row.Request.Grade) ? null : row.Request.Grade,
-                    TotalStock = row.Quantity
-                };
+                    entity = new Book
+                    {
+                        ISBN = string.IsNullOrWhiteSpace(row.Request.ISBN) ? null : row.Request.ISBN,
+                        Code = row.Request.Code
+                    };
+                    _bookRepository.Add(entity);
+                }
 
-                _bookRepository.Add(entity);
+                entity.Title = row.Request.Title;
+                entity.Author = string.IsNullOrWhiteSpace(row.Request.Author) ? null : row.Request.Author;
+                entity.Edition = string.IsNullOrWhiteSpace(row.Request.Edition) ? null : row.Request.Edition;
+                entity.Publisher = row.Request.Publisher;
+                entity.PublishedYear = row.Request.PublishedYear;
+                entity.SubjectId = row.Request.SubjectId;
+                entity.Grade = string.IsNullOrWhiteSpace(row.Request.Grade) ? null : row.Request.Grade;
+                entity.TotalStock = row.Quantity;
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _stockEntryRepository.Add(new StockEntry
@@ -86,36 +100,43 @@ public class BookBulkImportService : IBookBulkImportService
                     EnteredById = userId,
                     EnteredAt = DateTime.UtcNow
                 });
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                insertedRows.Add(new BulkImportRowResult
+                rowResult.Success = true;
+                rowResult.Status = isUpdate ? "Updated" : "Inserted";
+                rowResult.Note = isUpdate ? "Updated existing book." : "Inserted new book.";
+
+                if (isUpdate)
+                    parsed.Report.UpdatedRows++;
+                else
+                    parsed.Report.InsertedRows++;
+
+                existingBooksByCode[row.Request.Code] = entity;
+            }
+            catch (Exception ex)
+            {
+                rowResult.Success = false;
+                rowResult.Status = "Failed";
+                rowResult.Note = ex.Message;
+                parsed.Report.FailedRows++;
+                parsed.Report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = row.RowNumber,
-                    Key = row.Request.Code,
-                    Success = true,
-                    Note = "Inserted"
+                    Field = "Commit",
+                    Code = "CommitFailed",
+                    Message = ex.Message
                 });
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            return new BulkImportReport
+            finally
             {
-                Entity = "Book",
-                TotalRows = parsed.Rows.Count,
-                ValidRows = parsed.Rows.Count,
-                InvalidRows = 0,
-                InsertedRows = parsed.Rows.Count,
-                FailedRows = 0,
-                CanCommit = true,
-                Rows = insertedRows
-            };
+                processedRows++;
+                processedRowsProgress?.Report(processedRows);
+            }
         }
-        catch
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
+
+        parsed.Report.CanCommit = parsed.Report.Rows.Any(r => r.Success);
+        parsed.Report.ValidRows = parsed.Report.Rows.Count(r => r.Success);
+        return parsed.Report;
     }
 
     private async Task<(List<BookImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
@@ -244,15 +265,6 @@ public class BookBulkImportService : IBookBulkImportService
                 .Select(a => new AcademicYearLookup(a.Id, a.Year, a.Name))
                 .ToListAsync(cancellationToken);
 
-        var codes = rows.Select(r => r.Request.Code).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        var existingCodes = codes.Count == 0
-            ? new List<string>()
-            : await _bookRepository.Query()
-                .Where(b => codes.Contains(b.Code))
-                .Select(b => b.Code)
-                .ToListAsync(cancellationToken);
-        var existingCodeSet = existingCodes.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
         foreach (var row in rows)
         {
             if (!subjectMap.TryGetValue(row.SubjectCode, out var subjectId))
@@ -293,17 +305,6 @@ public class BookBulkImportService : IBookBulkImportService
                 });
             }
 
-            if (existingCodeSet.Contains(row.Request.Code))
-            {
-                report.Issues.Add(new BulkImportRowIssue
-                {
-                    RowNumber = row.RowNumber,
-                    Field = nameof(CreateBookRequest.Code),
-                    Code = "Conflict",
-                    Message = $"Book with code '{row.Request.Code}' already exists."
-                });
-            }
-
             var validation = validator.Validate(row.Request);
             foreach (var error in validation.Errors)
             {
@@ -325,12 +326,13 @@ public class BookBulkImportService : IBookBulkImportService
         report.InvalidRows = rowIssueSet.Count;
         report.ValidRows = Math.Max(0, report.TotalRows - report.InvalidRows);
         report.FailedRows = report.InvalidRows;
-        report.CanCommit = report.Issues.Count == 0 && report.TotalRows > 0;
+        report.CanCommit = report.ValidRows > 0;
         report.Rows = rows.Select(r => new BulkImportRowResult
         {
             RowNumber = r.RowNumber,
             Key = r.Request.Code,
             Success = !rowIssueSet.Contains(r.RowNumber),
+            Status = rowIssueSet.Contains(r.RowNumber) ? "Failed" : "Valid",
             Note = rowIssueSet.Contains(r.RowNumber) ? "Validation failed" : "Valid"
         }).ToList();
 

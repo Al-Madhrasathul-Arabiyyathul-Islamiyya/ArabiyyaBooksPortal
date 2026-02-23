@@ -38,24 +38,38 @@ public class StudentBulkImportService : IStudentBulkImportService
     public async Task<BulkImportReport> CommitAsync(Stream stream, CancellationToken cancellationToken = default)
     {
         var parsed = await ParseAsync(stream, cancellationToken);
-        if (!parsed.Report.CanCommit)
+        if (parsed.Rows.Count == 0)
             return parsed.Report;
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        var rowsByRowNumber = parsed.Report.Rows.ToDictionary(r => r.RowNumber);
+        var indexNumbers = parsed.Rows.Select(r => r.Request.IndexNo).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var existingByIndexNo = await _studentRepository.Query()
+            .Include(s => s.StudentParents)
+            .Where(s => indexNumbers.Contains(s.IndexNo))
+            .ToDictionaryAsync(s => s.IndexNo, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        foreach (var row in parsed.Rows)
         {
-            foreach (var row in parsed.Rows)
+            var rowResult = rowsByRowNumber[row.RowNumber];
+            try
             {
-                var student = new Student
+                var isUpdate = existingByIndexNo.TryGetValue(row.Request.IndexNo, out var student);
+                if (student is null)
                 {
-                    FullName = row.Request.FullName,
-                    IndexNo = row.Request.IndexNo,
-                    NationalId = row.Request.NationalId,
-                    ClassSectionId = row.Request.ClassSectionId
-                };
+                    student = new Student
+                    {
+                        IndexNo = row.Request.IndexNo
+                    };
+                    _studentRepository.Add(student);
+                }
+
+                student.FullName = row.Request.FullName;
+                student.NationalId = row.Request.NationalId;
+                student.ClassSectionId = row.Request.ClassSectionId;
 
                 if (row.ParentId.HasValue)
                 {
+                    student.StudentParents.Clear();
                     student.StudentParents.Add(new StudentParent
                     {
                         ParentId = row.ParentId.Value,
@@ -63,35 +77,38 @@ public class StudentBulkImportService : IStudentBulkImportService
                     });
                 }
 
-                _studentRepository.Add(student);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                rowResult.Success = true;
+                rowResult.Status = isUpdate ? "Updated" : "Inserted";
+                rowResult.Note = isUpdate ? "Updated existing student." : "Inserted new student.";
+
+                if (isUpdate)
+                    parsed.Report.UpdatedRows++;
+                else
+                    parsed.Report.InsertedRows++;
+
+                existingByIndexNo[row.Request.IndexNo] = student;
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-        }
-        catch
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
-
-        return new BulkImportReport
-        {
-            Entity = "Student",
-            TotalRows = parsed.Rows.Count,
-            ValidRows = parsed.Rows.Count,
-            InvalidRows = 0,
-            InsertedRows = parsed.Rows.Count,
-            FailedRows = 0,
-            CanCommit = true,
-            Rows = parsed.Rows.Select(r => new BulkImportRowResult
+            catch (Exception ex)
             {
-                RowNumber = r.RowNumber,
-                Key = r.Request.IndexNo,
-                Success = true,
-                Note = "Inserted"
-            }).ToList()
-        };
+                rowResult.Success = false;
+                rowResult.Status = "Failed";
+                rowResult.Note = ex.Message;
+                parsed.Report.FailedRows++;
+                parsed.Report.Issues.Add(new BulkImportRowIssue
+                {
+                    RowNumber = row.RowNumber,
+                    Field = "Commit",
+                    Code = "CommitFailed",
+                    Message = ex.Message
+                });
+            }
+        }
+
+        parsed.Report.CanCommit = parsed.Report.Rows.Any(r => r.Success);
+        parsed.Report.ValidRows = parsed.Report.Rows.Count(r => r.Success);
+        return parsed.Report;
     }
 
     private async Task<(List<StudentImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
@@ -180,27 +197,6 @@ public class StudentBulkImportService : IStudentBulkImportService
 
         report.TotalRows = rows.Count;
 
-        var indexNos = rows.Select(r => r.Request.IndexNo).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        if (indexNos.Count > 0)
-        {
-            var existingIndexNos = await _studentRepository.Query()
-                .Where(s => indexNos.Contains(s.IndexNo))
-                .Select(s => s.IndexNo)
-                .ToListAsync(cancellationToken);
-
-            var existingSet = existingIndexNos.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            foreach (var row in rows.Where(r => existingSet.Contains(r.Request.IndexNo)))
-            {
-                report.Issues.Add(new BulkImportRowIssue
-                {
-                    RowNumber = row.RowNumber,
-                    Field = nameof(CreateStudentRequest.IndexNo),
-                    Code = "Conflict",
-                    Message = $"Student with index number '{row.Request.IndexNo}' already exists."
-                });
-            }
-        }
-
         var classSectionIds = rows
             .Select(r => r.Request.ClassSectionId)
             .Where(id => id > 0)
@@ -263,12 +259,13 @@ public class StudentBulkImportService : IStudentBulkImportService
         report.InvalidRows = rowIssueSet.Count;
         report.ValidRows = Math.Max(0, report.TotalRows - report.InvalidRows);
         report.FailedRows = report.InvalidRows;
-        report.CanCommit = report.Issues.Count == 0 && report.TotalRows > 0;
+        report.CanCommit = report.ValidRows > 0;
         report.Rows = rows.Select(r => new BulkImportRowResult
         {
             RowNumber = r.RowNumber,
             Key = r.Request.IndexNo,
             Success = !rowIssueSet.Contains(r.RowNumber),
+            Status = rowIssueSet.Contains(r.RowNumber) ? "Failed" : "Valid",
             Note = rowIssueSet.Contains(r.RowNumber) ? "Validation failed" : "Valid"
         }).ToList();
 

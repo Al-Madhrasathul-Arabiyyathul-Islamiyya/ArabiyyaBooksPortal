@@ -197,7 +197,7 @@ public class BulkImportEndpointContractIntegrationTests : IClassFixture<Integrat
     }
 
     [Fact]
-    public async Task Books_BulkCommit_MixedDuplicateAndNewRows_ShouldRejectCommitAndNotInsertNewRow()
+    public async Task Books_BulkCommit_MixedDuplicateAndNewRows_ShouldUpsertAndInsertWithRowStatuses()
     {
         await AuthenticateAsync();
 
@@ -222,18 +222,64 @@ public class BulkImportEndpointContractIntegrationTests : IClassFixture<Integrat
 
         using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var report = doc.RootElement.GetProperty("data");
-        report.GetProperty("canCommit").GetBoolean().Should().BeFalse();
-        report.GetProperty("insertedRows").GetInt32().Should().Be(0);
-        report.GetProperty("failedRows").GetInt32().Should().BeGreaterThan(0);
-
-        var issues = report.GetProperty("issues");
-        issues.EnumerateArray().Any(i =>
-            string.Equals(i.GetProperty("field").GetString(), "Code", StringComparison.OrdinalIgnoreCase) &&
-            string.Equals(i.GetProperty("code").GetString(), "Conflict", StringComparison.OrdinalIgnoreCase))
-            .Should().BeTrue();
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("updatedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(0);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), duplicateCode, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Updated", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), newCode, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
 
         await AssertBookExistsAsync(duplicateCode);
-        await AssertBookNotExistsAsync(newCode);
+        await AssertBookExistsAsync(newCode);
+    }
+
+    [Fact]
+    public async Task Books_BulkCommitAsync_ShouldExposeProgressAndDownloadableReport()
+    {
+        await AuthenticateAsync();
+
+        var subjectCode = await GetAnySubjectCodeAsync();
+        var academicYear = await GetActiveAcademicYearNameAsync();
+        var code = $"BK-ASYNC-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var workbookBytes = CreateWorkbook(
+            "Books",
+            ["Code", "Title", "SubjectCode", "Publisher", "PublishedYear", "AcademicYear", "Quantity"],
+            [code, "Async Book", subjectCode, "Other", "2026", academicYear, "1"]);
+
+        using var startResponse = await PostWorkbookAsync("/api/books/bulk/commit-async", "books-async.xlsx", workbookBytes);
+        startResponse.EnsureSuccessStatusCode();
+
+        using var startDoc = JsonDocument.Parse(await startResponse.Content.ReadAsStringAsync());
+        var jobId = startDoc.RootElement.GetProperty("data").GetProperty("jobId").GetGuid();
+
+        JsonDocument? finalStatus = null;
+        for (var i = 0; i < 30; i++)
+        {
+            using var statusResponse = await _client.GetAsync($"/api/books/bulk/jobs/{jobId}");
+            statusResponse.EnsureSuccessStatusCode();
+            var statusDoc = JsonDocument.Parse(await statusResponse.Content.ReadAsStringAsync());
+            var status = statusDoc.RootElement.GetProperty("data").GetProperty("status").GetString();
+            if (string.Equals(status, "Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                finalStatus = statusDoc;
+                break;
+            }
+
+            await Task.Delay(250);
+        }
+
+        finalStatus.Should().NotBeNull();
+        var reportReady = finalStatus!.RootElement.GetProperty("data").GetProperty("reportReady").GetBoolean();
+        reportReady.Should().BeTrue();
+
+        using var reportResponse = await _client.GetAsync($"/api/books/bulk/jobs/{jobId}/report");
+        reportResponse.EnsureSuccessStatusCode();
+        var reportBytes = await reportResponse.Content.ReadAsByteArrayAsync();
+        reportBytes.Length.Should().BeGreaterThan(0);
     }
 
     private async Task AuthenticateAsync()

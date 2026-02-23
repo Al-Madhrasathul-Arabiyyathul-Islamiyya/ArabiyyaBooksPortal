@@ -36,6 +36,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddSingleton<BookBulkImportJobStore>();
 builder.Services.Configure<ImportTemplateCacheOptions>(
     builder.Configuration.GetSection(ImportTemplateCacheOptions.SectionName));
 builder.Services.AddScoped<ImportTemplateCacheService>();
