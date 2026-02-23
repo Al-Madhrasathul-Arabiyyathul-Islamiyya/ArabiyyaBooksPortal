@@ -238,6 +238,288 @@ public class BulkImportEndpointContractIntegrationTests : IClassFixture<Integrat
     }
 
     [Fact]
+    public async Task Books_BulkCommit_MixedValidAndInvalidRows_ShouldPartiallyApplyAndReportFailures()
+    {
+        await AuthenticateAsync();
+
+        var subjectCode = await GetAnySubjectCodeAsync();
+        var activeYearId = await GetActiveAcademicYearIdAsync();
+        var validCode = $"BK-MIX-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var invalidCode = $"BK-BAD-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var workbookBytes = CreateWorkbook(
+            "Books",
+            ["Code", "Title", "SubjectCode", "Publisher", "PublishedYear", "AcademicYearId", "Quantity"],
+            new[]
+            {
+                new[] { validCode, "Bulk Valid Book", subjectCode, "Other", "2026", activeYearId.ToString(), "2" },
+                new[] { invalidCode, "Bulk Invalid Book", "SUBJECT-DOES-NOT-EXIST", "Other", "2026", activeYearId.ToString(), "2" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/books/bulk/commit", "books-commit-mixed-invalid.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(1);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), validCode, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), invalidCode, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Failed", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertBookExistsAsync(validCode);
+    }
+
+    [Fact]
+    public async Task Students_BulkCommit_MixedDuplicateAndNewRows_ShouldUpsertAndInsertWithRowStatuses()
+    {
+        await AuthenticateAsync();
+
+        var classSectionId = await EnsureClassSectionAsync();
+        var duplicateIndex = $"IDX-DUP-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var newIndex = $"IDX-NEW-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var seedWorkbookBytes = CreateWorkbook(
+            "Students",
+            ["FullName", "IndexNo", "NationalId", "ClassSectionId", "ParentNationalId"],
+            [$"Seed Student {duplicateIndex}", duplicateIndex, $"S-{Guid.NewGuid():N}"[..10], classSectionId.ToString(), ""]);
+        using (var seedResponse = await PostWorkbookAsync("/api/students/bulk/commit", "students-seed.xlsx", seedWorkbookBytes))
+        {
+            seedResponse.EnsureSuccessStatusCode();
+        }
+
+        var workbookBytes = CreateWorkbook(
+            "Students",
+            ["FullName", "IndexNo", "NationalId", "ClassSectionId", "ParentNationalId"],
+            new[]
+            {
+                new[] { $"Updated Student {duplicateIndex}", duplicateIndex, $"S-{Guid.NewGuid():N}"[..10], classSectionId.ToString(), "" },
+                new[] { $"New Student {newIndex}", newIndex, $"S-{Guid.NewGuid():N}"[..10], classSectionId.ToString(), "" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/students/bulk/commit", "students-commit-mixed.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("updatedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(0);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), duplicateIndex, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Updated", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), newIndex, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertStudentExistsAsync(duplicateIndex);
+        await AssertStudentExistsAsync(newIndex);
+    }
+
+    [Fact]
+    public async Task Students_BulkCommit_MixedValidAndInvalidRows_ShouldPartiallyApplyAndReportFailures()
+    {
+        await AuthenticateAsync();
+
+        var classSectionId = await EnsureClassSectionAsync();
+        var validIndex = $"IDX-OK-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var invalidIndex = $"IDX-BAD-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var workbookBytes = CreateWorkbook(
+            "Students",
+            ["FullName", "IndexNo", "NationalId", "ClassSectionId", "ParentNationalId"],
+            new[]
+            {
+                new[] { $"Valid Student {validIndex}", validIndex, $"S-{Guid.NewGuid():N}"[..10], classSectionId.ToString(), "" },
+                new[] { $"Invalid Student {invalidIndex}", invalidIndex, $"S-{Guid.NewGuid():N}"[..10], "999999", "" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/students/bulk/commit", "students-commit-mixed-invalid.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(1);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), validIndex, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), invalidIndex, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Failed", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertStudentExistsAsync(validIndex);
+    }
+
+    [Fact]
+    public async Task Teachers_BulkCommit_MixedDuplicateAndNewRows_ShouldUpsertAndInsertWithRowStatuses()
+    {
+        await AuthenticateAsync();
+
+        var duplicateNationalId = $"T-DUP-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var newNationalId = $"T-NEW-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var seedWorkbookBytes = CreateWorkbook(
+            "Teachers",
+            ["FullName", "NationalId", "Email", "Phone"],
+            [$"Seed Teacher {duplicateNationalId}", duplicateNationalId, $"{duplicateNationalId.ToLowerInvariant()}@local.test", "7712000"]);
+        using (var seedResponse = await PostWorkbookAsync("/api/teachers/bulk/commit", "teachers-seed.xlsx", seedWorkbookBytes))
+        {
+            seedResponse.EnsureSuccessStatusCode();
+        }
+
+        var workbookBytes = CreateWorkbook(
+            "Teachers",
+            ["FullName", "NationalId", "Email", "Phone"],
+            new[]
+            {
+                new[] { $"Updated Teacher {duplicateNationalId}", duplicateNationalId, $"{duplicateNationalId.ToLowerInvariant()}-updated@local.test", "7712001" },
+                new[] { $"New Teacher {newNationalId}", newNationalId, $"{newNationalId.ToLowerInvariant()}@local.test", "7712002" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/teachers/bulk/commit", "teachers-commit-mixed.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("updatedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(0);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), duplicateNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Updated", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), newNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertTeacherExistsAsync(duplicateNationalId);
+        await AssertTeacherExistsAsync(newNationalId);
+    }
+
+    [Fact]
+    public async Task Teachers_BulkCommit_MixedValidAndInvalidRows_ShouldPartiallyApplyAndReportFailures()
+    {
+        await AuthenticateAsync();
+
+        var validNationalId = $"T-OK-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var invalidNationalId = $"T-BAD-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var workbookBytes = CreateWorkbook(
+            "Teachers",
+            ["FullName", "NationalId", "Email", "Phone"],
+            new[]
+            {
+                new[] { $"Valid Teacher {validNationalId}", validNationalId, $"{validNationalId.ToLowerInvariant()}@local.test", "7712111" },
+                new[] { "", invalidNationalId, $"{invalidNationalId.ToLowerInvariant()}@local.test", "7712112" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/teachers/bulk/commit", "teachers-commit-mixed-invalid.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(1);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), validNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), invalidNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Failed", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertTeacherExistsAsync(validNationalId);
+    }
+
+    [Fact]
+    public async Task Parents_BulkCommit_MixedDuplicateAndNewRows_ShouldUpsertAndInsertWithRowStatuses()
+    {
+        await AuthenticateAsync();
+
+        var duplicateNationalId = $"P-DUP-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var newNationalId = $"P-NEW-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var seedWorkbookBytes = CreateWorkbook(
+            "Parents",
+            ["FullName", "NationalId", "Phone", "Relationship", "StudentIndexNo"],
+            [$"Seed Parent {duplicateNationalId}", duplicateNationalId, "7700011", "Father", ""]);
+        using (var seedResponse = await PostWorkbookAsync("/api/parents/bulk/commit", "parents-seed.xlsx", seedWorkbookBytes))
+        {
+            seedResponse.EnsureSuccessStatusCode();
+        }
+
+        var workbookBytes = CreateWorkbook(
+            "Parents",
+            ["FullName", "NationalId", "Phone", "Relationship", "StudentIndexNo"],
+            new[]
+            {
+                new[] { $"Updated Parent {duplicateNationalId}", duplicateNationalId, "7700012", "Father", "" },
+                new[] { $"New Parent {newNationalId}", newNationalId, "7700013", "Mother", "" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/parents/bulk/commit", "parents-commit-mixed.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("updatedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(0);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), duplicateNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Updated", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), newNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertParentExistsAsync(duplicateNationalId);
+        await AssertParentExistsAsync(newNationalId);
+    }
+
+    [Fact]
+    public async Task Parents_BulkCommit_MixedValidAndInvalidRows_ShouldPartiallyApplyAndReportFailures()
+    {
+        await AuthenticateAsync();
+
+        var validNationalId = $"P-OK-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+        var invalidNationalId = $"P-BAD-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 1000000:D6}";
+
+        var workbookBytes = CreateWorkbook(
+            "Parents",
+            ["FullName", "NationalId", "Phone", "Relationship", "StudentIndexNo"],
+            new[]
+            {
+                new[] { $"Valid Parent {validNationalId}", validNationalId, "7700021", "Father", "" },
+                new[] { "", invalidNationalId, "7700022", "Mother", "" }
+            });
+
+        using var response = await PostWorkbookAsync("/api/parents/bulk/commit", "parents-commit-mixed-invalid.xlsx", workbookBytes);
+        response.EnsureSuccessStatusCode();
+
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var report = doc.RootElement.GetProperty("data");
+        report.GetProperty("canCommit").GetBoolean().Should().BeTrue();
+        report.GetProperty("insertedRows").GetInt32().Should().Be(1);
+        report.GetProperty("failedRows").GetInt32().Should().Be(1);
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), validNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Inserted", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        report.GetProperty("rows").EnumerateArray().Any(r =>
+            string.Equals(r.GetProperty("key").GetString(), invalidNationalId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(r.GetProperty("status").GetString(), "Failed", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+
+        await AssertParentExistsAsync(validNationalId);
+    }
+
+    [Fact]
     public async Task Books_BulkCommitAsync_ShouldExposeProgressAndDownloadableReport()
     {
         await AuthenticateAsync();
