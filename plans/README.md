@@ -11,6 +11,7 @@
 | 05 | [05-post-v1-backup-and-scheduled-reports.md](./05-post-v1-backup-and-scheduled-reports.md) | Post-v1 scheduler/backup/report automation plan |
 | 06 | [06-backend-grade-bulk-import-history.md](./06-backend-grade-bulk-import-history.md) | Historical record of grade entity and bulk import rollout |
 | 07 | [07-frontend-testing-suite-rollout.md](./07-frontend-testing-suite-rollout.md) | Modular rollout plan for frontend unit/e2e test coverage and gates |
+| 08 | [08-post-v1-realtime-signalr-and-websockets.md](./08-post-v1-realtime-signalr-and-websockets.md) | Post-v1 realtime event streaming plan for bulk-import and operational monitoring |
 | 99 | [99-plan-index-and-archive.md](./99-plan-index-and-archive.md) | Archive policy and plan-management conventions |
 
 ## Legacy Plan Files
