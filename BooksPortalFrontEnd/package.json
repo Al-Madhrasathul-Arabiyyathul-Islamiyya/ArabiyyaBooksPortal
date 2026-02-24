@@ -1,6 +1,6 @@
 {
   "name": "BooksPortalFrontEnd",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "dependencies": {
     "@nuxt/eslint": "1.13.0",
     "@nuxt/fonts": "0.13.0",
