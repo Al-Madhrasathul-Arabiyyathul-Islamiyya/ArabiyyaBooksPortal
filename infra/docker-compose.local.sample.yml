@@ -1,69 +1,13 @@
 name: booksportal-local
 
 services:
-  traefik:
-    image: traefik:v3.1
-    container_name: booksportal-traefik
-    command:
-      - --providers.file.filename=/etc/traefik/dynamic/dynamic.yml
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --entrypoints.web.http.redirections.entrypoint.permanent=true
-      - --api.dashboard=true
-      - --log.level=INFO
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8081:8080"
-    volumes:
-      - ./traefik/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro
-      - ./certs:/certs:ro
-    networks:
-      - default
-
   api:
-    ports: []
     environment:
       ConnectionStrings__DefaultConnection: Server=host.docker.internal,1433;Database=BooksPortal;User Id=booksportal_app;Password=ChangeThis!123;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True
-      JwtSettings__SigningMode: Certificate
-      JwtSettings__Issuer: BooksPortal
-      JwtSettings__Audience: BooksPortalClient
-      JwtSettings__CertificatePath: /certs/signing.pfx
-      JwtSettings__CertificatePassword: ""
-      DataProtection__KeyStoragePath: /var/aspnet-dpkeys
-      DataProtection__CertificatePath: /certs/pfx_cert.pfx
-      DataProtection__CertificatePassword: ""
-      SuperAdminSeed__UserName: admin
-      SuperAdminSeed__Email: admin@booksportal.local
+      JwtSettings__Secret: ChangeThisBeforeDeployment_AtLeast32Chars
       SuperAdminSeed__Password: ChangeThisBeforeDeployment1!
-      SuperAdminSeed__FullName: System Administrator
-      SuperAdminSeed__NationalId: A0000001
-      SuperAdminSeed__Designation: System Administrator
-      Cors__AllowedOrigins__0: https://bp.arabiyya.local
-    volumes:
-      - booksportal_dataprotection:/var/aspnet-dpkeys
-      - ./certs:/certs:ro
-    networks:
-      - default
 
   frontend:
-    ports: []
     environment:
-      NUXT_PUBLIC_API_BASE: https://api-bp.arabiyya.local/api
+      NUXT_PUBLIC_API_BASE: http://localhost:5071/api
       NUXT_PUBLIC_APP_TITLE: Arabiyya Academic Books Portal
-      NODE_EXTRA_CA_CERTS: /certs/rootCA.pem
-      NUXT_AUTH_SESSION_SIGNING_MODE: Certificate
-      NUXT_AUTH_SESSION_SIGNING_PRIVATE_KEY_PATH: /certs/signing-key.pem
-      NUXT_AUTH_SESSION_SIGNING_PUBLIC_CERT_PATH: /certs/signing-cert.pem
-    extra_hosts:
-      - "bp.arabiyya.local:host-gateway"
-      - "api-bp.arabiyya.local:host-gateway"
-    volumes:
-      - ./certs:/certs:ro
-    networks:
-      - default
-
-volumes:
-  booksportal_dataprotection:
