@@ -40,9 +40,26 @@ public class ExceptionHandlingMiddleware
         };
 
         if (statusCode == StatusCodes.Status500InternalServerError)
-            _logger.LogError(exception, "Unhandled exception");
+        {
+            _logger.LogError(
+                exception,
+                "Unhandled exception. {Method} {Path} responded {StatusCode}. TraceId: {TraceId}",
+                context.Request.Method,
+                context.Request.Path.Value,
+                statusCode,
+                context.TraceIdentifier);
+        }
         else
-            _logger.LogWarning(exception, "Handled exception: {Message}", exception.Message);
+        {
+            _logger.LogWarning(
+                "Handled exception: {Message}. {Method} {Path} responded {StatusCode}. TraceId: {TraceId}. ExceptionType: {ExceptionType}",
+                exception.Message,
+                context.Request.Method,
+                context.Request.Path.Value,
+                statusCode,
+                context.TraceIdentifier,
+                exception.GetType().Name);
+        }
 
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
