@@ -17,7 +17,7 @@
 
     <Popover
       ref="popoverRef"
-      class="w-[28rem]"
+      class="w-md"
     >
       <div class="flex items-center justify-between pb-2">
         <h3 class="text-sm font-semibold">
