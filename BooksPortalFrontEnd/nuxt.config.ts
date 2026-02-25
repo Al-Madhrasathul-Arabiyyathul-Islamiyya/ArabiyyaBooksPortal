@@ -47,6 +47,9 @@ export default defineNuxtConfig({
         expiryCookieMaxAgeSeconds: 60 * 60 * 24 * 7,
         expirySkewSeconds: 30,
         cookieSecure: !import.meta.dev,
+        signingMode: 'None',
+        signingPrivateKeyPath: '',
+        signingPublicCertPath: '',
       },
     },
     public: {

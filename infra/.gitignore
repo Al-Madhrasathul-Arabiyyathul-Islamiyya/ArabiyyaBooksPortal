@@ -1,5 +1,6 @@
 # Local-only infra overrides
 /docker-compose.local.yml
-/.env.local
+.env.local
 /runtime/
 **/certs/
+**/traefik/
