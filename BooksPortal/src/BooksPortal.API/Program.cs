@@ -25,6 +25,8 @@ if (File.Exists(farumaPath))
 
 var builder = WebApplication.CreateBuilder(args);
 
+ValidateRequiredProductionConfiguration(builder.Configuration, builder.Environment);
+
 // Serilog
 builder.Host.UseSerilog((context, config) =>
     config.ReadFrom.Configuration(context.Configuration));
@@ -122,5 +124,49 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 app.Run();
+
+static void ValidateRequiredProductionConfiguration(IConfiguration configuration, IWebHostEnvironment environment)
+{
+    if (environment.IsDevelopment())
+    {
+        return;
+    }
+
+    static string Require(IConfiguration config, string key)
+    {
+        var value = config[key];
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new InvalidOperationException($"Missing required configuration key: {key}");
+        }
+
+        return value;
+    }
+
+    Require(configuration, "ConnectionStrings:DefaultConnection");
+
+    var signingMode = Require(configuration, "JwtSettings:SigningMode");
+    if (string.Equals(signingMode, JwtSettings.SymmetricMode, StringComparison.OrdinalIgnoreCase))
+    {
+        Require(configuration, "JwtSettings:Secret");
+    }
+    else if (string.Equals(signingMode, JwtSettings.CertificateMode, StringComparison.OrdinalIgnoreCase))
+    {
+        var hasCertificatePath = !string.IsNullOrWhiteSpace(configuration["JwtSettings:CertificatePath"]);
+        var hasCertificateBase64 = !string.IsNullOrWhiteSpace(configuration["JwtSettings:CertificateBase64"]);
+        if (!hasCertificatePath && !hasCertificateBase64)
+        {
+            throw new InvalidOperationException(
+                "JwtSettings in Certificate mode requires either JwtSettings:CertificatePath or JwtSettings:CertificateBase64.");
+        }
+    }
+
+    Require(configuration, "SuperAdminSeed:UserName");
+    Require(configuration, "SuperAdminSeed:Email");
+    Require(configuration, "SuperAdminSeed:Password");
+    Require(configuration, "SuperAdminSeed:FullName");
+    Require(configuration, "SuperAdminSeed:NationalId");
+    Require(configuration, "SuperAdminSeed:Designation");
+}
 
 public partial class Program { }

@@ -8,7 +8,7 @@ COPY BooksPortalFrontEnd/ ./
 ENV NODE_OPTIONS=--max-old-space-size=2048
 RUN bun run build
 
-FROM node:20-alpine AS runtime
+FROM node:24-alpine AS runtime
 WORKDIR /app
 COPY --from=build /app/.output ./.output
 COPY --from=build /app/node_modules ./node_modules
