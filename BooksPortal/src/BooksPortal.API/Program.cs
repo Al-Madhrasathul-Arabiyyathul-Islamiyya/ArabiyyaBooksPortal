@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
 using Serilog;
+using Serilog.Events;
 using System.Text.Json.Serialization;
 
 QuestPDF.Settings.License = LicenseType.Community;
@@ -106,6 +107,30 @@ using (var scope = app.Services.CreateScope())
 
 // Middleware pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = static (httpContext, _, exception) =>
+    {
+        if (exception is not null || httpContext.Response.StatusCode >= StatusCodes.Status500InternalServerError)
+            return LogEventLevel.Error;
+
+        if (httpContext.Response.StatusCode >= StatusCodes.Status400BadRequest)
+            return LogEventLevel.Warning;
+
+        return LogEventLevel.Information;
+    };
+    options.EnrichDiagnosticContext = static (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("TraceId", httpContext.TraceIdentifier);
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+        diagnosticContext.Set("RemoteIpAddress", httpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+
+        var userId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        diagnosticContext.Set("UserId", userId ?? string.Empty);
+    };
+});
 
 if (app.Environment.IsDevelopment())
 {

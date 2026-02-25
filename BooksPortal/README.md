@@ -72,6 +72,29 @@ Override with environment variables, for example:
 - `Cors__AllowedOrigins__0=http://localhost:3000`
 - `Cors__AllowedOrigins__1=https://your-frontend.example.com`
 
+## Logging and Observability
+
+### Exception Logging Policy
+
+- Expected handled exceptions (4xx responses like business rule or validation errors) are logged as structured warnings **without stack traces**.
+- Unexpected/unhandled exceptions (5xx responses) are logged as structured errors **with stack traces**.
+
+### Access Logging
+
+- Request/access logs are emitted through Serilog request logging middleware for every request.
+- Log events include request method/path, status code, duration, trace identifier, host/scheme, remote IP, and user id (when authenticated).
+
+### Sinks and Docker Log Persistence
+
+- API logs are written to:
+  - Console (structured JSON events)
+  - Rolling file sink: `logs/log-.txt`
+- Docker compose mounts API logs to a named volume:
+  - container path: `/app/logs`
+  - volume: `booksportal_logs`
+
+This setup is Loki-friendly for future ingestion through a collector such as Promtail.
+
 ## Project Structure
 
 ```
