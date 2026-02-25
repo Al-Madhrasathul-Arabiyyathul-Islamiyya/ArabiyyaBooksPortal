@@ -10,25 +10,23 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${BP_API_ENVIRONMENT:-Production}
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: ${BP_DB_CONNECTION:-Server=host.docker.internal,1433;Database=BooksPortal;User Id=booksportal_app;Password=CHANGE_ME_AT_DEPLOYMENT;TrustServerCertificate=True;Encrypt=False;MultipleActiveResultSets=True}
-      JwtSettings__SigningMode: ${BP_JWT_SIGNING_MODE:-Symmetric}
-      JwtSettings__Secret: ${BP_JWT_SECRET:-CHANGE_ME_AT_DEPLOYMENT}
-      JwtSettings__Issuer: ${BP_JWT_ISSUER:-BooksPortal}
-      JwtSettings__Audience: ${BP_JWT_AUDIENCE:-BooksPortalClient}
+      ConnectionStrings__DefaultConnection: ${BP_DB_CONNECTION:?BP_DB_CONNECTION is required}
+      JwtSettings__SigningMode: ${BP_JWT_SIGNING_MODE:?BP_JWT_SIGNING_MODE is required}
+      JwtSettings__Secret: ${BP_JWT_SECRET:-}
+      JwtSettings__Issuer: ${BP_JWT_ISSUER:?BP_JWT_ISSUER is required}
+      JwtSettings__Audience: ${BP_JWT_AUDIENCE:?BP_JWT_AUDIENCE is required}
       JwtSettings__ExpiryInMinutes: ${BP_JWT_EXPIRY_MINUTES:-240}
       JwtSettings__RefreshTokenExpiryInDays: ${BP_JWT_REFRESH_DAYS:-7}
       JwtSettings__ClockSkewSeconds: ${BP_JWT_CLOCK_SKEW_SECONDS:-30}
       Cors__AllowedOrigins__0: ${BP_CORS_ORIGIN_0:-http://localhost:3000}
       SlipStorage__BasePath: /app/slips
       ImportTemplateCache__StoragePath: /app/App_Data/import-templates
-      SuperAdminSeed__UserName: ${BP_SUPERADMIN_USERNAME:-admin}
-      SuperAdminSeed__Email: ${BP_SUPERADMIN_EMAIL:-admin@booksportal.local}
-      SuperAdminSeed__Password: ${BP_SUPERADMIN_PASSWORD:-CHANGE_ME_AT_DEPLOYMENT}
-      SuperAdminSeed__FullName: ${BP_SUPERADMIN_FULLNAME:-System Administrator}
-      SuperAdminSeed__NationalId: ${BP_SUPERADMIN_NID:-A0000001}
-      SuperAdminSeed__Designation: ${BP_SUPERADMIN_DESIGNATION:-System Administrator}
-    ports:
-      - "${BP_API_PORT:-5071}:8080"
+      SuperAdminSeed__UserName: ${BP_SUPERADMIN_USERNAME:?BP_SUPERADMIN_USERNAME is required}
+      SuperAdminSeed__Email: ${BP_SUPERADMIN_EMAIL:?BP_SUPERADMIN_EMAIL is required}
+      SuperAdminSeed__Password: ${BP_SUPERADMIN_PASSWORD:?BP_SUPERADMIN_PASSWORD is required}
+      SuperAdminSeed__FullName: ${BP_SUPERADMIN_FULLNAME:?BP_SUPERADMIN_FULLNAME is required}
+      SuperAdminSeed__NationalId: ${BP_SUPERADMIN_NID:?BP_SUPERADMIN_NID is required}
+      SuperAdminSeed__Designation: ${BP_SUPERADMIN_DESIGNATION:?BP_SUPERADMIN_DESIGNATION is required}
     volumes:
       - booksportal_slips:/app/slips
       - booksportal_logs:/app/logs
@@ -42,14 +40,13 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      NUXT_PUBLIC_API_BASE: ${BP_PUBLIC_API_BASE:-http://localhost:5071/api}
-      NUXT_PUBLIC_APP_TITLE: ${BP_PUBLIC_APP_TITLE:-Arabiyya Academic Books Portal}
+      NUXT_PUBLIC_API_BASE: ${BP_PUBLIC_API_BASE:?BP_PUBLIC_API_BASE is required}
+      NUXT_PUBLIC_APP_TITLE: ${BP_PUBLIC_APP_TITLE:?BP_PUBLIC_APP_TITLE is required}
+      NODE_EXTRA_CA_CERTS: ${BP_NODE_EXTRA_CA_CERTS:-}
       NUXT_AUTH_SESSION_ACCESS_COOKIE_MAX_AGE_SECONDS: ${BP_NUXT_ACCESS_COOKIE_SECONDS:-14400}
       NUXT_AUTH_SESSION_REFRESH_COOKIE_MAX_AGE_SECONDS: ${BP_NUXT_REFRESH_COOKIE_SECONDS:-604800}
       NUXT_AUTH_SESSION_EXPIRY_COOKIE_MAX_AGE_SECONDS: ${BP_NUXT_EXPIRY_COOKIE_SECONDS:-14400}
       NUXT_AUTH_SESSION_EXPIRY_SKEW_SECONDS: ${BP_NUXT_EXPIRY_SKEW_SECONDS:-30}
-    ports:
-      - "${BP_FRONTEND_PORT:-3000}:3000"
     depends_on:
       - api
 
