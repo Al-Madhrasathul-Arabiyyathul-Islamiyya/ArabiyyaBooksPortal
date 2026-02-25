@@ -7,8 +7,6 @@
 4. `plans/04-high-priority-backend-followups.md`
 5. `plans/05-post-v1-backup-and-scheduled-reports.md`
 6. `plans/06-backend-grade-bulk-import-history.md`
-7. `plans/07-frontend-testing-suite-rollout.md`
-8. `plans/08-post-v1-realtime-signalr-and-websockets.md`
 
 ## Archive Policy
 - Legacy plans are preserved under `plans/archive/`.
