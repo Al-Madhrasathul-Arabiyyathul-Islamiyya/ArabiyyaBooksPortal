@@ -1,5 +1,0 @@
-# Local-only infra overrides
-/docker-compose.local.yml
-/.env.local
-/runtime/
-**/certs/
