@@ -21,6 +21,27 @@ interface FetchErrorShape {
 const GENERIC_OPERATION_ERROR
   = 'There was an issue while processing your request. Please try again later. If this continues, contact IT support.'
 
+function getStatusFallbackMessage(statusCode: number): string | null {
+  switch (statusCode) {
+    case 400:
+      return 'The request could not be processed. Please review the data and try again.'
+    case 401:
+      return 'Your session has expired. Please sign in again.'
+    case 403:
+      return 'You do not have permission to perform this action.'
+    case 404:
+      return 'The requested resource was not found.'
+    case 409:
+      return 'A conflicting record already exists.'
+    case 422:
+      return 'The submitted data is invalid. Please review the form and try again.'
+    case 429:
+      return 'Too many requests were made. Please wait and try again.'
+    default:
+      return statusCode >= 500 ? GENERIC_OPERATION_ERROR : null
+  }
+}
+
 function isTechnicalServerMessage(message: string): boolean {
   const lowered = message.toLowerCase()
   return (
@@ -75,11 +96,15 @@ export function normalizeBackendErrors(error: unknown): NormalizedValidationErro
     }
   }
 
-  const statusCode = data?.status ?? fetchError.status ?? fetchError.statusCode ?? null
+  const rawStatusCode = data?.status ?? fetchError.status ?? fetchError.statusCode ?? null
+  const statusCode = rawStatusCode === null || rawStatusCode === undefined
+    ? null
+    : Number(rawStatusCode)
   const backendMessage = data?.message?.trim() || data?.detail?.trim() || data?.title?.trim() || ''
   const transportMessage = fetchError.message?.trim() || ''
   const message = backendMessage || transportMessage
-  const looksLikeTransportMessage = /^\[(GET|POST|PUT|PATCH|DELETE)\]\s*"/i.test(transportMessage)
+  const looksLikeTransportMessage = /\[(GET|POST|PUT|PATCH|DELETE)\]\s*"/i.test(transportMessage)
+  const safeBackendMessage = backendMessage && !isTechnicalServerMessage(backendMessage) ? backendMessage : ''
 
   if (message) {
     const lowered = message.toLowerCase()
@@ -93,23 +118,22 @@ export function normalizeBackendErrors(error: unknown): NormalizedValidationErro
     else if (lowered.includes('csrf')) {
       globalErrors.push('Security validation failed. Please refresh the page and try again.')
     }
-    else if (statusCode === 409 && globalErrors.length === 0) {
-      globalErrors.push(backendMessage || 'A conflicting record already exists.')
-    }
-    else if (statusCode === 401 && globalErrors.length === 0) {
-      globalErrors.push('Your session has expired. Please sign in again.')
-    }
-    else if (statusCode === 403 && globalErrors.length === 0) {
-      globalErrors.push('You do not have permission to perform this action.')
-    }
-    else if (statusCode && statusCode >= 500 && globalErrors.length === 0) {
-      globalErrors.push(GENERIC_OPERATION_ERROR)
+    else if (statusCode !== null && globalErrors.length === 0) {
+      const statusFallback = getStatusFallbackMessage(statusCode)
+      if (statusFallback) {
+        globalErrors.push(safeBackendMessage || statusFallback)
+      }
     }
     else if (isTechnicalServerMessage(message) && globalErrors.length === 0) {
       globalErrors.push(GENERIC_OPERATION_ERROR)
     }
     else if (looksLikeTransportMessage && globalErrors.length === 0) {
-      globalErrors.push('The request could not be completed. Please review the form and try again.')
+      if (statusCode !== null) {
+        globalErrors.push(getStatusFallbackMessage(statusCode) ?? 'The request could not be completed. Please review the form and try again.')
+      }
+      else {
+        globalErrors.push('The request could not be completed. Please review the form and try again.')
+      }
     }
     else if (globalErrors.length === 0) {
       globalErrors.push(message)
