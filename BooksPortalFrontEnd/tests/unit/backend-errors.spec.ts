@@ -42,6 +42,24 @@ describe('normalizeBackendErrors', () => {
     })
     expect(conflict.globalErrors[0]).toBe('Duplicate key')
 
+    const conflictFromTransport = normalizeBackendErrors({
+      statusCode: '409',
+      message: 'Error: [DELETE] "http://localhost:5071/api/AcademicYears/3": 409 Conflict',
+    })
+    expect(conflictFromTransport.globalErrors[0]).toContain('conflicting record')
+
+    const notFoundFromTransport = normalizeBackendErrors({
+      status: '404',
+      message: '[GET] "http://localhost:5071/api/missing": 404 Not Found',
+    })
+    expect(notFoundFromTransport.globalErrors[0]).toContain('not found')
+
+    const unprocessableFromTransport = normalizeBackendErrors({
+      statusCode: 422,
+      message: '[POST] "http://localhost:5071/api/books/bulk/validate": 422 Unprocessable Entity',
+    })
+    expect(unprocessableFromTransport.globalErrors[0]).toContain('submitted data is invalid')
+
     const serverError = normalizeBackendErrors({
       data: { status: 500, message: 'Unhandled exception with stack trace' },
     })
