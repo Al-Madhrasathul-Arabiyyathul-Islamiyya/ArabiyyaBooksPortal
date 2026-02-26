@@ -6,6 +6,17 @@ import { clearSessionTokens, getExpirySkewSeconds, getSessionTokens, isExpiryExp
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 const refreshInFlight = new Map<string, Promise<boolean>>()
 
+function deriveBackendErrorMessage(fetchError: FetchError): string {
+  const data = fetchError.data as { message?: string, detail?: string, title?: string } | undefined
+  return (
+    data?.message?.trim()
+    || data?.detail?.trim()
+    || data?.title?.trim()
+    || fetchError.statusMessage?.trim()
+    || 'Request to backend failed.'
+  )
+}
+
 function getBackendBaseUrl(event: H3Event): string {
   const config = useRuntimeConfig(event)
   const base = String(config.public.apiBase ?? '').trim()
@@ -143,7 +154,12 @@ export async function proxyAuthorizedBackendRequest(event: H3Event, apiPath: str
   catch (error) {
     const fetchError = error as FetchError
     if (fetchError.statusCode !== 401) {
-      throw error
+      const statusCode = Number(fetchError.statusCode ?? 500)
+      throw createError({
+        statusCode: Number.isFinite(statusCode) ? statusCode : 500,
+        statusMessage: deriveBackendErrorMessage(fetchError),
+        data: fetchError.data,
+      })
     }
 
     const refreshed = await refreshServerSession(event)
