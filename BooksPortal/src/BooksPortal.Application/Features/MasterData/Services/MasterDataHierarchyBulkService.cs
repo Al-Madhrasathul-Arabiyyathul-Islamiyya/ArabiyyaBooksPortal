@@ -10,6 +10,7 @@ namespace BooksPortal.Application.Features.MasterData.Services;
 
 public sealed class MasterDataHierarchyBulkService : IMasterDataHierarchyBulkService
 {
+    private readonly IAcademicYearService _academicYearService;
     private readonly IRepository<AcademicYear> _academicYearRepository;
     private readonly IRepository<Keystage> _keystageRepository;
     private readonly IRepository<Grade> _gradeRepository;
@@ -17,12 +18,14 @@ public sealed class MasterDataHierarchyBulkService : IMasterDataHierarchyBulkSer
     private readonly IUnitOfWork _unitOfWork;
 
     public MasterDataHierarchyBulkService(
+        IAcademicYearService academicYearService,
         IRepository<AcademicYear> academicYearRepository,
         IRepository<Keystage> keystageRepository,
         IRepository<Grade> gradeRepository,
         IRepository<ClassSection> classSectionRepository,
         IUnitOfWork unitOfWork)
     {
+        _academicYearService = academicYearService;
         _academicYearRepository = academicYearRepository;
         _keystageRepository = keystageRepository;
         _gradeRepository = gradeRepository;
@@ -34,6 +37,22 @@ public sealed class MasterDataHierarchyBulkService : IMasterDataHierarchyBulkSer
     {
         if (request.AcademicYears.Count == 0)
             throw new BusinessRuleException("At least one academic year must be provided.");
+
+        var requestedYears = request.AcademicYears
+            .Select(x => x.Year)
+            .Distinct()
+            .ToList();
+        var existingRequestedYears = await _academicYearRepository.Query()
+            .Where(a => requestedYears.Contains(a.Year))
+            .Select(a => a.Year)
+            .ToListAsync();
+        if (existingRequestedYears.Count > 0)
+            throw new BusinessRuleException(
+                $"Hierarchy upload rejected. Academic year(s) already exist: {string.Join(", ", existingRequestedYears.OrderBy(x => x))}.");
+
+        var requestedActiveCount = request.AcademicYears.Count(x => x.IsActive == true);
+        if (requestedActiveCount > 1)
+            throw new BusinessRuleException("Hierarchy upload rejected. Only one academic year can be marked active.");
 
         var response = new HierarchyBulkUpsertResponse();
 
@@ -126,6 +145,12 @@ public sealed class MasterDataHierarchyBulkService : IMasterDataHierarchyBulkSer
 
             _academicYearRepository.Add(created);
             await _unitOfWork.SaveChangesAsync();
+
+            if (created.IsActive)
+            {
+                await _academicYearService.ActivateAsync(created.Id);
+            }
+
             response.CreatedCount++;
             response.Results.Add(new HierarchyBulkUpsertResultRow
             {
