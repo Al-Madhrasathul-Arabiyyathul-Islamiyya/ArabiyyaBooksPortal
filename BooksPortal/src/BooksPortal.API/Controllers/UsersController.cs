@@ -1,5 +1,6 @@
 using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.Users.DTOs;
+using BooksPortal.Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BooksPortal.API.Controllers;
 
 [Route("api/users")]
-[Authorize(Roles = "SuperAdmin,Admin")]
+[Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
 public class UsersController : ApiControllerBase
 {
     private const int MaxPageSize = 100;
@@ -45,6 +46,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
     {
         var validation = await _createValidator.ValidateAsync(request);
@@ -56,6 +58,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request)
     {
         var validation = await _updateValidator.ValidateAsync(request);
@@ -67,6 +70,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPost("{id:int}/toggle-active")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> ToggleActive(int id)
     {
         await _userService.ToggleUserActiveAsync(id);
@@ -74,6 +78,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPut("{id:int}/roles")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> AssignRoles(int id, [FromBody] List<string> roles)
     {
         await _userService.AssignRolesAsync(id, roles);

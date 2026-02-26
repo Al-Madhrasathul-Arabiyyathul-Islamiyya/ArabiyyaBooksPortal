@@ -51,4 +51,14 @@ public class ImportTemplatesController : ApiControllerBase
             ? FailResponse("Parents template is unavailable.")
             : File(template.Value.Bytes, template.Value.ContentType, template.Value.FileName);
     }
+
+    [HttpGet("master-data-hierarchy")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
+    public async Task<IActionResult> GetMasterDataHierarchyTemplate(CancellationToken cancellationToken)
+    {
+        var template = await _cacheService.GetTemplateAsync("master-data-hierarchy", cancellationToken);
+        return template is null
+            ? FailResponse("Master data hierarchy template is unavailable.")
+            : File(template.Value.Bytes, template.Value.ContentType, template.Value.FileName);
+    }
 }
