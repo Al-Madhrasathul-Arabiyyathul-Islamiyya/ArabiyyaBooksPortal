@@ -48,6 +48,7 @@
               <template #body="{ data }">
                 <InputText
                   :model-value="getDraftValue(data.id)"
+                  :disabled="!isSuperAdmin"
                   fluid
                   @update:model-value="setDraftValue(data.id, $event)"
                 />
@@ -68,6 +69,7 @@
                   :model-value="getDraftSortOrder(data.id)"
                   :min="0"
                   :use-grouping="false"
+                  :disabled="!isSuperAdmin"
                   fluid
                   @update:model-value="setDraftSortOrder(data.id, $event)"
                 />
@@ -86,6 +88,7 @@
             >
               <template #body="{ data }">
                 <CommonIconActionButton
+                  v-if="isSuperAdmin"
                   icon="pi pi-save"
                   severity="success"
                   tooltip="Save setting"

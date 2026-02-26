@@ -46,6 +46,14 @@ export const CreateSubjectRequestSchema = z.object({
 })
 export type CreateSubjectRequest = z.infer<typeof CreateSubjectRequestSchema>
 
+export const CreateGradeRequestSchema = z.object({
+  keystageId: z.number().int().min(1, 'Keystage is required'),
+  code: z.string().min(1, 'Code is required'),
+  name: z.string().min(1, 'Name is required'),
+  sortOrder: z.number().int().min(0),
+})
+export type CreateGradeRequest = z.infer<typeof CreateGradeRequestSchema>
+
 export const CreateClassSectionRequestSchema = z.object({
   academicYearId: z.number().int().min(1, 'Academic year is required'),
   keystageId: z.number().int().min(1, 'Keystage is required'),

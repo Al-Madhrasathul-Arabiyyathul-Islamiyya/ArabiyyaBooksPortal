@@ -10,6 +10,7 @@
         </p>
       </div>
       <Button
+        v-if="isSuperAdmin"
         label="New Format"
         icon="pi pi-plus"
         @click="openCreateDialog"
@@ -111,6 +112,7 @@
             <template #body="{ data }">
               <div class="flex items-center gap-2">
                 <CommonIconActionButton
+                  v-if="isSuperAdmin"
                   icon="pi pi-pencil"
                   tooltip="Edit format"
                   @click="openEditDialog(data)"
