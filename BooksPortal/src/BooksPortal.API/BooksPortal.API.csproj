@@ -13,6 +13,7 @@
     </PackageReference>
     <PackageReference Include="QuestPDF" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 

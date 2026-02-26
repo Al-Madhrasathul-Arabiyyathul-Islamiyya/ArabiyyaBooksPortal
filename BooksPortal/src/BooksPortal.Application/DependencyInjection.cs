@@ -32,12 +32,14 @@ public static class DependencyInjection
 
         services.AddScoped<IAcademicYearService, AcademicYearService>();
         services.AddScoped<IKeystageService, KeystageService>();
+        services.AddScoped<IGradeService, GradeService>();
         services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IClassSectionService, ClassSectionService>();
         services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<IParentService, ParentService>();
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<ILookupService, LookupService>();
+        services.AddScoped<IMasterDataHierarchyBulkService, MasterDataHierarchyBulkService>();
 
         services.AddScoped<IBookService, BookService>();
         services.AddScoped<IBookBulkImportService, BookBulkImportService>();
