@@ -22,10 +22,12 @@ public class ReferenceNumberFormatsController : ApiControllerBase
         => OkResponse(await _service.GetByIdAsync(id));
 
     [HttpPost]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Create(CreateReferenceNumberFormatRequest request)
         => CreatedResponse(await _service.CreateAsync(request));
 
     [HttpPut("{id}")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Update(int id, CreateReferenceNumberFormatRequest request)
         => OkResponse(await _service.UpdateAsync(id, request));
 
