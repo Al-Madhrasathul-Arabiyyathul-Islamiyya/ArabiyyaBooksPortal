@@ -276,7 +276,8 @@ import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['admin'],
+  middleware: ['admin', 'role'],
+  roles: [ROLES.superAdmin],
   breadcrumb: {
     admin: 'Admin',
     settings: 'Settings',

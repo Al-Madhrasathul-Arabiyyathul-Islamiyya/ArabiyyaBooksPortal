@@ -42,6 +42,7 @@ export type Keystage = z.infer<typeof KeystageSchema>
 
 export const GradeSchema = z.object({
   id: z.number(),
+  code: z.string(),
   name: z.string(),
   sortOrder: z.number(),
   keystageId: z.number(),

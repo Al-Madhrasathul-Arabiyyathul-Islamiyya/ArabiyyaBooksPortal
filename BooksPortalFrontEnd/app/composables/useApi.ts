@@ -65,9 +65,17 @@ export function useApi() {
     if (!import.meta.client) return
 
     const response = await $fetch.raw(`${baseURL}${url}`, { method: 'GET' })
-    const blob = new Blob([response._data as BlobPart], {
-      type: response.headers.get('content-type') ?? 'application/octet-stream',
-    })
+    const contentType = response.headers.get('content-type') ?? 'application/octet-stream'
+
+    let blobPart: BlobPart
+    if (contentType.includes('application/json') && typeof response._data === 'object') {
+      blobPart = JSON.stringify(response._data, null, 2)
+    }
+    else {
+      blobPart = response._data as BlobPart
+    }
+
+    const blob = new Blob([blobPart], { type: contentType })
 
     const objectUrl = URL.createObjectURL(blob)
     if (openInNewTab) {

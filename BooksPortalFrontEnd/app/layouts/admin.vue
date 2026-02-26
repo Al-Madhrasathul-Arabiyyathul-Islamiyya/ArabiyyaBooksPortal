@@ -76,7 +76,7 @@
 import type { MenuItem } from 'primevue/menuitem'
 
 const colorMode = useColorMode()
-const { user, logout } = useAuth()
+const { user, isSuperAdmin, logout } = useAuth()
 const route = useRoute()
 const { public: { appTitle } } = useRuntimeConfig()
 const userMenuRef = ref()
@@ -96,7 +96,7 @@ const userMenuItems = ref([
   {
     label: 'Profile',
     icon: 'pi pi-user',
-    command: () => navigateTo('/admin/settings/profile'),
+    command: () => navigateTo('/profile'),
   },
   { separator: true },
   {
@@ -146,6 +146,12 @@ const menuItems = computed<MenuItem[]>(() => ([
         label: 'Classes',
         command: () => navigateTo('/admin/master-data/class-sections'),
         class: isActive('/admin/master-data/class-sections') ? 'app-menu-item-active' : undefined,
+      },
+      {
+        key: 'master-data-grades',
+        label: 'Grades',
+        command: () => navigateTo('/admin/master-data/grades'),
+        class: isActive('/admin/master-data/grades') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-students',
@@ -210,12 +216,14 @@ const menuItems = computed<MenuItem[]>(() => ([
     label: 'Settings',
     icon: 'pi pi-cog',
     items: [
-      {
-        key: 'settings-users',
-        label: 'Users',
-        command: () => navigateTo('/admin/settings/users'),
-        class: isActive('/admin/settings/users') ? 'app-menu-item-active' : undefined,
-      },
+      ...(isSuperAdmin.value
+        ? [{
+            key: 'settings-users',
+            label: 'Users',
+            command: () => navigateTo('/admin/settings/users'),
+            class: isActive('/admin/settings/users') ? 'app-menu-item-active' : undefined,
+          }]
+        : []),
       {
         key: 'settings-reference-formats',
         label: 'Reference Formats',
@@ -228,12 +236,14 @@ const menuItems = computed<MenuItem[]>(() => ([
         command: () => navigateTo('/admin/settings/slip-templates'),
         class: isActive('/admin/settings/slip-templates') ? 'app-menu-item-active' : undefined,
       },
-      {
-        key: 'settings-profile',
-        label: 'Profile',
-        command: () => navigateTo('/admin/settings/profile'),
-        class: isActive('/admin/settings/profile') ? 'app-menu-item-active' : undefined,
-      },
+      ...(isSuperAdmin.value
+        ? [{
+            key: 'settings-master-data-hierarchy',
+            label: 'Master Data Bulk Upload',
+            command: () => navigateTo('/admin/settings/master-data-hierarchy-bulk'),
+            class: isActive('/admin/settings/master-data-hierarchy-bulk') ? 'app-menu-item-active' : undefined,
+          }]
+        : []),
     ],
   },
   {

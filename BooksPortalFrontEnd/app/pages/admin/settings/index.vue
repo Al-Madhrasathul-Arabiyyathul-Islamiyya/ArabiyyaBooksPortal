@@ -5,7 +5,7 @@
         Settings
       </h1>
       <p class="text-sm text-surface-600 dark:text-surface-400">
-        Manage users, reference formats, templates, and your profile.
+        Manage users, reference formats, and template settings.
       </p>
     </div>
 
@@ -46,7 +46,9 @@ definePageMeta({
   },
 })
 
-const settingCards = [
+const { isSuperAdmin } = useAuth()
+
+const settingCards = computed(() => [
   {
     title: 'Users',
     description: 'Create users, assign roles, and manage account status.',
@@ -65,11 +67,13 @@ const settingCards = [
     to: '/admin/settings/slip-templates',
     icon: 'pi pi-file-edit',
   },
-  {
-    title: 'Profile',
-    description: 'Review your profile and change your password.',
-    to: '/admin/settings/profile',
-    icon: 'pi pi-user',
-  },
-]
+  ...(isSuperAdmin.value
+    ? [{
+        title: 'Master Data Bulk Upload',
+        description: 'Upload academic years, keystages, grades, and classes via JSON template.',
+        to: '/admin/settings/master-data-hierarchy-bulk',
+        icon: 'pi pi-upload',
+      }]
+    : []),
+].filter(item => isSuperAdmin.value || item.to !== '/admin/settings/users'))
 </script>
