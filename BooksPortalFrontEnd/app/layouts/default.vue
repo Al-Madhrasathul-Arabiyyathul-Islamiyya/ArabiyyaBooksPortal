@@ -188,7 +188,7 @@ const userMenuItems = ref([
   {
     label: 'Profile',
     icon: 'pi pi-user',
-    command: () => navigateTo(isAdmin.value ? '/admin/settings/profile' : '/distribution'),
+    command: () => navigateTo('/profile'),
   },
   { separator: true },
   {

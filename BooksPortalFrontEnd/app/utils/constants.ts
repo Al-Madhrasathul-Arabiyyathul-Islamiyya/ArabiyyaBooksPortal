@@ -17,6 +17,10 @@ export const API = {
     base: '/keystages',
     byId: (id: number) => `/keystages/${id}`,
   },
+  grades: {
+    base: '/grades',
+    byId: (id: number) => `/grades/${id}`,
+  },
   subjects: {
     base: '/subjects',
     byId: (id: number) => `/subjects/${id}`,
@@ -70,6 +74,10 @@ export const API = {
     teachers: '/import-templates/teachers',
     students: '/import-templates/students',
     parents: '/import-templates/parents',
+    masterDataHierarchy: '/import-templates/master-data-hierarchy',
+  },
+  masterDataHierarchy: {
+    bulkUpsert: '/master-data/hierarchy/bulk/upsert',
   },
   books: {
     base: '/books',
