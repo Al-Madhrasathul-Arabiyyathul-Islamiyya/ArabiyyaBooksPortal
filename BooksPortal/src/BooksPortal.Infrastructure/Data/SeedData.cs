@@ -51,20 +51,20 @@ public static class SeedData
 
         await EnsureSeededAccountAsync(userManager, superAdmin, UserRole.SuperAdmin, "SuperAdmin");
 
+        var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
+        await SlipTemplateSettingsSeeder.SeedAsync(db);
+
         if (!isDevelopment)
             return;
 
         await EnsureSeededAccountAsync(userManager, admin, UserRole.Admin, "Admin");
         await EnsureSeededAccountAsync(userManager, user, UserRole.User, "User");
 
-        var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
-
         await CurriculumSeeder.SeedAsync(db);
         await ReferenceNumberFormatSeeder.SeedAsync(db);
         await ClassSectionSeeder.SeedAsync(db);
         await SubjectAndBookSeeder.SeedAsync(db);
         await PeopleSeeder.SeedAsync(db);
-        await SlipTemplateSettingsSeeder.SeedAsync(db);
     }
 
     private static async Task EnsureSeededAccountAsync(
