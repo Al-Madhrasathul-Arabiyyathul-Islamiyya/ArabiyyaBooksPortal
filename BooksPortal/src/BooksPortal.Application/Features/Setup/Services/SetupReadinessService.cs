@@ -57,6 +57,35 @@ public class SetupReadinessService : ISetupReadinessService
         return await EvaluateAndPersistAsync(state, cancellationToken);
     }
 
+    public Task<SetupStatusResponse> GetBootstrapStatusAsync(CancellationToken cancellationToken = default)
+        => GetStatusAsync(cancellationToken);
+
+    public async Task<SetupStatusResponse> BootstrapSuperAdminAsync(
+        BootstrapSuperAdminRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (await _identityService.HasAnySuperAdminAsync(cancellationToken))
+            throw new BusinessRuleException("System bootstrap is already completed for SuperAdmin account.");
+
+        await _identityService.CreateSuperAdminAsync(
+            request.UserName,
+            request.Email,
+            request.Password,
+            request.FullName,
+            request.NationalId,
+            request.Designation,
+            cancellationToken);
+
+        var state = await GetOrCreateStateAsync(cancellationToken);
+        state.StartedAtUtc ??= DateTime.UtcNow;
+        state.SuperAdminConfirmedAtUtc ??= DateTime.UtcNow;
+        state.Status = SetupStatus.InProgress;
+        _setupRepository.Update(state);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return await EvaluateAndPersistAsync(state, cancellationToken);
+    }
+
     public async Task<SetupStatusResponse> StartAsync(CancellationToken cancellationToken = default)
     {
         var state = await GetOrCreateStateAsync(cancellationToken);

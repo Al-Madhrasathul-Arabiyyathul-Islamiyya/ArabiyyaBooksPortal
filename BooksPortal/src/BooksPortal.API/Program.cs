@@ -191,12 +191,6 @@ static void ValidateRequiredProductionConfiguration(IConfiguration configuration
         }
     }
 
-    Require(configuration, "SuperAdminSeed:UserName");
-    Require(configuration, "SuperAdminSeed:Email");
-    Require(configuration, "SuperAdminSeed:Password");
-    Require(configuration, "SuperAdminSeed:FullName");
-    Require(configuration, "SuperAdminSeed:NationalId");
-    Require(configuration, "SuperAdminSeed:Designation");
 }
 
 public partial class Program { }
