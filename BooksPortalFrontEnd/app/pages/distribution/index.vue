@@ -171,6 +171,7 @@ const api = useApi()
 const { showError } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
 const { getLifecycleLabel, getLifecycleSeverity } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const slips = ref<DistributionSlip[]>([])
 const academicYears = ref<Lookup[]>([])
@@ -198,6 +199,8 @@ function formatDateTime(value: string) {
 }
 
 async function loadLookups() {
+  if (isOperationBlocked.value) return
+
   try {
     const [yearsResponse, activeResponse] = await Promise.all([
       api.get<Lookup[]>(API.lookups.academicYears),
@@ -219,6 +222,8 @@ async function loadLookups() {
 }
 
 async function loadSlips() {
+  if (isOperationBlocked.value) return
+
   isLoading.value = true
   try {
     const response = await api.get<PaginatedList<DistributionSlip>>(API.distributions.base, {
@@ -301,6 +306,9 @@ function onRowClick(event: { data: DistributionSlip }) {
 }
 
 onMounted(async () => {
+  const allowed = await guard('load distributions')
+  if (!allowed) return
+
   await loadLookups()
   await loadSlips()
 })

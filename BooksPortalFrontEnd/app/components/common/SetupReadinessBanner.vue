@@ -16,11 +16,18 @@
           v-if="missingSteps.length > 0"
           class="text-xs text-surface-700 dark:text-surface-200"
         >
-          Missing steps: {{ missingSteps.join(', ') }}
+          Missing steps: {{ missingStepLabels }}
+        </div>
+        <div
+          v-if="!canManageSetup"
+          class="text-xs text-surface-700 dark:text-surface-200"
+        >
+          Setup updates require a SuperAdmin account.
         </div>
       </div>
 
       <Button
+        v-if="canManageSetup"
         label="Open Setup Center"
         icon="pi pi-cog"
         size="small"
@@ -33,10 +40,21 @@
 </template>
 
 <script setup lang="ts">
-const { isIncomplete, blockingMessage, missingSteps, ensureLoaded } = useSetupReadiness()
-const { isAuthenticated, isAdmin } = useAuth()
+const { isIncomplete, canManageSetup, blockingMessage, missingSteps, ensureLoaded } = useSetupReadiness()
+const { isAuthenticated } = useAuth()
 
-const shouldShow = computed(() => isAuthenticated.value && isAdmin.value && isIncomplete.value)
+const STEP_LABELS: Record<string, string> = {
+  'super-admin': 'SuperAdmin Account',
+  'slip-templates': 'Slip Templates',
+  'active-academic-year': 'Active Academic Year',
+  'hierarchy': 'Master Data Hierarchy',
+  'reference-formats': 'Reference Number Formats',
+}
+
+const shouldShow = computed(() => isAuthenticated.value && isIncomplete.value)
+const missingStepLabels = computed(() =>
+  missingSteps.value.map(step => STEP_LABELS[step] ?? step).join(', '),
+)
 
 onMounted(() => {
   void ensureLoaded()

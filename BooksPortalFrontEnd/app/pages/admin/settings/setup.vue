@@ -36,44 +36,30 @@
     <Card>
       <template #content>
         <div class="grid gap-3">
-          <div
+          <SetupStepCard
             v-for="step in steps"
             :key="step.key"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-surface-200 p-3 dark:border-surface-700"
+            :step="step"
           >
-            <div class="grid gap-1">
-              <div class="flex items-center gap-2">
-                <i
-                  class="pi text-sm"
-                  :class="step.isComplete ? 'pi-check-circle text-green-500' : 'pi-clock text-amber-500'"
-                />
-                <span class="font-semibold">{{ step.title }}</span>
-              </div>
-              <div class="text-sm text-surface-600 dark:text-surface-300">
-                {{ step.hint || 'No additional instructions.' }}
-              </div>
-              <div
-                v-if="step.completedAtUtc"
-                class="text-xs text-surface-500"
-              >
-                Completed: {{ new Date(step.completedAtUtc).toLocaleString() }}
-              </div>
-            </div>
-
-            <div
-              v-if="canManageSetup && !isCompleted"
-              class="flex gap-2"
-            >
+            <template #actions>
               <Button
-                v-if="actionLabel(step.key)"
+                v-if="canConfigure(step.key) && canManageSetup && !isCompleted"
+                :label="configureLabel(step.key)"
+                icon="pi pi-cog"
+                outlined
+                size="small"
+                @click="openConfigure(step.key)"
+              />
+              <Button
+                v-if="canManageSetup && !isCompleted && actionLabel(step.key)"
                 :label="actionLabel(step.key)!"
                 size="small"
                 :loading="isMutating"
                 :disabled="step.isComplete || !isActionEnabled(step.key)"
                 @click="runStep(step.key)"
               />
-            </div>
-          </div>
+            </template>
+          </SetupStepCard>
 
           <div
             v-if="canManageSetup && !isCompleted"
@@ -90,6 +76,19 @@
         </div>
       </template>
     </Card>
+
+    <SetupSlipTemplatesDialog
+      v-model:visible="isSlipTemplatesDialogVisible"
+      @refreshed="refreshStatus"
+    />
+    <SetupReferenceFormatsDialog
+      v-model:visible="isReferenceFormatsDialogVisible"
+      @refreshed="refreshStatus"
+    />
+    <SetupHierarchyDialog
+      v-model:visible="isHierarchyDialogVisible"
+      @refreshed="refreshStatus"
+    />
   </div>
 </template>
 
@@ -121,6 +120,10 @@ const {
   missingSteps,
 } = useSetupReadiness()
 
+const isSlipTemplatesDialogVisible = ref(false)
+const isReferenceFormatsDialogVisible = ref(false)
+const isHierarchyDialogVisible = ref(false)
+
 const statusLabel = computed(() => {
   if (normalizedStatus.value === 'Completed') return 'Completed'
   if (normalizedStatus.value === 'InProgress') return 'In Progress'
@@ -137,10 +140,36 @@ function actionLabel(stepKey: string): string | null {
   switch (stepKey) {
     case 'super-admin': return 'Confirm'
     case 'slip-templates': return 'Confirm'
-    case 'hierarchy': return 'Initialize'
-    case 'active-academic-year': return 'Initialize'
-    case 'reference-formats': return 'Initialize'
+    case 'hierarchy': return 'Confirm'
+    case 'active-academic-year': return 'Confirm'
+    case 'reference-formats': return 'Confirm'
     default: return null
+  }
+}
+
+function configureLabel(stepKey: string): string {
+  switch (stepKey) {
+    case 'slip-templates': return 'Edit Templates'
+    case 'reference-formats': return 'Edit Formats'
+    default: return 'Configure'
+  }
+}
+
+function canConfigure(stepKey: string) {
+  return stepKey === 'slip-templates' || stepKey === 'hierarchy' || stepKey === 'active-academic-year' || stepKey === 'reference-formats'
+}
+
+function openConfigure(stepKey: string) {
+  if (stepKey === 'slip-templates') {
+    isSlipTemplatesDialogVisible.value = true
+    return
+  }
+  if (stepKey === 'reference-formats') {
+    isReferenceFormatsDialogVisible.value = true
+    return
+  }
+  if (stepKey === 'hierarchy' || stepKey === 'active-academic-year') {
+    isHierarchyDialogVisible.value = true
   }
 }
 
