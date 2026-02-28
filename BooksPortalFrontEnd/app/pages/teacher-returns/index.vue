@@ -228,6 +228,7 @@
           <Button
             label="Create Return Slip"
             :loading="isSubmittingReturn"
+            :disabled="isOperationBlocked"
             @click="submitReturn"
           />
         </div>
@@ -264,6 +265,7 @@ const route = useRoute()
 const { showError, showSuccess } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
 const { getLifecycleLabel, getLifecycleSeverity, isFinalized } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const slips = ref<TeacherReturnSlip[]>([])
 const academicYears = ref<Lookup[]>([])
@@ -441,6 +443,8 @@ function closeReturnDialog() {
 }
 
 async function openDialogFromIssueId(issueId: number) {
+  if (!(await guard('open return processing'))) return
+
   try {
     const response = await api.get<TeacherIssue>(API.teacherIssues.byId(issueId))
     if (!response.success) {
@@ -467,6 +471,7 @@ async function openDialogFromIssueId(issueId: number) {
 
 async function submitReturn() {
   if (!selectedIssue.value) return
+  if (!(await guard('create teacher return slip'))) return
 
   const teacherIssueId = selectedIssue.value.id
   const selectedItems = returnRows.value
