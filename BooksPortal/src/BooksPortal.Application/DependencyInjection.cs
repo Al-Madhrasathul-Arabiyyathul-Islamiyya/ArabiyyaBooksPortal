@@ -17,6 +17,8 @@ using BooksPortal.Application.Features.MasterData.Interfaces;
 using BooksPortal.Application.Features.MasterData.Services;
 using BooksPortal.Application.Features.Settings.Interfaces;
 using BooksPortal.Application.Features.Settings.Services;
+using BooksPortal.Application.Features.Setup.Interfaces;
+using BooksPortal.Application.Features.Setup.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -55,6 +57,7 @@ public static class DependencyInjection
 
         services.AddScoped<IReferenceNumberFormatService, ReferenceNumberFormatService>();
         services.AddScoped<ISlipTemplateSettingService, SlipTemplateSettingService>();
+        services.AddScoped<ISetupReadinessService, SetupReadinessService>();
 
         return services;
     }

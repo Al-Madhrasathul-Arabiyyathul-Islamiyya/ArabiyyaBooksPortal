@@ -52,11 +52,11 @@ public static class SeedData
         await EnsureSeededAccountAsync(userManager, superAdmin, UserRole.SuperAdmin, "SuperAdmin");
 
         var db = serviceProvider.GetRequiredService<BooksPortalDbContext>();
-        await SlipTemplateSettingsSeeder.SeedAsync(db);
 
         if (!isDevelopment)
             return;
 
+        await SlipTemplateSettingsSeeder.SeedAsync(db);
         await EnsureSeededAccountAsync(userManager, admin, UserRole.Admin, "Admin");
         await EnsureSeededAccountAsync(userManager, user, UserRole.User, "User");
 

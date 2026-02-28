@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BooksPortal.IntegrationTests;
 
-public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory<Program>
+public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _dbName = $"BooksPortalIntegration_{Guid.NewGuid():N}";
     private readonly string _connectionString;

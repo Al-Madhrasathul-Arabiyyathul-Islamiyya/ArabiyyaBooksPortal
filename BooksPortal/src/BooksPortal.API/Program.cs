@@ -4,6 +4,7 @@ using BooksPortal.API.Services;
 using BooksPortal.Application;
 using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Common.Models;
+using BooksPortal.Application.Features.Setup.Interfaces;
 using BooksPortal.Infrastructure;
 using BooksPortal.Infrastructure.Data;
 using BooksPortal.Infrastructure.Security;
@@ -103,6 +104,9 @@ using (var scope = app.Services.CreateScope())
 
     var templateCache = scope.ServiceProvider.GetRequiredService<ImportTemplateCacheService>();
     await templateCache.InitializeAsync();
+
+    var setupReadinessService = scope.ServiceProvider.GetRequiredService<ISetupReadinessService>();
+    await setupReadinessService.EnsureBackfillStateAsync();
 }
 
 // Middleware pipeline
@@ -143,6 +147,7 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<SetupReadinessMiddleware>();
 
 app.MapControllers();
 

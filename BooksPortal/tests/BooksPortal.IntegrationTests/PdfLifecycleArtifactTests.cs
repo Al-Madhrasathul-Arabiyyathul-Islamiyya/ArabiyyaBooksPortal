@@ -9,12 +9,14 @@ namespace BooksPortal.IntegrationTests;
 [Collection("Integration API")]
 public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
+    private readonly IntegrationTestWebApplicationFactory _factory;
     private readonly HttpClient _client;
     private static readonly string ArtifactDirectory = Path.GetFullPath(
         Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "TestArtifacts", "PdfSamples"));
 
     public PdfLifecycleArtifactTests(IntegrationTestWebApplicationFactory factory)
     {
+        _factory = factory;
         _client = factory.CreateClient();
     }
 
@@ -67,6 +69,7 @@ public class PdfLifecycleArtifactTests : IClassFixture<IntegrationTestWebApplica
         token.Should().NotBeNullOrWhiteSpace();
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        await SetupReadinessTestBootstrapper.EnsureReadyAsync(_factory.Services);
     }
 
     private async Task<int> GetActiveAcademicYearIdAsync()
