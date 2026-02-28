@@ -66,6 +66,7 @@
       </header>
 
       <main class="admin-layout-main flex min-h-0 flex-1 flex-col p-6">
+        <SetupReadinessBanner class="mb-4" />
         <slot />
       </main>
     </div>
@@ -81,6 +82,8 @@ const route = useRoute()
 const { public: { appTitle } } = useRuntimeConfig()
 const userMenuRef = ref()
 const expandedKeys = ref<Record<string, boolean>>({})
+const authStore = useAuthStore()
+const setupReadinessStore = useSetupReadinessStore()
 
 useLayoutPageHead('admin')
 
@@ -225,6 +228,12 @@ const menuItems = computed<MenuItem[]>(() => ([
           }]
         : []),
       {
+        key: 'settings-setup',
+        label: 'Setup Center',
+        command: () => navigateTo('/admin/settings/setup'),
+        class: isActive('/admin/settings/setup') ? 'app-menu-item-active' : undefined,
+      },
+      {
         key: 'settings-reference-formats',
         label: 'Reference Formats',
         command: () => navigateTo('/admin/settings/reference-formats'),
@@ -264,6 +273,19 @@ function syncExpandedKeys(path: string) {
 }
 
 watch(() => route.path, syncExpandedKeys, { immediate: true })
+
+watch(
+  () => authStore.isAuthenticated,
+  (isAuthenticated) => {
+    if (isAuthenticated) {
+      void setupReadinessStore.fetchStatus()
+    }
+    else {
+      setupReadinessStore.clear()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

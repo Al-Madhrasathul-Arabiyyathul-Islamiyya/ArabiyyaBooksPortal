@@ -119,6 +119,7 @@ const api = useApi()
 const { showError, showSuccess } = useAppToast()
 const { confirmAction } = useAppConfirm()
 const { getLifecycleLabel, getLifecycleIcon, getLifecycleBadgeClass, isProcessing, isFinalized } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const slip = ref<TeacherIssue | null>(null)
 const isLoading = ref(false)
@@ -135,13 +136,13 @@ const lifecycleLabel = computed(() => getLifecycleLabel(slip.value?.lifecycleSta
 const lifecycleIcon = computed(() => getLifecycleIcon(slip.value?.lifecycleStatus))
 const lifecycleBadgeClass = computed(() => getLifecycleBadgeClass(slip.value?.lifecycleStatus))
 const canFinalize = computed(() =>
-  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus),
+  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus) && !isOperationBlocked.value,
 )
 const canCancel = computed(() =>
-  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus),
+  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus) && !isOperationBlocked.value,
 )
 const canProcessReturn = computed(() =>
-  Boolean(slip.value) && isFinalized(slip.value?.lifecycleStatus) && totalOutstanding.value > 0,
+  Boolean(slip.value) && isFinalized(slip.value?.lifecycleStatus) && totalOutstanding.value > 0 && !isOperationBlocked.value,
 )
 
 const slipNotes = computed(() => {
@@ -198,8 +199,9 @@ async function printSlip() {
   }
 }
 
-function finalizeSlip() {
+async function finalizeSlip() {
   if (!Number.isFinite(slipId.value) || !canFinalize.value) return
+  if (!await guard('finalize this teacher issue slip')) return
   confirmAction(
     'Finalize this teacher issue slip? Finalized slips cannot be cancelled.',
     async () => {
@@ -226,8 +228,9 @@ function finalizeSlip() {
   )
 }
 
-function cancelSlip() {
+async function cancelSlip() {
   if (!Number.isFinite(slipId.value) || !canCancel.value) return
+  if (!await guard('cancel this teacher issue slip')) return
   confirmAction(
     'Cancel this teacher issue slip? This will reverse stock movements.',
     async () => {

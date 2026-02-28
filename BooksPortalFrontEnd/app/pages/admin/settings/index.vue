@@ -56,6 +56,12 @@ const settingCards = computed(() => [
     icon: 'pi pi-users',
   },
   {
+    title: 'Setup Center',
+    description: 'Track setup readiness and complete required bootstrap steps.',
+    to: '/admin/settings/setup',
+    icon: 'pi pi-cog',
+  },
+  {
     title: 'Reference Formats',
     description: 'Configure reference number templates per slip type.',
     to: '/admin/settings/reference-formats',

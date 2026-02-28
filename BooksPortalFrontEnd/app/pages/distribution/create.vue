@@ -222,6 +222,7 @@
               type="submit"
               :label="isRevisionMode ? 'Save Changes' : 'Create Slip'"
               :loading="isSubmitting"
+              :disabled="isOperationBlocked"
             />
           </div>
         </form>
@@ -312,6 +313,7 @@ const route = useRoute()
 const { showError, showSuccess } = useAppToast()
 const { isAdmin } = useAuth()
 const { isProcessing } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
@@ -571,6 +573,10 @@ async function loadRevisionSlip() {
 }
 
 async function submitForm() {
+  if (!await guard(isRevisionMode.value ? 'save distribution changes' : 'create a distribution slip')) {
+    return
+  }
+
   form.studentId = selectedStudent.value?.id ?? null
   form.parentId = selectedParent.value?.id ?? form.parentId
 

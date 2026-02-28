@@ -154,6 +154,7 @@
 
       <!-- Page content -->
       <main class="flex-1 p-6">
+        <SetupReadinessBanner class="mb-4" />
         <slot />
       </main>
     </div>
@@ -227,9 +228,23 @@ const collapsedNavItems = computed(() => ([
 
 // Initialize auth on layout mount
 const authStore = useAuthStore()
+const setupReadinessStore = useSetupReadinessStore()
 onMounted(() => {
   authStore.initialize()
 })
+
+watch(
+  () => authStore.isAuthenticated,
+  (isAuthenticated) => {
+    if (isAuthenticated) {
+      void setupReadinessStore.fetchStatus()
+    }
+    else {
+      setupReadinessStore.clear()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

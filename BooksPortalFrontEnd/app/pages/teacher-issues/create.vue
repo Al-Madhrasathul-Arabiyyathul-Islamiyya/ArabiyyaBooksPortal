@@ -187,6 +187,7 @@
               type="submit"
               :label="isRevisionMode ? 'Save Changes' : 'Create Slip'"
               :loading="isSubmitting"
+              :disabled="isOperationBlocked"
             />
           </div>
         </form>
@@ -250,6 +251,7 @@ const route = useRoute()
 const { showError, showSuccess } = useAppToast()
 const { isAdmin } = useAuth()
 const { isProcessing } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
@@ -464,6 +466,10 @@ function mapSelectedItems() {
 }
 
 async function submitForm() {
+  if (!await guard(isRevisionMode.value ? 'save teacher issue changes' : 'create a teacher issue slip')) {
+    return
+  }
+
   setGlobalError('')
   const parsed = await validateWithSchema(form)
   if (!parsed.success) return

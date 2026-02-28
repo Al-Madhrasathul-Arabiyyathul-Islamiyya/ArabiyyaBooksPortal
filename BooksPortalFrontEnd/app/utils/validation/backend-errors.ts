@@ -20,6 +20,8 @@ interface FetchErrorShape {
 
 const GENERIC_OPERATION_ERROR
   = 'There was an issue while processing your request. Please try again later. If this continues, contact IT support.'
+const SETUP_INCOMPLETE_ERROR
+  = 'System setup is incomplete. Complete the setup steps in Admin > Settings > Setup Center before continuing.'
 
 function getStatusFallbackMessage(statusCode: number): string | null {
   switch (statusCode) {
@@ -56,6 +58,37 @@ function isTechnicalServerMessage(message: string): boolean {
     || lowered.includes('dbupdateexception')
     || lowered.includes(' at ')
   )
+}
+
+function hasSetupIncompleteSignal(
+  fieldErrors: Record<string, string[]>,
+  globalErrors: string[],
+  data: FetchErrorShape['data'],
+): boolean {
+  const codeValues = fieldErrors.code ?? []
+  if (codeValues.some(value => value.toUpperCase().includes('SETUP_INCOMPLETE'))) {
+    return true
+  }
+
+  const setupKeys = ['missingsteps', 'hints', 'issues']
+  if (data?.errors && typeof data.errors === 'object' && !Array.isArray(data.errors)) {
+    const keys = Object.keys(data.errors).map(key => key.toLowerCase())
+    if (keys.some(key => setupKeys.includes(key))) {
+      return true
+    }
+  }
+
+  const allMessages = [
+    ...globalErrors,
+    ...Object.values(fieldErrors).flat(),
+    data?.message ?? '',
+    data?.detail ?? '',
+    data?.title ?? '',
+  ]
+    .join(' ')
+    .toLowerCase()
+
+  return allMessages.includes('setup_incomplete') || allMessages.includes('setup incomplete')
 }
 
 export function normalizeBackendErrors(error: unknown): NormalizedValidationErrors {
@@ -105,6 +138,10 @@ export function normalizeBackendErrors(error: unknown): NormalizedValidationErro
   const message = backendMessage || transportMessage
   const looksLikeTransportMessage = /\[(GET|POST|PUT|PATCH|DELETE)\]\s*"/i.test(transportMessage)
   const safeBackendMessage = backendMessage && !isTechnicalServerMessage(backendMessage) ? backendMessage : ''
+
+  if (hasSetupIncompleteSignal(fieldErrors, globalErrors, data)) {
+    return { fieldErrors, globalErrors: [SETUP_INCOMPLETE_ERROR] }
+  }
 
   if (message) {
     const lowered = message.toLowerCase()
