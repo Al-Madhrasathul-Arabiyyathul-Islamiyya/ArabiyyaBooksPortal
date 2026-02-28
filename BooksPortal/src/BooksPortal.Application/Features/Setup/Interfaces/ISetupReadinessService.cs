@@ -5,6 +5,10 @@ namespace BooksPortal.Application.Features.Setup.Interfaces;
 public interface ISetupReadinessService
 {
     Task<SetupStatusResponse> GetStatusAsync(CancellationToken cancellationToken = default);
+    Task<SetupStatusResponse> GetBootstrapStatusAsync(CancellationToken cancellationToken = default);
+    Task<SetupStatusResponse> BootstrapSuperAdminAsync(
+        BootstrapSuperAdminRequest request,
+        CancellationToken cancellationToken = default);
     Task<SetupStatusResponse> StartAsync(CancellationToken cancellationToken = default);
     Task<SetupStatusResponse> ConfirmSuperAdminAsync(CancellationToken cancellationToken = default);
     Task<SetupStatusResponse> ConfirmSlipTemplatesAsync(CancellationToken cancellationToken = default);

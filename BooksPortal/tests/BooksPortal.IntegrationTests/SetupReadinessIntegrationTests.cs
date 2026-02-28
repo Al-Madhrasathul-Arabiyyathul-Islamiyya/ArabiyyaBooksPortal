@@ -87,6 +87,14 @@ public class SetupReadinessIntegrationTests : IClassFixture<IntegrationTestWebAp
         public Task<SetupStatusResponse> GetStatusAsync(CancellationToken cancellationToken = default)
             => Task.FromResult(BuildIncomplete());
 
+        public Task<SetupStatusResponse> GetBootstrapStatusAsync(CancellationToken cancellationToken = default)
+            => Task.FromResult(BuildIncomplete());
+
+        public Task<SetupStatusResponse> BootstrapSuperAdminAsync(
+            BootstrapSuperAdminRequest request,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult(BuildIncomplete());
+
         public Task<SetupStatusResponse> StartAsync(CancellationToken cancellationToken = default)
             => Task.FromResult(BuildIncomplete());
 

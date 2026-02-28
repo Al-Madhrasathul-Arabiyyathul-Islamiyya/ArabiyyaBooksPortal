@@ -1,4 +1,5 @@
 using BooksPortal.Application.Features.Setup.Interfaces;
+using BooksPortal.Application.Features.Setup.DTOs;
 using BooksPortal.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,18 @@ public class SetupController : ApiControllerBase
     [HttpGet("status")]
     public async Task<IActionResult> GetStatus(CancellationToken cancellationToken)
         => OkResponse(await _service.GetStatusAsync(cancellationToken));
+
+    [AllowAnonymous]
+    [HttpGet("bootstrap/status")]
+    public async Task<IActionResult> GetBootstrapStatus(CancellationToken cancellationToken)
+        => OkResponse(await _service.GetBootstrapStatusAsync(cancellationToken));
+
+    [AllowAnonymous]
+    [HttpPost("bootstrap/super-admin")]
+    public async Task<IActionResult> BootstrapSuperAdmin(
+        [FromBody] BootstrapSuperAdminRequest request,
+        CancellationToken cancellationToken)
+        => OkResponse(await _service.BootstrapSuperAdminAsync(request, cancellationToken));
 
     [HttpPost("start")]
     [Authorize(Roles = UserRole.SuperAdmin)]
