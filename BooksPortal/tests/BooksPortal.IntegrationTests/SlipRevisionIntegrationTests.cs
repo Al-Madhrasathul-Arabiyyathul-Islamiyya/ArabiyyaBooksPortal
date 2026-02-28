@@ -9,10 +9,12 @@ namespace BooksPortal.IntegrationTests;
 [Collection("Integration API")]
 public class SlipRevisionIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
+    private readonly IntegrationTestWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
     public SlipRevisionIntegrationTests(IntegrationTestWebApplicationFactory factory)
     {
+        _factory = factory;
         _client = factory.CreateClient();
     }
 
@@ -138,6 +140,7 @@ public class SlipRevisionIntegrationTests : IClassFixture<IntegrationTestWebAppl
         token.Should().NotBeNullOrWhiteSpace();
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        await SetupReadinessTestBootstrapper.EnsureReadyAsync(_factory.Services);
     }
 
     private async Task<int> GetActiveAcademicYearIdAsync()

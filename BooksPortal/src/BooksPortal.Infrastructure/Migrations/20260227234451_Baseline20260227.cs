@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BooksPortal.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Baseline20260216 : Migration
+    public partial class Baseline20260227 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -199,6 +199,34 @@ namespace BooksPortal.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subjects", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemSetupState",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    StartedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SuperAdminConfirmedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SlipTemplatesConfirmedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    HierarchyInitializedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ActiveAcademicYearValidatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReferenceFormatsInitializedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastEvaluatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompletedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SchemaVersion = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemSetupState", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -967,6 +995,11 @@ namespace BooksPortal.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "SystemSetupState",
+                columns: new[] { "Id", "ActiveAcademicYearValidatedAtUtc", "CompletedAtUtc", "CreatedAt", "CreatedBy", "DeletedAt", "HierarchyInitializedAtUtc", "IsDeleted", "LastEvaluatedAtUtc", "ReferenceFormatsInitializedAtUtc", "SchemaVersion", "SlipTemplatesConfirmedAtUtc", "StartedAtUtc", "Status", "SuperAdminConfirmedAtUtc", "UpdatedAt", "UpdatedBy" },
+                values: new object[] { 1, null, null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, null, null, false, null, null, "1", null, null, 0, null, null, null });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AcademicYears_Year",
                 table: "AcademicYears",
@@ -1363,6 +1396,9 @@ namespace BooksPortal.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "StudentParents");
+
+            migrationBuilder.DropTable(
+                name: "SystemSetupState");
 
             migrationBuilder.DropTable(
                 name: "TeacherAssignments");

@@ -17,29 +17,29 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 ## Phase 1 - Backend
 
 ### Slice 1.1 Setup state model
-- [ ] Add persisted setup-state model (singleton) for status and completed steps.
-- [ ] Add readiness evaluation service for required prerequisites.
-- [ ] Add machine-readable missing-step issue model.
+- [x] Add persisted setup-state model (singleton) for status and completed steps.
+- [x] Add readiness evaluation service for required prerequisites.
+- [x] Add machine-readable missing-step issue model.
 
 ### Slice 1.2 Setup APIs
-- [ ] Implement setup status endpoint (`GET /api/setup/status`).
-- [ ] Implement setup step mutation endpoints (`/start`, `/super-admin`, `/slip-templates/confirm`, `/hierarchy/initialize`, `/reference-formats/initialize`, `/complete`).
-- [ ] Enforce role policy: write operations restricted to `SuperAdmin`.
+- [x] Implement setup status endpoint (`GET /api/setup/status`).
+- [x] Implement setup step mutation endpoints (`/start`, `/super-admin`, `/slip-templates/confirm`, `/hierarchy/initialize`, `/reference-formats/initialize`, `/complete`).
+- [x] Enforce role policy: write operations restricted to `SuperAdmin`.
 
 ### Slice 1.3 Operation guardrails
-- [ ] Add centralized readiness guard for operation-critical write endpoints.
-- [ ] Return structured `409` with code `SETUP_INCOMPLETE` and missing-step metadata.
+- [x] Add centralized readiness guard for operation-critical write endpoints.
+- [x] Return structured `409` with code `SETUP_INCOMPLETE` and missing-step metadata.
 
 ### Slice 1.4 Data/migration policy
-- [ ] If DB context changes are introduced, create a **fresh migration snapshot** (pre-v1 policy).
-- [ ] Add compatibility backfill logic for existing databases:
-  - [ ] auto-mark setup completed when prerequisites already satisfied.
-  - [ ] mark in-progress with diagnostics otherwise.
+- [x] If DB context changes are introduced, create a **fresh migration snapshot** (pre-v1 policy).
+- [x] Add compatibility backfill logic for existing databases:
+  - [x] auto-mark setup completed when prerequisites already satisfied.
+  - [x] mark in-progress with diagnostics otherwise.
 
 ### Slice 1.5 Backend verification
-- [ ] Unit tests for readiness evaluator and setup transitions.
-- [ ] Integration tests for setup endpoints and readiness guards.
-- [ ] Contract tests for setup payloads and error envelope.
+- [x] Unit tests for readiness evaluator and setup transitions.
+- [x] Integration tests for setup endpoints and readiness guards.
+- [~] Contract tests for setup payloads and error envelope.
 
 ## Phase 2 - Frontend
 
@@ -70,8 +70,7 @@ Status legend: `[ ]` Todo | `[~]` In progress | `[x]` Done
 - [ ] Keep progress updates only in this numbered plan file.
 
 ## Acceptance Criteria
-- [ ] Production instances cannot process operations before setup completion.
+- [x] Production instances cannot process operations before setup completion.
 - [ ] SuperAdmin can complete setup fully from UI/API without manual DB edits.
 - [ ] Admin can monitor readiness but cannot mutate setup.
 - [ ] Tests pass for setup workflow and readiness guard scenarios.
-

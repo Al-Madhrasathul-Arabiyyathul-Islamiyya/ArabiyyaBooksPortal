@@ -39,6 +39,7 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<TeacherReturnSlip> TeacherReturnSlips => Set<TeacherReturnSlip>();
     public DbSet<TeacherReturnSlipItem> TeacherReturnSlipItems => Set<TeacherReturnSlipItem>();
     public DbSet<SlipTemplateSetting> SlipTemplateSettings => Set<SlipTemplateSetting>();
+    public DbSet<SystemSetupState> SystemSetupState => Set<SystemSetupState>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
