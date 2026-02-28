@@ -45,12 +45,12 @@
               <div class="flex items-center gap-2">
                 <i
                   class="pi text-sm"
-                  :class="step.completed ? 'pi-check-circle text-green-500' : 'pi-clock text-amber-500'"
+                  :class="step.isComplete ? 'pi-check-circle text-green-500' : 'pi-clock text-amber-500'"
                 />
                 <span class="font-semibold">{{ step.title }}</span>
               </div>
               <div class="text-sm text-surface-600 dark:text-surface-300">
-                {{ step.description }}
+                {{ step.hint || 'No additional instructions.' }}
               </div>
               <div
                 v-if="step.completedAtUtc"
@@ -69,10 +69,23 @@
                 :label="actionLabel(step.key)!"
                 size="small"
                 :loading="isMutating"
-                :disabled="step.completed || !isActionEnabled(step.key)"
+                :disabled="step.isComplete || !isActionEnabled(step.key)"
                 @click="runStep(step.key)"
               />
             </div>
+          </div>
+
+          <div
+            v-if="canManageSetup && !isCompleted"
+            class="flex justify-end"
+          >
+            <Button
+              label="Complete Setup"
+              icon="pi pi-check"
+              :loading="isMutating"
+              :disabled="missingSteps.length > 0"
+              @click="runStep('complete')"
+            />
           </div>
         </div>
       </template>
@@ -122,43 +135,37 @@ const statusSeverity = computed(() => {
 
 function actionLabel(stepKey: string): string | null {
   switch (stepKey) {
-    case 'Start': return 'Start'
-    case 'SuperAdminConfirmed': return 'Confirm'
-    case 'SlipTemplatesReady': return 'Confirm'
-    case 'HierarchyReady': return 'Initialize'
-    case 'ReferenceFormatsReady': return 'Initialize'
-    case 'Complete': return 'Complete Setup'
+    case 'super-admin': return 'Confirm'
+    case 'slip-templates': return 'Confirm'
+    case 'hierarchy': return 'Initialize'
+    case 'active-academic-year': return 'Initialize'
+    case 'reference-formats': return 'Initialize'
     default: return null
   }
 }
 
 function isActionEnabled(stepKey: string): boolean {
-  if (stepKey === 'Complete') {
-    return missingSteps.value.length === 1 && missingSteps.value[0] === 'Complete'
-  }
+  if (stepKey === 'super-admin') return false
   return true
 }
 
 async function runStep(stepKey: string) {
   try {
     switch (stepKey) {
-      case 'Start':
-        await mutate('start')
-        break
-      case 'SuperAdminConfirmed':
+      case 'super-admin':
         await mutate('confirmSuperAdmin')
         break
-      case 'SlipTemplatesReady':
+      case 'slip-templates':
         await mutate('confirmSlipTemplates')
         break
-      case 'HierarchyReady':
-      case 'ActiveAcademicYearReady':
+      case 'hierarchy':
+      case 'active-academic-year':
         await mutate('initializeHierarchy')
         break
-      case 'ReferenceFormatsReady':
+      case 'reference-formats':
         await mutate('initializeReferenceFormats')
         break
-      case 'Complete':
+      case 'complete':
         await mutate('complete')
         break
       default:

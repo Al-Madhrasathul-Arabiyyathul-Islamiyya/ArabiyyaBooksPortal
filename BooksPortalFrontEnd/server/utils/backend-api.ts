@@ -182,3 +182,50 @@ export async function proxyAuthorizedBackendRequest(event: H3Event, apiPath: str
     return retried._data
   }
 }
+
+export async function proxyBackendRequest(event: H3Event, apiPath: string) {
+  const method = getMethod(event).toUpperCase() as HttpMethod
+  const accepts = getHeader(event, 'accept') ?? ''
+  const path = apiPath.toLowerCase()
+  const binary = accepts.includes('application/pdf')
+    || accepts.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    || accepts.includes('application/octet-stream')
+    || path.includes('/print')
+    || path.includes('/import-templates/')
+    || (path.includes('/bulk/jobs/') && path.endsWith('/report'))
+    || path.includes('/reports/export/')
+  const hasBody = method === 'POST' || method === 'PUT' || method === 'PATCH'
+  const requestContentType = (getHeader(event, 'content-type') ?? '').toLowerCase()
+  const hasMultipartBody = requestContentType.includes('multipart/form-data')
+  const body = hasBody
+    ? (
+        hasMultipartBody
+          ? await readRawBody(event, false)
+          : await readBody(event)
+      )
+    : undefined
+
+  try {
+    const response = await callBackendRaw(event, apiPath, { method, body, binary })
+    setResponseStatus(event, response.status, response.statusText)
+
+    const contentType = response.headers.get('content-type')
+    if (contentType) appendHeader(event, 'content-type', contentType)
+    const contentDisposition = response.headers.get('content-disposition')
+    if (contentDisposition) appendHeader(event, 'content-disposition', contentDisposition)
+
+    if (binary) {
+      return send(event, new Uint8Array(response._data as ArrayBuffer))
+    }
+    return response._data
+  }
+  catch (error) {
+    const fetchError = error as FetchError
+    const statusCode = Number(fetchError.statusCode ?? 500)
+    throw createError({
+      statusCode: Number.isFinite(statusCode) ? statusCode : 500,
+      statusMessage: deriveBackendErrorMessage(fetchError),
+      data: fetchError.data,
+    })
+  }
+}

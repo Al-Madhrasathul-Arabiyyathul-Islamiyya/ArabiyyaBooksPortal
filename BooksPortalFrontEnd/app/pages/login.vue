@@ -93,6 +93,7 @@ definePageMeta({
 })
 
 const { login } = useAuth()
+const setupStore = useSetupReadinessStore()
 const { public: { appTitle } } = useRuntimeConfig()
 const loginTitle = computed(() => `Login - ${appTitle}`)
 
@@ -156,11 +157,24 @@ async function handleLogin() {
 }
 
 onMounted(() => {
-  if (!import.meta.client) return
-  if (form.email) return
-  const savedEmail = localStorage.getItem(savedEmailKey)
-  if (savedEmail) {
-    form.email = savedEmail
-  }
+  void (async () => {
+    try {
+      await setupStore.fetchStatus(true)
+      if (setupStore.requiresBootstrap) {
+        await navigateTo('/setup/bootstrap')
+        return
+      }
+    }
+    catch {
+      // Keep login available if setup status cannot be fetched.
+    }
+
+    if (!import.meta.client) return
+    if (form.email) return
+    const savedEmail = localStorage.getItem(savedEmailKey)
+    if (savedEmail) {
+      form.email = savedEmail
+    }
+  })()
 })
 </script>

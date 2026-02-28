@@ -81,6 +81,8 @@ export const API = {
   },
   setup: {
     status: '/setup/status',
+    bootstrapStatus: '/setup/bootstrap/status',
+    bootstrapSuperAdmin: '/setup/bootstrap/super-admin',
     start: '/setup/start',
     superAdmin: '/setup/super-admin',
     slipTemplatesConfirm: '/setup/slip-templates/confirm',
