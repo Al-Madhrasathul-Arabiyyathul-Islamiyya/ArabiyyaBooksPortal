@@ -66,6 +66,33 @@ public class ExceptionHandlingMiddlewareTests
         body.Should().Contain("An unexpected error occurred.");
     }
 
+    [Fact]
+    public async Task InvokeAsync_SetupIncompleteException_ReturnsStructuredConflictPayload()
+    {
+        var logger = new TestLogger<ExceptionHandlingMiddleware>();
+        var middleware = new ExceptionHandlingMiddleware(
+            _ => throw new SetupIncompleteException(
+                "System setup is incomplete.",
+                ["super-admin", "reference-formats"],
+                ["Create SuperAdmin.", "Initialize reference formats."]),
+            logger);
+
+        var context = new DefaultHttpContext();
+        context.TraceIdentifier = "trace-setup";
+        context.Request.Method = HttpMethods.Post;
+        context.Request.Path = "/api/distributions";
+        context.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status409Conflict);
+        context.Response.Body.Position = 0;
+        var body = await new StreamReader(context.Response.Body, Encoding.UTF8).ReadToEndAsync();
+        body.Should().Contain("SETUP_INCOMPLETE");
+        body.Should().Contain("super-admin");
+        body.Should().Contain("reference-formats");
+    }
+
     private sealed class TestLogger<T> : ILogger<T>
     {
         public List<TestLogEntry> Entries { get; } = new();
