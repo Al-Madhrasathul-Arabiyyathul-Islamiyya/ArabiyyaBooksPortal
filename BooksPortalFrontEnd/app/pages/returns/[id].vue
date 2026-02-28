@@ -109,6 +109,7 @@ const api = useApi()
 const { showError, showSuccess } = useAppToast()
 const { confirmAction } = useAppConfirm()
 const { getLifecycleLabel, getLifecycleIcon, getLifecycleBadgeClass, isProcessing } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const slip = ref<ReturnSlip | null>(null)
 const isLoading = ref(false)
@@ -120,8 +121,8 @@ const slipId = computed(() => Number(route.params.id))
 const lifecycleLabel = computed(() => getLifecycleLabel(slip.value?.lifecycleStatus))
 const lifecycleIcon = computed(() => getLifecycleIcon(slip.value?.lifecycleStatus))
 const lifecycleBadgeClass = computed(() => getLifecycleBadgeClass(slip.value?.lifecycleStatus))
-const canFinalize = computed(() => Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus))
-const canCancel = computed(() => Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus))
+const canFinalize = computed(() => Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus) && !isOperationBlocked.value)
+const canCancel = computed(() => Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus) && !isOperationBlocked.value)
 
 const detailNotes = computed(() => {
   if (!slip.value) return null
@@ -176,8 +177,9 @@ async function printSlip() {
   }
 }
 
-function finalizeSlip() {
+async function finalizeSlip() {
   if (!Number.isFinite(slipId.value) || !canFinalize.value) return
+  if (!await guard('finalize this return slip')) return
 
   confirmAction(
     'Finalize this return slip? Finalized slips cannot be cancelled.',
@@ -205,8 +207,9 @@ function finalizeSlip() {
   )
 }
 
-function cancelSlip() {
+async function cancelSlip() {
   if (!Number.isFinite(slipId.value) || !canCancel.value) return
+  if (!await guard('cancel this return slip')) return
 
   confirmAction(
     'Cancel this return slip? This will reverse stock movements.',

@@ -197,6 +197,7 @@ const api = useApi()
 const { showError } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
 const { getLifecycleLabel, getLifecycleSeverity, isFinalized } = useSlipLifecycle()
+const { isOperationBlocked } = useOperationReadinessGuard()
 
 const slips = ref<TeacherIssue[]>([])
 const academicYears = ref<Lookup[]>([])
@@ -243,7 +244,7 @@ function getOutstandingQuantity(slip: TeacherIssue) {
 }
 
 function canProcessReturn(slip: TeacherIssue) {
-  return isFinalized(slip.lifecycleStatus) && getOutstandingQuantity(slip) > 0
+  return !isOperationBlocked.value && isFinalized(slip.lifecycleStatus) && getOutstandingQuantity(slip) > 0
 }
 
 async function loadLookups() {

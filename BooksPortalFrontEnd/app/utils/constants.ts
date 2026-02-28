@@ -79,6 +79,15 @@ export const API = {
   masterDataHierarchy: {
     bulkUpsert: '/master-data/hierarchy/bulk/upsert',
   },
+  setup: {
+    status: '/setup/status',
+    start: '/setup/start',
+    superAdmin: '/setup/super-admin',
+    slipTemplatesConfirm: '/setup/slip-templates/confirm',
+    hierarchyInitialize: '/setup/hierarchy/initialize',
+    referenceFormatsInitialize: '/setup/reference-formats/initialize',
+    complete: '/setup/complete',
+  },
   books: {
     base: '/books',
     byId: (id: number) => `/books/${id}`,

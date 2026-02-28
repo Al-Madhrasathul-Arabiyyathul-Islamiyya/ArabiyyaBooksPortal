@@ -76,6 +76,27 @@ describe('normalizeBackendErrors', () => {
     expect(result.globalErrors[0]).toContain('There was an issue while processing your request')
   })
 
+  it('maps setup-incomplete conflicts to setup center guidance', () => {
+    const byCode = normalizeBackendErrors({
+      data: {
+        status: 409,
+        errors: {
+          code: ['SETUP_INCOMPLETE'],
+          missingSteps: ['HierarchyReady'],
+        },
+      },
+    })
+    expect(byCode.globalErrors[0]).toContain('System setup is incomplete')
+
+    const byMessage = normalizeBackendErrors({
+      data: {
+        status: 409,
+        message: 'setup incomplete',
+      },
+    })
+    expect(byMessage.globalErrors[0]).toContain('Setup Center')
+  })
+
   it('returns friendly fallback message helper', () => {
     const message = getFriendlyErrorMessage(
       { status: 403, message: 'Forbidden' },
