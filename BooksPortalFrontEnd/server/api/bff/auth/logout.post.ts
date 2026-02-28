@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { clearSessionTokens, getSessionTokens } from '../../../utils/auth-session'
+import { clearSessionTokens, getSessionTokens } from '#server/utils/auth-session'
 
 type LogoutResponse = {
   success: boolean

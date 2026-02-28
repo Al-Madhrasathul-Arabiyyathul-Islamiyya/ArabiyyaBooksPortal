@@ -1,8 +1,9 @@
-import type { SetupStatusResponse, SetupStatusValue } from '~/types/setup'
+import type { BootstrapSuperAdminRequest, SetupStatusResponse, SetupStatusValue } from '~/types/setup'
 import { API } from '~/utils/constants'
 
 type SetupMutationAction
-  = 'start'
+  = 'bootstrapSuperAdmin'
+    | 'start'
     | 'confirmSuperAdmin'
     | 'confirmSlipTemplates'
     | 'initializeHierarchy'
@@ -37,24 +38,28 @@ export const useSetupReadinessStore = defineStore('setup-readiness', () => {
 
   const normalizedStatus = computed(() => normalizeSetupStatus(status.value?.status))
   const isCompleted = computed(() => normalizedStatus.value === 'Completed')
-  const isIncomplete = computed(() => !isCompleted.value)
-  const missingSteps = computed(() => status.value?.missingSteps ?? [])
-  const hints = computed(() => status.value?.hints ?? [])
+  const isIncomplete = computed(() => !isCompleted.value && issues.value.length > 0)
+  const missingSteps = computed(() => issues.value.map(issue => issue.key))
+  const requiresBootstrap = computed(() => missingSteps.value.includes('super-admin'))
+  const hints = computed(() =>
+    issues.value
+      .map(issue => issue.hint ?? '')
+      .filter(hint => !!hint),
+  )
   const issues = computed(() => status.value?.issues ?? [])
   const steps = computed(() => status.value?.steps ?? [])
 
   async function fetchStatus(force = false) {
-    if (!authStore.isAuthenticated && !force) {
-      return null
-    }
-
     if (initialized.value && !force) {
       return status.value
     }
 
     isLoading.value = true
     try {
-      const response = await api.get<SetupStatusResponse>(API.setup.status)
+      const endpoint = authStore.isAuthenticated
+        ? API.setup.status
+        : API.setup.bootstrapStatus
+      const response = await api.get<SetupStatusResponse>(endpoint)
       if (response.success) {
         status.value = response.data
         initialized.value = true
@@ -71,10 +76,13 @@ export const useSetupReadinessStore = defineStore('setup-readiness', () => {
     initialized.value = false
   }
 
-  async function mutate(action: SetupMutationAction) {
+  async function mutate(action: SetupMutationAction, payload?: BootstrapSuperAdminRequest) {
     isMutating.value = true
     try {
       switch (action) {
+        case 'bootstrapSuperAdmin':
+          await api.post(API.setup.bootstrapSuperAdmin, payload ? { ...payload } : undefined)
+          break
         case 'start':
           await api.post(API.setup.start)
           break
@@ -111,6 +119,7 @@ export const useSetupReadinessStore = defineStore('setup-readiness', () => {
     isCompleted,
     isIncomplete,
     missingSteps,
+    requiresBootstrap,
     hints,
     issues,
     steps,

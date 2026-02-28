@@ -1,13 +1,11 @@
 import { storeToRefs } from 'pinia'
 
 const STEP_LABELS: Record<string, string> = {
-  Start: 'Start Setup',
-  SuperAdminConfirmed: 'Confirm Super Admin',
-  SlipTemplatesReady: 'Confirm Slip Templates',
-  HierarchyReady: 'Initialize Master Data Hierarchy',
-  ActiveAcademicYearReady: 'Validate Active Academic Year',
-  ReferenceFormatsReady: 'Initialize Reference Formats',
-  Complete: 'Complete Setup',
+  'super-admin': 'SuperAdmin Account',
+  'slip-templates': 'Slip Templates',
+  'active-academic-year': 'Academic Year Activation',
+  'hierarchy': 'Master Data Hierarchy',
+  'reference-formats': 'Reference Number Formats',
 }
 
 export function useSetupReadiness() {
@@ -22,6 +20,7 @@ export function useSetupReadiness() {
     normalizedStatus,
     isCompleted,
     isIncomplete,
+    requiresBootstrap,
     missingSteps,
     hints,
     issues,
@@ -59,6 +58,7 @@ export function useSetupReadiness() {
     normalizedStatus,
     isCompleted,
     isIncomplete,
+    requiresBootstrap,
     isOperationBlocked,
     canManageSetup,
     missingSteps,
