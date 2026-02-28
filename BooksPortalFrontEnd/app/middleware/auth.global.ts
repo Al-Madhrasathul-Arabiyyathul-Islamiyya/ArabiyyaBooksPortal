@@ -1,3 +1,5 @@
+import { ROLES } from '~/utils/constants'
+
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path === '/login' || to.path === '/setup/bootstrap') return
 
@@ -17,5 +19,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
 
     return navigateTo('/login')
+  }
+
+  try {
+    await setupStore.fetchStatus(true)
+    const isSuperAdmin = authStore.roles.includes(ROLES.superAdmin)
+    const isSetupRoute = to.path === '/admin/settings/setup'
+    if (isSuperAdmin && setupStore.isIncomplete && !isSetupRoute) {
+      return navigateTo('/admin/settings/setup')
+    }
+  }
+  catch {
+    // Keep route navigation available if setup status cannot be resolved.
   }
 })
