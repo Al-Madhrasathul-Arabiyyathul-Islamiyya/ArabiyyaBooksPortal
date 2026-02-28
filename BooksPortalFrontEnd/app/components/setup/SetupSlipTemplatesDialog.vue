@@ -6,11 +6,30 @@
     :style="{ width: '70rem' }"
   >
     <div class="grid gap-4">
+      <div class="flex justify-end">
+        <Button
+          label="Load Default Templates"
+          icon="pi pi-refresh"
+          severity="secondary"
+          outlined
+          :loading="isResetting"
+          @click="resetToDefaults"
+        />
+      </div>
+
       <Message
         severity="warn"
         :closable="false"
       >
         Changes here directly affect generated slip labels and print output.
+      </Message>
+
+      <Message
+        v-if="!isLoading && settings.length === 0"
+        severity="info"
+        :closable="false"
+      >
+        No slip template records found. Click "Load Default Templates" to initialize baseline values.
       </Message>
 
       <Card
@@ -97,6 +116,7 @@ const { showError, showSuccess } = useAppToast()
 
 const settings = ref<SlipTemplateSetting[]>([])
 const isLoading = ref(false)
+const isResetting = ref(false)
 const editState = ref<Record<number, { value: string, sortOrder: number }>>({})
 const isSavingRow = ref<Record<number, boolean>>({})
 
@@ -189,6 +209,26 @@ async function saveSetting(id: number) {
   }
   finally {
     isSavingRow.value[id] = false
+  }
+}
+
+async function resetToDefaults() {
+  isResetting.value = true
+  try {
+    const response = await api.post<string>(API.slipTemplateSettings.reset)
+    if (response.success) {
+      showSuccess(response.message ?? 'Slip template defaults loaded')
+      await loadSettings()
+      emit('refreshed')
+      return
+    }
+    showError(response.message ?? 'Failed to load default templates')
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to load default templates'))
+  }
+  finally {
+    isResetting.value = false
   }
 }
 
