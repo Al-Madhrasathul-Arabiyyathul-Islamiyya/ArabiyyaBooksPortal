@@ -21,6 +21,13 @@ type LoginTokenData = {
   expiresAt: string
 }
 
+type SetupStatusResponse = {
+  status?: string | number
+  issues?: Array<{ key: string }>
+}
+
+let setupEnsured = false
+
 async function backendLogin(page: Page, email: string, password: string): Promise<LoginTokenData> {
   const loginRes = await page.request.post(`${backendAuthBase}/auth/login`, {
     data: { email, password },
@@ -32,6 +39,55 @@ async function backendLogin(page: Page, email: string, password: string): Promis
   const loginBody = await loginRes.json() as ApiEnvelope<LoginTokenData>
   expect(loginBody.success, `Backend auth login success=false (${loginBody.message ?? 'no message'})`).toBeTruthy()
   return loginBody.data
+}
+
+async function setupPost(page: Page, accessToken: string, path: string) {
+  return page.request.post(`${backendAuthBase}${path}`, {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+    },
+  })
+}
+
+async function ensureSetupReadiness(page: Page) {
+  if (setupEnsured) return
+
+  const adminSession = await backendLogin(
+    page,
+    e2eCredentials.admin.email,
+    e2eCredentials.admin.password,
+  )
+
+  const statusRes = await page.request.get(`${backendAuthBase}/setup/status`, {
+    headers: {
+      authorization: `Bearer ${adminSession.accessToken}`,
+    },
+  })
+
+  if (!statusRes.ok()) {
+    setupEnsured = true
+    return
+  }
+
+  const statusBody = await statusRes.json() as ApiEnvelope<SetupStatusResponse>
+  const issueKeys = new Set((statusBody.data?.issues ?? []).map(issue => issue.key))
+  if (issueKeys.size === 0) {
+    setupEnsured = true
+    return
+  }
+
+  if (issueKeys.has('slip-templates')) {
+    await setupPost(page, adminSession.accessToken, '/setup/slip-templates/confirm')
+  }
+  if (issueKeys.has('hierarchy') || issueKeys.has('active-academic-year')) {
+    await setupPost(page, adminSession.accessToken, '/setup/hierarchy/initialize')
+  }
+  if (issueKeys.has('reference-formats')) {
+    await setupPost(page, adminSession.accessToken, '/setup/reference-formats/initialize')
+  }
+
+  await setupPost(page, adminSession.accessToken, '/setup/complete')
+  setupEnsured = true
 }
 
 async function setSessionCookies(page: Page, session: LoginTokenData) {
@@ -68,6 +124,7 @@ async function setSessionCookies(page: Page, session: LoginTokenData) {
 }
 
 export async function loginAndGetCsrf(page: Page, email: string, password: string) {
+  await ensureSetupReadiness(page)
   const session = await backendLogin(page, email, password)
   await setSessionCookies(page, session)
 
