@@ -23,6 +23,60 @@ type DistributionDetail = { id: number, referenceNo: string }
 type ReturnDetail = { id: number, referenceNo: string }
 type TeacherIssueRead = { id: number, referenceNo: string }
 
+type LifecycleReadable = {
+  lifecycleStatus?: number | string | null
+}
+
+function normalizeLifecycleStatus(value: unknown): 'Processing' | 'Finalized' | 'Cancelled' | null {
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase()
+    if (normalized === 'processing') return 'Processing'
+    if (normalized === 'finalized') return 'Finalized'
+    if (normalized === 'cancelled' || normalized === 'canceled') return 'Cancelled'
+    return null
+  }
+  if (typeof value === 'number') {
+    if (value === 0) return 'Processing'
+    if (value === 1) return 'Finalized'
+    if (value === 2) return 'Cancelled'
+  }
+  return null
+}
+
+function resolveSlipApiPath(url: string): string | null {
+  const match = url.match(/^\/(distribution|returns|teacher-issues|teacher-returns)\/(\d+)$/)
+  if (!match) return null
+  const [, kind, id] = match
+  if (kind === 'distribution') return `/distributions/${id}`
+  if (kind === 'returns') return `/returns/${id}`
+  if (kind === 'teacher-issues') return `/TeacherIssues/${id}`
+  if (kind === 'teacher-returns') return `/TeacherReturns/${id}`
+  return null
+}
+
+async function waitForSlipStatus(page: Page, url: string, status: 'Processing' | 'Finalized' | 'Cancelled') {
+  const apiPath = resolveSlipApiPath(url)
+  if (!apiPath) return
+
+  const timeoutMs = 30000
+  const start = Date.now()
+  let lastStatus: string | null = null
+
+  while (Date.now() - start < timeoutMs) {
+    const response = await page.request.get(`/api/bff${apiPath}`)
+    if (response.ok()) {
+      const body = await response.json() as { success?: boolean, data?: LifecycleReadable }
+      if (body.success && body.data) {
+        lastStatus = normalizeLifecycleStatus(body.data.lifecycleStatus)
+        if (lastStatus === status) return
+      }
+    }
+    await page.waitForTimeout(500)
+  }
+
+  throw new Error(`Timed out waiting for ${apiPath} lifecycle status "${status}". Last seen: ${lastStatus ?? 'unknown'}`)
+}
+
 async function pickAcademicYearId(page: Page) {
   const active = await bffGet<{ id: number }>(page, '/AcademicYears/active')
   return active.id
@@ -133,9 +187,10 @@ async function createTeacherReturn(page: Page, teacherIssueId: number, csrfToken
 }
 
 async function expectSlipStatus(page: Page, url: string, heading: string, status: 'Processing' | 'Finalized' | 'Cancelled') {
+  await waitForSlipStatus(page, url, status)
   await page.goto(url)
   await expect(page.getByRole('heading', { name: heading })).toBeVisible()
-  await expect(page.getByText(status).first()).toBeVisible()
+  await expect(page.getByText(status).first()).toBeVisible({ timeout: 15000 })
   await expect(page.getByRole('button', { name: 'Print' })).toBeVisible()
 }
 
