@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -58,7 +58,7 @@
           </FormsFormField>
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="students"
           :loading="isLoading"
           data-key="id"
@@ -128,7 +128,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -139,7 +139,7 @@
       :style="{ width: '52rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -252,7 +252,7 @@
             </div>
           </div>
 
-          <DataTable
+          <CommonAdminDataTable
             :value="linkedParents"
             data-key="parentId"
             size="small"
@@ -292,7 +292,7 @@
                 />
               </template>
             </Column>
-          </DataTable>
+          </CommonAdminDataTable>
         </div>
 
         <Message
@@ -376,6 +376,7 @@ definePageMeta({
 
 const api = useApi()
 const bulkImport = useBulkImport()
+const bulkJobs = useBulkImportJobs()
 const { showError, showSuccess, showInfo } = useAppToast()
 const { confirmDelete } = useAppConfirm()
 const { isSuperAdmin } = useAuth()
@@ -460,11 +461,13 @@ function resetForm() {
 
 async function loadClassSections() {
   try {
-    const response = await api.get<ClassSection[]>(API.classSections.base, {
+    const response = await api.get<PaginatedList<ClassSection>>(API.classSections.base, {
+      pageNumber: 1,
+      pageSize: 500,
       academicYearId: activeAcademicYearId.value ?? undefined,
     })
     if (response.success) {
-      classSections.value = response.data
+      classSections.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load classes')
@@ -626,22 +629,20 @@ async function commitStudentBulk(file: File) {
   bulkError.value = ''
   isBulkCommitting.value = true
   try {
-    const response = await bulkImport.commitFile(file, {
-      validate: API.students.bulkValidate,
-      commit: API.students.bulkCommit,
-      template: API.importTemplates.students,
-      templateFileName: 'students-import-template.xlsx',
+    const response = await bulkJobs.queueJob(file, 'Students', {
+      commitAsync: API.students.bulkCommitAsync,
+      jobStatus: API.students.bulkJob,
+      jobReport: API.students.bulkJobReport,
     })
     if (response.success) {
-      bulkReport.value = response.data
-      showSuccess('Student import committed')
-      await loadStudents()
+      showSuccess('Student import started. You can monitor progress from the header notifier.')
+      isBulkDialogVisible.value = false
       return
     }
-    bulkError.value = response.message ?? 'Commit failed'
+    bulkError.value = response.message ?? 'Failed to start import'
   }
   catch (error: unknown) {
-    bulkError.value = getFriendlyErrorMessage(error, 'Commit failed')
+    bulkError.value = getFriendlyErrorMessage(error, 'Failed to start import')
   }
   finally {
     isBulkCommitting.value = false

@@ -118,7 +118,7 @@
             </template>
           </Column>
           <Column
-            header="Status"
+            header="Issue Status"
             style="min-width: 10rem;"
           >
             <template #body="{ data }">
@@ -137,6 +137,17 @@
             </template>
           </Column>
           <Column
+            header="Status"
+            style="min-width: 9rem;"
+          >
+            <template #body="{ data }">
+              <Tag
+                :value="getLifecycleLabel(data.lifecycleStatus)"
+                :severity="getLifecycleSeverity(data.lifecycleStatus)"
+              />
+            </template>
+          </Column>
+          <Column
             header="Actions"
             :exportable="false"
             style="width: 8rem;"
@@ -152,7 +163,7 @@
                   icon="pi pi-replay"
                   tooltip="Process return"
                   severity="warn"
-                  :disabled="getOutstandingQuantity(data) === 0"
+                  :disabled="!canProcessReturn(data)"
                   @click.stop="navigateTo(`/teacher-returns?issueId=${data.id}`)"
                 />
               </div>
@@ -176,6 +187,7 @@ import {
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
+  title: 'Teacher Issuance',
   breadcrumb: {
     'teacher-issues': 'Teacher Issues',
   },
@@ -184,6 +196,8 @@ definePageMeta({
 const api = useApi()
 const { showError } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
+const { getLifecycleLabel, getLifecycleSeverity, isFinalized } = useSlipLifecycle()
+const { isOperationBlocked } = useOperationReadinessGuard()
 
 const slips = ref<TeacherIssue[]>([])
 const academicYears = ref<Lookup[]>([])
@@ -229,6 +243,10 @@ function getOutstandingQuantity(slip: TeacherIssue) {
   return slip.items.reduce((sum, item) => sum + item.outstandingQuantity, 0)
 }
 
+function canProcessReturn(slip: TeacherIssue) {
+  return !isOperationBlocked.value && isFinalized(slip.lifecycleStatus) && getOutstandingQuantity(slip) > 0
+}
+
 async function loadLookups() {
   try {
     const [yearsResponse, activeResponse] = await Promise.all([
@@ -254,6 +272,7 @@ async function loadSlips() {
       ...queryParams.value,
       academicYearId: filters.academicYearId ?? undefined,
       search: filters.teacherSearch || undefined,
+      includeCancelled: false,
     })
     if (response.success) {
       slips.value = response.data.items

@@ -1,0 +1,17 @@
+.git
+.gitignore
+.claude
+.codex
+**/node_modules
+**/.nuxt
+**/.output
+**/dist
+**/bin
+**/obj
+**/TestResults
+**/test-results
+**/coverage
+**/logs
+**/.idea
+**/.vscode
+designs

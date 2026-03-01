@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+mapfile -t staged_files < <(git diff --cached --name-only --diff-filter=ACMR)
+if [[ ${#staged_files[@]} -eq 0 ]]; then
+  exit 0
+fi
+
+backend_changed=false
+frontend_changed=false
+backend_includes=()
+frontend_lint_targets=()
+
+for file in "${staged_files[@]}"; do
+  if [[ "$file" == BooksPortal/* ]]; then
+    backend_changed=true
+    if [[ "$file" == *.cs ]]; then
+      backend_includes+=("$file")
+    fi
+  fi
+
+  if [[ "$file" == BooksPortalFrontEnd/* ]]; then
+    frontend_changed=true
+    if [[ "$file" == *.ts || "$file" == *.tsx || "$file" == *.js || "$file" == *.mjs || "$file" == *.cjs || "$file" == *.vue ]]; then
+      frontend_lint_targets+=("${file#BooksPortalFrontEnd/}")
+    fi
+  fi
+done
+
+if [[ "$backend_changed" == true && ${#backend_includes[@]} -gt 0 ]]; then
+  echo "[pre-commit] Formatting backend staged files with dotnet format..."
+  dotnet format "$repo_root/BooksPortal/BooksPortal.slnx" --include "${backend_includes[@]}" --verbosity minimal
+  git add -- "${backend_includes[@]}"
+fi
+
+if [[ "$frontend_changed" == true && ${#frontend_lint_targets[@]} -gt 0 ]]; then
+  echo "[pre-commit] Formatting frontend staged files with eslint --fix..."
+  (
+    cd "$repo_root/BooksPortalFrontEnd"
+    bunx eslint --fix "${frontend_lint_targets[@]}"
+  )
+
+  frontend_root_files=()
+  for target in "${frontend_lint_targets[@]}"; do
+    frontend_root_files+=("BooksPortalFrontEnd/$target")
+  done
+  git add -- "${frontend_root_files[@]}"
+fi

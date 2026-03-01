@@ -41,7 +41,59 @@ Development uses trusted authentication:
 Server=.;Database=BooksPortalDev;Trusted_Connection=True;TrustServerCertificate=True;
 ```
 
-Configure in `src/BooksPortal.API/appsettings.Development.json`.
+Configure in `src/BooksPortal.API/appsettings.json` (or via environment variables).
+
+## Auth and JWT Configuration
+
+JWT and session-related settings are configured via `JwtSettings`:
+
+- `JwtSettings:ExpiryInMinutes` (default `240`)
+- `JwtSettings:RefreshTokenExpiryInDays` (default `7`)
+- `JwtSettings:ClockSkewSeconds` (default `30`)
+- `JwtSettings:SigningMode` (`Symmetric` or `Certificate`)
+- `JwtSettings:Secret` (used in `Symmetric` mode)
+- `JwtSettings:CertificateBase64` / `JwtSettings:CertificatePath` / `JwtSettings:CertificatePassword` (used in `Certificate` mode)
+
+The API supports dual signing mode:
+
+- `Symmetric` for local/CI convenience
+- `Certificate` for deployment environments
+
+All values can be overridden by environment variables (e.g. `JwtSettings__ExpiryInMinutes=240`).
+
+## CORS Configuration
+
+Allowed frontend origins are configured in:
+
+- `Cors:AllowedOrigins` (array)
+
+Override with environment variables, for example:
+
+- `Cors__AllowedOrigins__0=http://localhost:3000`
+- `Cors__AllowedOrigins__1=https://your-frontend.example.com`
+
+## Logging and Observability
+
+### Exception Logging Policy
+
+- Expected handled exceptions (4xx responses like business rule or validation errors) are logged as structured warnings **without stack traces**.
+- Unexpected/unhandled exceptions (5xx responses) are logged as structured errors **with stack traces**.
+
+### Access Logging
+
+- Request/access logs are emitted through Serilog request logging middleware for every request.
+- Log events include request method/path, status code, duration, trace identifier, host/scheme, remote IP, and user id (when authenticated).
+
+### Sinks and Docker Log Persistence
+
+- API logs are written to:
+  - Console (structured JSON events)
+  - Rolling file sink: `logs/log-.txt`
+- Docker compose mounts API logs to a named volume:
+  - container path: `/app/logs`
+  - volume: `booksportal_logs`
+
+This setup is Loki-friendly for future ingestion through a collector such as Promtail.
 
 ## Project Structure
 

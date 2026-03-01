@@ -10,3 +10,45 @@
   --font-mono: "Geist Mono", monospace;
   --font-thaana: "Faruma", sans-serif;
 }
+
+/* Admin table sticky UX */
+.admin-data-table {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.admin-data-table .p-datatable-table-container {
+  height: 100%;
+}
+
+.admin-data-table .p-datatable-thead > tr > th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--p-content-background);
+}
+
+.admin-data-table .p-datatable-paginator-bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: var(--p-content-background);
+  border-top: 1px solid var(--p-content-border-color);
+}
+
+/* Ensure only admin cards that host data tables become full-height containers */
+.admin-layout-main .p-card:has(.admin-data-table) {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.admin-layout-main .p-card:has(.admin-data-table) > .p-card-body,
+.admin-layout-main .p-card:has(.admin-data-table) > .p-card-body > .p-card-content {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}

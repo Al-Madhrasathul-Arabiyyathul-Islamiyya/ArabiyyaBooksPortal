@@ -1,5 +1,6 @@
 using BooksPortal.Application.Common.Exceptions;
 using BooksPortal.Application.Common.Interfaces;
+using BooksPortal.Application.Common.Models;
 using BooksPortal.Application.Features.Users.DTOs;
 using BooksPortal.Domain.Enums;
 using BooksPortal.Infrastructure.Data;
@@ -27,9 +28,66 @@ public class UserService : IUserService
             ?? new SuperAdminAccountSettings();
     }
 
-    public async Task<List<UserResponse>> GetAllUsersAsync()
+    public async Task<PaginatedList<UserResponse>> GetPagedUsersAsync(
+        int pageNumber,
+        int pageSize,
+        string? search = null,
+        bool? isActive = null,
+        string? role = null)
     {
-        var users = await _userManager.Users.ToListAsync();
+        IQueryable<Staff> query = _userManager.Users;
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(u =>
+                (u.UserName != null && u.UserName.Contains(term)) ||
+                (u.Email != null && u.Email.Contains(term)) ||
+                (u.FullName != null && u.FullName.Contains(term)) ||
+                (u.NationalId != null && u.NationalId.Contains(term)));
+        }
+
+        if (isActive.HasValue)
+            query = query.Where(u => u.IsActive == isActive.Value);
+
+        List<Staff> users;
+        int totalCount;
+
+        if (!string.IsNullOrWhiteSpace(role))
+        {
+            var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+            query = usersInRole.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim();
+                query = query.Where(u =>
+                    (u.UserName != null && u.UserName.Contains(term)) ||
+                    (u.Email != null && u.Email.Contains(term)) ||
+                    (u.FullName != null && u.FullName.Contains(term)) ||
+                    (u.NationalId != null && u.NationalId.Contains(term)));
+            }
+
+            if (isActive.HasValue)
+                query = query.Where(u => u.IsActive == isActive.Value);
+
+            totalCount = query.Count();
+            users = query
+                .OrderBy(u => u.FullName ?? u.UserName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+        else
+        {
+            totalCount = await query.CountAsync();
+            users = await query
+                .OrderBy(u => u.FullName ?? u.UserName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         var result = new List<UserResponse>();
 
         foreach (var user in users)
@@ -38,7 +96,7 @@ public class UserService : IUserService
             result.Add(MapToResponse(user, roles));
         }
 
-        return result;
+        return new PaginatedList<UserResponse>(result, totalCount, pageNumber, pageSize);
     }
 
     public async Task<UserResponse> GetUserByIdAsync(int id)

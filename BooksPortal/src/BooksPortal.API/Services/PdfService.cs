@@ -88,15 +88,46 @@ public class PdfService : IPdfService
         var logo = _logoPng;
         return GenerateDocument(page =>
         {
-            page.Content().Row(mainRow =>
+            page.Content().Layers(layers =>
             {
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeReturnCopy(col, slip, common, labels, logo));
+                layers.PrimaryLayer().Row(mainRow =>
+                {
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeReturnCopy(col, slip, common, labels, logo));
 
-                mainRow.ConstantItem(1).Element(ComposeCenterDivider);
+                    mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeReturnCopy(col, slip, common, labels, logo));
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeReturnCopy(col, slip, common, labels, logo));
+                });
+
+                if (slip.LifecycleStatus == BooksPortal.Domain.Enums.SlipLifecycleStatus.Cancelled)
+                {
+                    layers.Layer().Row(row =>
+                    {
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .TranslateX(-100)
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+
+                        row.ConstantItem(1);
+
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .TranslateX(-100)
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+                    });
+                }
             });
         });
     }
@@ -161,15 +192,46 @@ public class PdfService : IPdfService
         var logo = _logoPng;
         return GenerateDocument(page =>
         {
-            page.Content().Row(mainRow =>
+            page.Content().Layers(layers =>
             {
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeTeacherReturnCopy(col, slip, common, labels, logo));
+                layers.PrimaryLayer().Row(mainRow =>
+                {
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeTeacherReturnCopy(col, slip, common, labels, logo));
 
-                mainRow.ConstantItem(1).Element(ComposeCenterDivider);
+                    mainRow.ConstantItem(1).Element(ComposeCenterDivider);
 
-                mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
-                    ComposeTeacherReturnCopy(col, slip, common, labels, logo));
+                    mainRow.RelativeItem().PaddingHorizontal(10).Column(col =>
+                        ComposeTeacherReturnCopy(col, slip, common, labels, logo));
+                });
+
+                if (slip.LifecycleStatus == BooksPortal.Domain.Enums.SlipLifecycleStatus.Cancelled)
+                {
+                    layers.Layer().Row(row =>
+                    {
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .TranslateX(-100)
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+
+                        row.ConstantItem(1);
+
+                        row.RelativeItem()
+                            .Rotate(-20)
+                            .AlignCenter()
+                            .AlignMiddle()
+                            .TranslateX(-100)
+                            .Text("CANCELLED")
+                            .Bold()
+                            .FontSize(46)
+                            .FontColor(QuestPDF.Helpers.Colors.Red.Lighten2);
+                    });
+                }
             });
         });
     }

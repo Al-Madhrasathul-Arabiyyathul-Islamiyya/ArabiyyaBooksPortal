@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -18,7 +18,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="subjects"
           :loading="isLoading"
           data-key="id"
@@ -54,7 +54,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -65,7 +65,7 @@
       :style="{ width: '30rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField
@@ -129,6 +129,7 @@
 import type { Subject } from '~/types/entities'
 import { CreateSubjectRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -184,8 +185,7 @@ async function loadSubjects() {
     showError(response.message ?? 'Failed to load subjects')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load subjects')
+    showError(getFriendlyErrorMessage(error, 'Failed to load subjects'))
   }
   finally {
     isLoading.value = false
@@ -264,8 +264,7 @@ function handleDelete(item: Subject) {
         showError(response.message ?? 'Failed to delete subject')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete subject')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete subject'))
       }
     },
   )

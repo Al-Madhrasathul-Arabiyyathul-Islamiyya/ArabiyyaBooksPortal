@@ -54,10 +54,16 @@ public class TeacherIssueServiceTests
     {
         return new Book
         {
-            Id = id, Code = $"BK{id:D3}", Title = $"Book {id}",
-            SubjectId = 1, Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
-            TotalStock = totalStock, Distributed = distributed,
-            WithTeachers = withTeachers, Damaged = damaged, Lost = lost
+            Id = id,
+            Code = $"BK{id:D3}",
+            Title = $"Book {id}",
+            SubjectId = 1,
+            Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
+            TotalStock = totalStock,
+            Distributed = distributed,
+            WithTeachers = withTeachers,
+            Damaged = damaged,
+            Lost = lost
         };
     }
 
@@ -155,7 +161,8 @@ public class TeacherIssueServiceTests
         _bookRepo.GetByIdAsync(1).Returns(book);
         var request = new CreateTeacherIssueRequest
         {
-            AcademicYearId = 1, TeacherId = 1,
+            AcademicYearId = 1,
+            TeacherId = 1,
             Items = new() { new() { BookId = 1, Quantity = 5 } }
         };
 
@@ -171,7 +178,8 @@ public class TeacherIssueServiceTests
         _bookRepo.GetByIdAsync(999).Returns((Book?)null);
         var request = new CreateTeacherIssueRequest
         {
-            AcademicYearId = 1, TeacherId = 1,
+            AcademicYearId = 1,
+            TeacherId = 1,
             Items = new() { new() { BookId = 999, Quantity = 1 } }
         };
 
@@ -190,11 +198,14 @@ public class TeacherIssueServiceTests
         _refService.GenerateAsync(SlipType.TeacherIssue, 1).Returns("TIS2026000001");
         var request = new CreateTeacherIssueRequest
         {
-            AcademicYearId = 1, TeacherId = 1,
+            AcademicYearId = 1,
+            TeacherId = 1,
             Items = new() { new() { BookId = 1, Quantity = 3 } }
         };
 
-        try { await _sut.CreateAsync(request, userId: 1); } catch { }
+        try
+        { await _sut.CreateAsync(request, userId: 1); }
+        catch { }
 
         book.WithTeachers.Should().Be(8); // 5 + 3
     }
@@ -206,7 +217,8 @@ public class TeacherIssueServiceTests
     {
         var issue = new TeacherIssue
         {
-            Id = 1, Status = TeacherIssueStatus.Active,
+            Id = 1,
+            Status = TeacherIssueStatus.Active,
             Items = new List<TeacherIssueItem>
             {
                 new() { Id = 10, BookId = 1, Quantity = 5, ReturnedQuantity = 3 } // Outstanding = 2

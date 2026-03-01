@@ -9,16 +9,25 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/hints',
     '@nuxt/image',
-    '@nuxtjs/color-mode',
+    ...(process.env.VITEST ? [] : ['@nuxtjs/color-mode']),
     'nuxt-csurf',
     '@primevue/nuxt-module',
     '@pinia/nuxt',
     '@pinia/colada-nuxt',
     '@regle/nuxt',
     'dayjs-nuxt',
+    '@nuxt/test-utils/module',
   ],
 
   devtools: { enabled: true },
+  app: {
+    head: {
+      title: 'Arabiyya Academic Books Portal',
+      meta: [
+        { name: 'application-name', content: 'Arabiyya Academic Books Portal' },
+      ],
+    },
+  },
 
   css: ['./app/assets/css/main.css'],
 
@@ -31,9 +40,21 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    auth: {
+      session: {
+        accessCookieMaxAgeSeconds: 60 * 60 * 24 * 7,
+        refreshCookieMaxAgeSeconds: 60 * 60 * 24 * 30,
+        expiryCookieMaxAgeSeconds: 60 * 60 * 24 * 7,
+        expirySkewSeconds: 30,
+        cookieSecure: !import.meta.dev,
+        signingMode: 'None',
+        signingPrivateKeyPath: '',
+        signingPublicCertPath: '',
+      },
+    },
     public: {
       apiBase: 'http://localhost:5071/api',
-      appTitle: 'Arabiyya Books Portal',
+      appTitle: 'Arabiyya Academic Books Portal',
     },
   },
 

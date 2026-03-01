@@ -116,6 +116,38 @@
               {{ data.items.length }}
             </template>
           </Column>
+          <Column
+            header="Status"
+            style="min-width: 9rem;"
+          >
+            <template #body="{ data }">
+              <Tag
+                :value="getLifecycleLabel(data.lifecycleStatus)"
+                :severity="getLifecycleSeverity(data.lifecycleStatus)"
+              />
+            </template>
+          </Column>
+          <Column
+            header="Actions"
+            :exportable="false"
+            style="width: 8rem;"
+          >
+            <template #body="{ data }">
+              <div class="flex items-center gap-2">
+                <CommonIconActionButton
+                  icon="pi pi-eye"
+                  tooltip="Open details"
+                  @click.stop="navigateTo(`/distribution/${data.id}`)"
+                />
+                <CommonIconActionButton
+                  icon="pi pi-print"
+                  tooltip="Print slip"
+                  :loading="printLoadingSlipId === data.id"
+                  @click.stop="printSlip(data.id)"
+                />
+              </div>
+            </template>
+          </Column>
         </DataTable>
       </template>
     </Card>
@@ -129,6 +161,7 @@ import { API, PAGINATION } from '~/utils/constants'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
+  title: 'Students Distribution',
   breadcrumb: {
     distribution: 'Distributions',
   },
@@ -137,12 +170,15 @@ definePageMeta({
 const api = useApi()
 const { showError } = useAppToast()
 const { page, pageSize, totalRecords, onPage, queryParams, reset } = usePagination()
+const { getLifecycleLabel, getLifecycleSeverity } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const slips = ref<DistributionSlip[]>([])
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
 const isLoading = ref(false)
 const isReferenceLoading = ref(false)
+const printLoadingSlipId = ref<number | null>(null)
 const referenceMode = ref(false)
 const referenceSearch = ref('')
 
@@ -163,6 +199,8 @@ function formatDateTime(value: string) {
 }
 
 async function loadLookups() {
+  if (isOperationBlocked.value) return
+
   try {
     const [yearsResponse, activeResponse] = await Promise.all([
       api.get<Lookup[]>(API.lookups.academicYears),
@@ -184,6 +222,8 @@ async function loadLookups() {
 }
 
 async function loadSlips() {
+  if (isOperationBlocked.value) return
+
   isLoading.value = true
   try {
     const response = await api.get<PaginatedList<DistributionSlip>>(API.distributions.base, {
@@ -191,6 +231,7 @@ async function loadSlips() {
       academicYearId: filters.academicYearId ?? undefined,
       studentId: undefined,
       search: filters.studentSearch || undefined,
+      includeCancelled: false,
     })
     if (response.success) {
       slips.value = response.data.items
@@ -228,6 +269,19 @@ async function searchByReference() {
   }
 }
 
+async function printSlip(slipId: number) {
+  printLoadingSlipId.value = slipId
+  try {
+    await api.downloadBlob(API.distributions.print(slipId), `distribution-${slipId}.pdf`, true)
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to print distribution slip'))
+  }
+  finally {
+    printLoadingSlipId.value = null
+  }
+}
+
 async function clearReferenceSearch() {
   referenceSearch.value = ''
   referenceMode.value = false
@@ -252,6 +306,9 @@ function onRowClick(event: { data: DistributionSlip }) {
 }
 
 onMounted(async () => {
+  const allowed = await guard('load distributions')
+  if (!allowed) return
+
   await loadLookups()
   await loadSlips()
 })

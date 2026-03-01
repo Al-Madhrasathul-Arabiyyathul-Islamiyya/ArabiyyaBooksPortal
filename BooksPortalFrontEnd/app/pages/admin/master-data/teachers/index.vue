@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -38,7 +38,7 @@
           />
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="teachers"
           :loading="isLoading"
           data-key="id"
@@ -102,7 +102,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -113,7 +113,7 @@
       :style="{ width: '34rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField
@@ -205,7 +205,7 @@
       :header="`Manage Assignments - ${selectedTeacherName}`"
       :style="{ width: '52rem' }"
     >
-      <div class="flex flex-col gap-4">
+      <div class="flex h-full min-h-0 flex-col gap-4">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
           <FormsFormField
             label="Subject"
@@ -259,7 +259,7 @@
           {{ assignmentError }}
         </Message>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="selectedTeacherAssignments"
           data-key="id"
           size="small"
@@ -286,7 +286,7 @@
               />
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </div>
     </Dialog>
 
@@ -337,6 +337,7 @@ definePageMeta({
 
 const api = useApi()
 const bulkImport = useBulkImport()
+const bulkJobs = useBulkImportJobs()
 const { showError, showSuccess, showInfo } = useAppToast()
 const { confirmDelete } = useAppConfirm()
 const { isSuperAdmin } = useAuth()
@@ -450,7 +451,10 @@ async function loadLookups() {
   try {
     const [subjectsResponse, classSectionsResponse] = await Promise.all([
       api.get<Subject[]>(API.subjects.base),
-      api.get<ClassSection[]>(API.classSections.base),
+      api.get<PaginatedList<ClassSection>>(API.classSections.base, {
+        pageNumber: 1,
+        pageSize: 500,
+      }),
     ])
 
     if (subjectsResponse.success) {
@@ -461,7 +465,7 @@ async function loadLookups() {
     }
 
     if (classSectionsResponse.success) {
-      classSections.value = classSectionsResponse.data
+      classSections.value = classSectionsResponse.data.items
     }
     else {
       showError(classSectionsResponse.message ?? 'Failed to load classes')
@@ -542,22 +546,20 @@ async function commitTeacherBulk(file: File) {
   bulkError.value = ''
   isBulkCommitting.value = true
   try {
-    const response = await bulkImport.commitFile(file, {
-      validate: API.teachers.bulkValidate,
-      commit: API.teachers.bulkCommit,
-      template: API.importTemplates.teachers,
-      templateFileName: 'teachers-import-template.xlsx',
+    const response = await bulkJobs.queueJob(file, 'Teachers', {
+      commitAsync: API.teachers.bulkCommitAsync,
+      jobStatus: API.teachers.bulkJob,
+      jobReport: API.teachers.bulkJobReport,
     })
     if (response.success) {
-      bulkReport.value = response.data
-      showSuccess('Teacher import committed')
-      await loadTeachers()
+      showSuccess('Teacher import started. You can monitor progress from the header notifier.')
+      isBulkDialogVisible.value = false
       return
     }
-    bulkError.value = response.message ?? 'Commit failed'
+    bulkError.value = response.message ?? 'Failed to start import'
   }
   catch (error: unknown) {
-    bulkError.value = getFriendlyErrorMessage(error, 'Commit failed')
+    bulkError.value = getFriendlyErrorMessage(error, 'Failed to start import')
   }
   finally {
     isBulkCommitting.value = false

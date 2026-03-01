@@ -68,12 +68,22 @@ public class BookService : IBookService
 
         return new BookResponse
         {
-            Id = book.Id, ISBN = book.ISBN, Code = book.Code, Title = book.Title,
-            Author = book.Author, Edition = book.Edition, Publisher = book.Publisher,
-            PublishedYear = book.PublishedYear, SubjectId = book.SubjectId,
-            SubjectName = book.Subject.Name, Grade = book.Grade,
-            TotalStock = book.TotalStock, Distributed = book.Distributed,
-            WithTeachers = book.WithTeachers, Damaged = book.Damaged, Lost = book.Lost
+            Id = book.Id,
+            ISBN = book.ISBN,
+            Code = book.Code,
+            Title = book.Title,
+            Author = book.Author,
+            Edition = book.Edition,
+            Publisher = book.Publisher,
+            PublishedYear = book.PublishedYear,
+            SubjectId = book.SubjectId,
+            SubjectName = book.Subject.Name,
+            Grade = book.Grade,
+            TotalStock = book.TotalStock,
+            Distributed = book.Distributed,
+            WithTeachers = book.WithTeachers,
+            Damaged = book.Damaged,
+            Lost = book.Lost
         };
     }
 
@@ -157,20 +167,30 @@ public class BookService : IBookService
         }
     }
 
-    public async Task<List<StockEntryResponse>> GetStockEntriesAsync(int bookId)
+    public async Task<PaginatedList<StockEntryResponse>> GetStockEntriesAsync(int bookId, int pageNumber, int pageSize)
     {
         if (!await _bookRepo.AnyAsync(b => b.Id == bookId))
             throw new NotFoundException(nameof(Book), bookId);
 
-        var entries = await _stockEntryRepo.Query()
+        var query = _stockEntryRepo.Query()
             .Where(e => e.BookId == bookId)
             .OrderByDescending(e => e.EnteredAt)
-            .ToListAsync();
+            .Select(e => new StockEntryResponse
+            {
+                Id = e.Id,
+                BookId = e.BookId,
+                AcademicYearId = e.AcademicYearId,
+                Quantity = e.Quantity,
+                Source = e.Source,
+                Notes = e.Notes,
+                EnteredById = e.EnteredById,
+                EnteredAt = e.EnteredAt
+            });
 
-        return entries.Adapt<List<StockEntryResponse>>();
+        return await PaginatedList<StockEntryResponse>.CreateAsync(query, pageNumber, pageSize);
     }
 
-    public async Task<List<StockMovementResponse>> GetStockMovementsAsync(int bookId)
+    public async Task<PaginatedList<StockMovementResponse>> GetStockMovementsAsync(int bookId, int pageNumber, int pageSize)
     {
         if (!await _bookRepo.AnyAsync(b => b.Id == bookId))
             throw new NotFoundException(nameof(Book), bookId);
@@ -180,15 +200,28 @@ public class BookService : IBookService
             .Include(b => b.StockMovements)
             .FirstOrDefaultAsync(b => b.Id == bookId);
 
-        return book!.StockMovements
+        var items = book!.StockMovements
             .OrderByDescending(m => m.ProcessedAt)
             .Select(m => new StockMovementResponse
             {
-                Id = m.Id, BookId = m.BookId, MovementType = m.MovementType,
-                Quantity = m.Quantity, ReferenceId = m.ReferenceId,
-                ReferenceType = m.ReferenceType, Notes = m.Notes,
-                ProcessedById = m.ProcessedById, ProcessedAt = m.ProcessedAt
+                Id = m.Id,
+                BookId = m.BookId,
+                MovementType = m.MovementType,
+                Quantity = m.Quantity,
+                ReferenceId = m.ReferenceId,
+                ReferenceType = m.ReferenceType,
+                Notes = m.Notes,
+                ProcessedById = m.ProcessedById,
+                ProcessedAt = m.ProcessedAt
             }).ToList();
+
+        var totalCount = items.Count;
+        var pagedItems = items
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PaginatedList<StockMovementResponse>(pagedItems, totalCount, pageNumber, pageSize);
     }
 
     public async Task AdjustStockAsync(int bookId, AdjustStockRequest request, int userId)
@@ -228,10 +261,19 @@ public class BookService : IBookService
 
         return books.Select(b => new BookResponse
         {
-            Id = b.Id, ISBN = b.ISBN, Code = b.Code, Title = b.Title,
-            Author = b.Author, SubjectId = b.SubjectId, SubjectName = b.Subject.Name,
-            Grade = b.Grade, TotalStock = b.TotalStock, Distributed = b.Distributed,
-            WithTeachers = b.WithTeachers, Damaged = b.Damaged, Lost = b.Lost
+            Id = b.Id,
+            ISBN = b.ISBN,
+            Code = b.Code,
+            Title = b.Title,
+            Author = b.Author,
+            SubjectId = b.SubjectId,
+            SubjectName = b.Subject.Name,
+            Grade = b.Grade,
+            TotalStock = b.TotalStock,
+            Distributed = b.Distributed,
+            WithTeachers = b.WithTeachers,
+            Damaged = b.Damaged,
+            Lost = b.Lost
         }).ToList();
     }
 }

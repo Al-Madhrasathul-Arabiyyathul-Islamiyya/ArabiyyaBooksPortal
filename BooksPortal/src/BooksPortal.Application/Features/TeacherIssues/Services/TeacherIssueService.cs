@@ -204,6 +204,7 @@ public class TeacherIssueService : ITeacherIssueService
                 TeacherIssueId = issue.Id,
                 ReceivedById = userId,
                 ReceivedAt = ResolveTimestamp(request.ReceivedDate, request.ReceivedTime),
+                LifecycleStatus = SlipLifecycleStatus.Processing,
                 Notes = request.Notes
             };
 
@@ -275,7 +276,7 @@ public class TeacherIssueService : ITeacherIssueService
             }
 
             var returnPdfBytes = await _pdfService.GenerateTeacherReturnSlipAsync(returnResponse);
-            returnSlip.PdfFilePath = await _storageService.SaveAsync("TeacherReturn", issue.AcademicYear.Name, returnSlip.ReferenceNo, returnPdfBytes);
+            returnSlip.PdfFilePath = await _storageService.SaveAsync("TeacherReturn", issue.AcademicYear.Name, $"{returnSlip.ReferenceNo}-{returnSlip.LifecycleStatus}", returnPdfBytes);
             await _unitOfWork.SaveChangesAsync();
 
             await _unitOfWork.CommitTransactionAsync();
@@ -287,6 +288,95 @@ public class TeacherIssueService : ITeacherIssueService
             await _unitOfWork.RollbackTransactionAsync();
             throw;
         }
+    }
+
+    public async Task<PaginatedList<TeacherReturnSlipResponse>> GetTeacherReturnsPagedAsync(
+        int pageNumber,
+        int pageSize,
+        int? academicYearId = null,
+        int? teacherId = null,
+        int? teacherIssueId = null,
+        bool includeCancelled = false)
+    {
+        var query = _returnSlipRepo.Query()
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.AcademicYear)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Teacher)
+            .Include(r => r.Items).ThenInclude(i => i.Book)
+            .AsQueryable();
+
+        if (academicYearId.HasValue)
+            query = query.Where(r => r.TeacherIssue.AcademicYearId == academicYearId.Value);
+
+        if (teacherId.HasValue)
+            query = query.Where(r => r.TeacherIssue.TeacherId == teacherId.Value);
+
+        if (teacherIssueId.HasValue)
+            query = query.Where(r => r.TeacherIssueId == teacherIssueId.Value);
+
+        if (!includeCancelled)
+            query = query.Where(r => r.LifecycleStatus != SlipLifecycleStatus.Cancelled);
+
+        var projected = query
+            .OrderByDescending(r => r.ReceivedAt)
+            .Select(r => new TeacherReturnSlipResponse
+            {
+                Id = r.Id,
+                ReferenceNo = r.ReferenceNo,
+                TeacherIssueId = r.TeacherIssueId,
+                TeacherName = r.TeacherIssue.Teacher.FullName,
+                TeacherNationalId = r.TeacherIssue.Teacher.NationalId,
+                AcademicYearId = r.TeacherIssue.AcademicYearId,
+                AcademicYearName = r.TeacherIssue.AcademicYear.Name,
+                ReceivedById = r.ReceivedById,
+                ReceivedAt = r.ReceivedAt,
+                LifecycleStatus = r.LifecycleStatus,
+                FinalizedById = r.FinalizedById,
+                FinalizedAt = r.FinalizedAt,
+                CancelledById = r.CancelledById,
+                CancelledAt = r.CancelledAt,
+                Notes = r.Notes,
+                PdfFilePath = r.PdfFilePath,
+                Items = r.Items.Select(i => new TeacherReturnSlipItemResponse
+                {
+                    Id = i.Id,
+                    BookId = i.BookId,
+                    BookCode = i.Book.Code,
+                    BookTitle = i.Book.Title,
+                    Quantity = i.Quantity
+                }).ToList()
+            });
+
+        var page = await PaginatedList<TeacherReturnSlipResponse>.CreateAsync(projected, pageNumber, pageSize);
+        await EnrichTeacherReturnStaffAsync(page.Items);
+        return page;
+    }
+
+    public async Task<TeacherReturnSlipResponse> GetTeacherReturnByIdAsync(int id)
+    {
+        var slip = await _returnSlipRepo.Query()
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.AcademicYear)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Teacher)
+            .Include(r => r.Items).ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(r => r.Id == id)
+            ?? throw new NotFoundException(nameof(TeacherReturnSlip), id);
+
+        var response = MapTeacherReturnToResponse(slip);
+        await EnrichTeacherReturnStaffAsync([response]);
+        return response;
+    }
+
+    public async Task<TeacherReturnSlipResponse> GetTeacherReturnByReferenceAsync(string referenceNo)
+    {
+        var slip = await _returnSlipRepo.Query()
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.AcademicYear)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Teacher)
+            .Include(r => r.Items).ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(r => r.ReferenceNo == referenceNo)
+            ?? throw new NotFoundException(nameof(TeacherReturnSlip), referenceNo);
+
+        var response = MapTeacherReturnToResponse(slip);
+        await EnrichTeacherReturnStaffAsync([response]);
+        return response;
     }
 
     public async Task<TeacherIssueResponse> UpdateAsync(int id, UpdateTeacherIssueRequest request, int userId)
@@ -424,6 +514,11 @@ public class TeacherIssueService : ITeacherIssueService
             AcademicYearName = slip.TeacherIssue.AcademicYear.Name,
             ReceivedById = slip.ReceivedById,
             ReceivedAt = slip.ReceivedAt,
+            LifecycleStatus = slip.LifecycleStatus,
+            FinalizedById = slip.FinalizedById,
+            FinalizedAt = slip.FinalizedAt,
+            CancelledById = slip.CancelledById,
+            CancelledAt = slip.CancelledAt,
             Notes = slip.Notes,
             PdfFilePath = slip.PdfFilePath,
             Items = slip.Items.Select(i => new TeacherReturnSlipItemResponse
@@ -444,6 +539,93 @@ public class TeacherIssueService : ITeacherIssueService
         }
 
         return response;
+    }
+
+    public async Task FinalizeTeacherReturnAsync(int id, int userId)
+    {
+        var slip = await _returnSlipRepo.Query()
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.AcademicYear)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Teacher)
+            .Include(r => r.Items).ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(r => r.Id == id)
+            ?? throw new NotFoundException(nameof(TeacherReturnSlip), id);
+
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            throw new BusinessRuleException("Cancelled teacher return slips cannot be finalized.");
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            return;
+
+        slip.LifecycleStatus = SlipLifecycleStatus.Finalized;
+        slip.FinalizedById = userId;
+        slip.FinalizedAt = DateTime.UtcNow;
+        _returnSlipRepo.Update(slip);
+
+        var response = MapTeacherReturnToResponse(slip);
+        await EnrichTeacherReturnStaffAsync([response]);
+        var pdfBytes = await _pdfService.GenerateTeacherReturnSlipAsync(response);
+        slip.PdfFilePath = await _storageService.SaveAsync("TeacherReturn", slip.TeacherIssue.AcademicYear.Name, $"{slip.ReferenceNo}-{slip.LifecycleStatus}", pdfBytes);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CancelTeacherReturnAsync(int id, int userId)
+    {
+        var slip = await _returnSlipRepo.Query()
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.AcademicYear)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Teacher)
+            .Include(r => r.TeacherIssue).ThenInclude(i => i.Items).ThenInclude(ii => ii.Book)
+            .Include(r => r.Items)
+            .FirstOrDefaultAsync(r => r.Id == id)
+            ?? throw new NotFoundException(nameof(TeacherReturnSlip), id);
+
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Finalized)
+            throw new BusinessRuleException("Finalized teacher return slips cannot be cancelled.");
+        if (slip.LifecycleStatus == SlipLifecycleStatus.Cancelled)
+            return;
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            foreach (var item in slip.Items)
+            {
+                var issueItem = slip.TeacherIssue.Items.FirstOrDefault(ii => ii.Id == item.TeacherIssueItemId)
+                    ?? throw new NotFoundException(nameof(TeacherIssueItem), item.TeacherIssueItemId);
+
+                issueItem.ReturnedQuantity -= item.Quantity;
+                if (issueItem.ReturnedQuantity < 0)
+                    issueItem.ReturnedQuantity = 0;
+
+                if (issueItem.ReturnedQuantity == 0)
+                {
+                    issueItem.ReturnedAt = null;
+                    issueItem.ReceivedById = null;
+                }
+
+                var book = issueItem.Book;
+                book.WithTeachers += item.Quantity;
+                _bookRepo.Update(book);
+            }
+
+            slip.TeacherIssue.Status = DetermineStatus(slip.TeacherIssue);
+
+            slip.LifecycleStatus = SlipLifecycleStatus.Cancelled;
+            slip.CancelledById = userId;
+            slip.CancelledAt = DateTime.UtcNow;
+            _returnSlipRepo.Update(slip);
+            _issueRepo.Update(slip.TeacherIssue);
+
+            var response = MapTeacherReturnToResponse(slip);
+            await EnrichTeacherReturnStaffAsync([response]);
+            var pdfBytes = await _pdfService.GenerateTeacherReturnSlipAsync(response);
+            slip.PdfFilePath = await _storageService.SaveAsync("TeacherReturn", slip.TeacherIssue.AcademicYear.Name, $"{slip.ReferenceNo}-{slip.LifecycleStatus}", pdfBytes);
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task FinalizeAsync(int id, int userId)
@@ -488,7 +670,8 @@ public class TeacherIssueService : ITeacherIssueService
             foreach (var item in issue.Items)
             {
                 var outstanding = item.OutstandingQuantity;
-                if (outstanding <= 0) continue;
+                if (outstanding <= 0)
+                    continue;
 
                 var book = await _bookRepo.GetByIdAsync(item.BookId)
                     ?? throw new NotFoundException(nameof(Book), item.BookId);
@@ -597,6 +780,53 @@ public class TeacherIssueService : ITeacherIssueService
             response.AcademicYearName,
             $"{issue.ReferenceNo}-{issue.LifecycleStatus}",
             pdfBytes);
+    }
+
+    private static TeacherReturnSlipResponse MapTeacherReturnToResponse(TeacherReturnSlip slip)
+    {
+        return new TeacherReturnSlipResponse
+        {
+            Id = slip.Id,
+            ReferenceNo = slip.ReferenceNo,
+            TeacherIssueId = slip.TeacherIssueId,
+            TeacherName = slip.TeacherIssue.Teacher.FullName,
+            TeacherNationalId = slip.TeacherIssue.Teacher.NationalId,
+            AcademicYearId = slip.TeacherIssue.AcademicYearId,
+            AcademicYearName = slip.TeacherIssue.AcademicYear.Name,
+            ReceivedById = slip.ReceivedById,
+            ReceivedAt = slip.ReceivedAt,
+            LifecycleStatus = slip.LifecycleStatus,
+            FinalizedById = slip.FinalizedById,
+            FinalizedAt = slip.FinalizedAt,
+            CancelledById = slip.CancelledById,
+            CancelledAt = slip.CancelledAt,
+            Notes = slip.Notes,
+            PdfFilePath = slip.PdfFilePath,
+            Items = slip.Items.Select(i => new TeacherReturnSlipItemResponse
+            {
+                Id = i.Id,
+                BookId = i.BookId,
+                BookCode = i.Book.Code,
+                BookTitle = i.Book.Title,
+                Quantity = i.Quantity
+            }).ToList()
+        };
+    }
+
+    private async Task EnrichTeacherReturnStaffAsync(ICollection<TeacherReturnSlipResponse> slips)
+    {
+        if (slips.Count == 0)
+            return;
+
+        var staffMap = await _staffDirectoryService.GetByIdsAsync(slips.Select(s => s.ReceivedById));
+        foreach (var slip in slips)
+        {
+            if (staffMap.TryGetValue(slip.ReceivedById, out var staff))
+            {
+                slip.ReceivedByName = staff.DisplayName;
+                slip.ReceivedByDesignation = staff.Designation;
+            }
+        }
     }
 
     private static DateTime ResolveTimestamp(DateOnly? date, TimeOnly? time)

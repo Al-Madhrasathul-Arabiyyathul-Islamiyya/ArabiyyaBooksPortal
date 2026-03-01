@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -29,7 +29,7 @@
           <span class="text-base">{{ group.category }}</span>
         </template>
         <template #content>
-          <DataTable
+          <CommonAdminDataTable
             :value="group.items"
             :loading="isLoading"
             data-key="id"
@@ -48,6 +48,7 @@
               <template #body="{ data }">
                 <InputText
                   :model-value="getDraftValue(data.id)"
+                  :disabled="!isSuperAdmin"
                   fluid
                   @update:model-value="setDraftValue(data.id, $event)"
                 />
@@ -68,6 +69,7 @@
                   :model-value="getDraftSortOrder(data.id)"
                   :min="0"
                   :use-grouping="false"
+                  :disabled="!isSuperAdmin"
                   fluid
                   @update:model-value="setDraftSortOrder(data.id, $event)"
                 />
@@ -86,6 +88,7 @@
             >
               <template #body="{ data }">
                 <CommonIconActionButton
+                  v-if="isSuperAdmin"
                   icon="pi pi-save"
                   severity="success"
                   tooltip="Save setting"
@@ -94,7 +97,7 @@
                 />
               </template>
             </Column>
-          </DataTable>
+          </CommonAdminDataTable>
         </template>
       </Card>
     </div>
@@ -106,7 +109,7 @@
       :style="{ width: '36rem' }"
       :closable="!isConfirmingSave"
     >
-      <div class="flex flex-col gap-4">
+      <div class="flex h-full min-h-0 flex-col gap-4">
         <Message
           severity="warn"
           :closable="false"
@@ -172,6 +175,7 @@ import type { SlipTemplateSetting } from '~/types/entities'
 import { UpdateSlipTemplateSettingRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
+import { toZodFieldErrors } from '~/utils/validation/zod-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -306,7 +310,7 @@ function requestSaveSetting(id: number) {
   rowErrors.value[id] = {}
   const parsed = RowSchema.safeParse(current)
   if (!parsed.success) {
-    const fieldErrors = parsed.error.flatten().fieldErrors
+    const fieldErrors = toZodFieldErrors(parsed.error)
     rowErrors.value[id] = {
       value: fieldErrors.value?.[0],
       sortOrder: fieldErrors.sortOrder?.[0],

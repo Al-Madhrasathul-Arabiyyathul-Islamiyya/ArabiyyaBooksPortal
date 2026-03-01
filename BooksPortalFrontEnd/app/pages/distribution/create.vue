@@ -3,10 +3,10 @@
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
-          Create Distribution
+          {{ isRevisionMode ? 'Edit Distribution' : 'Create Distribution' }}
         </h1>
         <p class="text-sm text-surface-600 dark:text-surface-400">
-          Issue books to a student and generate a distribution slip.
+          {{ isRevisionMode ? 'Revise a processing distribution slip.' : 'Issue books to a student and generate a distribution slip.' }}
         </p>
       </div>
       <Button
@@ -14,7 +14,7 @@
         icon="pi pi-arrow-left"
         severity="secondary"
         text
-        @click="navigateTo('/distribution')"
+        @click="navigateTo(isRevisionMode ? `/distribution/${reviseSlipId}` : '/distribution')"
       />
     </div>
 
@@ -216,12 +216,13 @@
               label="Cancel"
               severity="secondary"
               text
-              @click="navigateTo('/distribution')"
+              @click="navigateTo(isRevisionMode ? `/distribution/${reviseSlipId}` : '/distribution')"
             />
             <Button
               type="submit"
-              label="Create Slip"
+              :label="isRevisionMode ? 'Save Changes' : 'Create Slip'"
               :loading="isSubmitting"
+              :disabled="isOperationBlocked"
             />
           </div>
         </form>
@@ -277,7 +278,8 @@
 
 <script setup lang="ts">
 import { z } from 'zod/v4'
-import type { Lookup, Parent, Student } from '~/types/entities'
+import type { PaginatedList } from '~/types/api'
+import type { Book, DistributionSlip, Lookup, Parent, Student } from '~/types/entities'
 import { CreateDistributionSlipRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
 import { termLabels, termOptions } from '~/utils/formatters'
@@ -307,8 +309,11 @@ type SelectedBook = {
 }
 
 const api = useApi()
+const route = useRoute()
 const { showError, showSuccess } = useAppToast()
 const { isAdmin } = useAuth()
+const { isProcessing } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
@@ -320,6 +325,9 @@ const isStudentDialogVisible = ref(false)
 const isParentDialogVisible = ref(false)
 const studentDialogMode = ref<'lookup' | 'create'>('lookup')
 const parentDialogMode = ref<'lookup' | 'create'>('lookup')
+const isRevisionLoading = ref(false)
+const reviseSlipId = computed(() => Number(route.query.reviseId))
+const isRevisionMode = computed(() => Number.isFinite(reviseSlipId.value) && reviseSlipId.value > 0)
 
 const FormSchema = z.object({
   academicYearId: z.number().int().min(1).nullable(),
@@ -463,7 +471,112 @@ async function loadLookups() {
   }
 }
 
+function mapBookToSelected(book: Book, quantity = 1): SelectedBook {
+  return {
+    id: book.id,
+    title: book.title,
+    code: book.code,
+    available: book.available,
+    quantity,
+  }
+}
+
+async function hydrateRevisionBooks(items: DistributionSlip['items'], academicYearId: number) {
+  const resolved = await Promise.all(items.map(async (item) => {
+    try {
+      const search = await api.get<Book[] | PaginatedList<Book>>(API.books.search, {
+        q: item.bookCode,
+        academicYearId,
+        page: 1,
+        pageSize: 5,
+      })
+      if (search.success) {
+        const candidates = Array.isArray(search.data) ? search.data : search.data.items
+        const matched = candidates.find(book => book.id === item.bookId || book.code === item.bookCode)
+        if (matched) return mapBookToSelected(matched, item.quantity)
+      }
+    }
+    catch {
+      // best effort hydration only
+    }
+
+    return {
+      id: item.bookId,
+      title: item.bookTitle,
+      code: item.bookCode,
+      available: Math.max(item.quantity, 1),
+      quantity: item.quantity,
+    }
+  }))
+
+  selectedBooks.value = resolved
+}
+
+async function loadRevisionSlip() {
+  if (!isRevisionMode.value) return
+
+  isRevisionLoading.value = true
+  try {
+    const slipResponse = await api.get<DistributionSlip>(API.distributions.byId(reviseSlipId.value))
+    if (!slipResponse.success) {
+      showError(slipResponse.message ?? 'Failed to load distribution slip for editing')
+      return
+    }
+
+    const current = slipResponse.data
+    if (!isProcessing(current.lifecycleStatus)) {
+      showError('Only processing distribution slips can be edited.')
+      void navigateTo(`/distribution/${current.id}`)
+      return
+    }
+
+    form.academicYearId = current.academicYearId
+    form.term = current.term
+    form.notes = current.notes ?? ''
+    form.studentId = current.studentId
+    form.parentId = current.parentId
+
+    try {
+      const studentResponse = await api.get<Student>(API.students.byId(current.studentId))
+      if (studentResponse.success) {
+        selectedStudent.value = studentResponse.data
+      }
+    }
+    catch {
+      selectedStudent.value = {
+        id: current.studentId,
+        fullName: current.studentName,
+        indexNo: current.studentIndexNo,
+        nationalId: current.studentNationalId ?? '',
+        classSectionId: 0,
+        classSectionDisplayName: current.studentClassName,
+        parents: [],
+      }
+    }
+
+    selectedParent.value = {
+      id: current.parentId,
+      fullName: current.parentName,
+      nationalId: '',
+      phone: null,
+      relationship: null,
+    }
+
+    await hydrateRevisionBooks(current.items, current.academicYearId)
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to load distribution slip for editing'))
+  }
+  finally {
+    isRevisionLoading.value = false
+  }
+}
+
 async function submitForm() {
+  if (!await guard(isRevisionMode.value ? 'save distribution changes' : 'create a distribution slip')) {
+    return
+  }
+
   form.studentId = selectedStudent.value?.id ?? null
   form.parentId = selectedParent.value?.id ?? form.parentId
 
@@ -514,14 +627,16 @@ async function submitForm() {
 
   isSubmitting.value = true
   try {
-    const response = await api.post(API.distributions.base, requestCheck.data)
+    const response = isRevisionMode.value
+      ? await api.put(API.distributions.byId(reviseSlipId.value), requestCheck.data)
+      : await api.post(API.distributions.base, requestCheck.data)
     if (response.success) {
-      showSuccess('Distribution created successfully')
+      showSuccess(isRevisionMode.value ? 'Distribution updated successfully' : 'Distribution created successfully')
       const slip = response.data as { id: number }
-      void navigateTo(`/distribution/${slip.id}`)
+      void navigateTo(`/distribution/${slip.id ?? reviseSlipId.value}`)
       return
     }
-    setGlobalError(response.message ?? 'Failed to create distribution')
+    setGlobalError(response.message ?? (isRevisionMode.value ? 'Failed to update distribution' : 'Failed to create distribution'))
   }
   catch (error: unknown) {
     applyBackendErrors(error)
@@ -560,5 +675,6 @@ watch(
 
 onMounted(async () => {
   await loadLookups()
+  await loadRevisionSlip()
 })
 </script>

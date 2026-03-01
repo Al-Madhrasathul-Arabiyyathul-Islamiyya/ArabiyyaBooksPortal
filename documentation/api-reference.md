@@ -54,6 +54,12 @@ Paginated endpoints return `PaginatedList<T>`:
 - **Validation run**: `tools/api-contract-tester/logs/httpyac-contract-log-8838ab0c-93e8-4237-9003-46b28cd0cdbb.json`
 - **Rule**: For the scoped endpoints, example payloads in this document are treated as frontend contracts.
 
+### Contract Alignment Notes
+
+- Pagination upgrades and consumption tracking are maintained in `plans/03-backend-pagination-enhancements.md`.
+- Slip lifecycle and revision follow-ups are tracked in `plans/04-high-priority-backend-followups.md`.
+- Frontend execution/verification closure is tracked in `plans/01-frontend-core-roadmap.md`.
+
 ---
 
 ## 1. Auth
@@ -320,10 +326,11 @@ All endpoints require **Bearer auth**.
 
 ### GET /api/ClassSections
 
-List class sections with optional filter.
+List class sections with optional filters (paginated).
 
-- **Query**: `?academicYearId={int}`
-- **Response**: `ClassSectionResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&keystageId={int}&gradeId={int}&search={string}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<ClassSectionResponse>`
 
 ### GET /api/ClassSections/{id}
 
@@ -442,14 +449,43 @@ Validate student import payload before commit.
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `FullName`, `IndexNo`, `NationalId`, `ClassSectionId`
+  - Optional: `ParentNationalId` (links student to parent by parent national ID)
 
 ### POST /api/students/bulk/commit
 
-Commit student import payload in a single transaction (reject-on-conflict, no upsert).
+Commit student import payload with per-row processing.
+
+- Existing rows (matched by `IndexNo`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
 
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+
+### POST /api/students/bulk/commit-async
+
+Start async student bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/students/bulk/jobs/{jobId}
+
+Get async student bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/students/bulk/jobs/{jobId}/report
+
+Download async student bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 **StudentResponse**:
 
@@ -523,6 +559,51 @@ Delete a parent.
 - **Auth**: Bearer + **SuperAdmin** role
 - **Response**: `string` message
 - **Behavior**: returns business-rule error if the parent is referenced by existing records.
+
+### POST /api/parents/bulk/validate
+
+Validate parent import payload before commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `FullName`, `NationalId`
+  - Optional: `Phone`, `Relationship`, `StudentIndexNo` (links parent to student by student index)
+
+### POST /api/parents/bulk/commit
+
+Commit parent import payload with per-row processing.
+
+- Existing rows (matched by `NationalId`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `BulkImportReport`
+
+### POST /api/parents/bulk/commit-async
+
+Start async parent bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/parents/bulk/jobs/{jobId}
+
+Get async parent bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/parents/bulk/jobs/{jobId}/report
+
+Download async parent bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 **ParentResponse**:
 
@@ -607,14 +688,42 @@ Validate teacher import payload before commit.
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `FullName`, `NationalId`, `Email`, `Phone`
 
 ### POST /api/teachers/bulk/commit
 
-Commit teacher import payload in a single transaction (reject-on-conflict, no upsert).
+Commit teacher import payload with per-row processing.
+
+- Existing rows (matched by `NationalId`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
 
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+
+### POST /api/teachers/bulk/commit-async
+
+Start async teacher bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/teachers/bulk/jobs/{jobId}
+
+Get async teacher bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/teachers/bulk/jobs/{jobId}/report
+
+Download async teacher bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 **TeacherResponse**:
 
@@ -733,14 +842,44 @@ Validate book import payload before commit.
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+- **Template columns**:
+  - Required: `Code`, `Title`, `SubjectCode`, `Publisher`, `PublishedYear`, `Quantity`
+  - Required one-of: `AcademicYear` or legacy `AcademicYearId`
+  - Optional: `ISBN`, `Author`, `Edition`, `Grade`, `Source`, `Notes`
 
 ### POST /api/books/bulk/commit
 
-Commit book import payload in a single transaction (reject-on-conflict, no upsert).
+Commit book import payload with per-row processing.
+
+- Existing rows (matched by `Code`) are **updated**.
+- New rows are **inserted**.
+- Invalid rows are rejected and reported; valid rows still commit.
 
 - **Auth**: Bearer + **SuperAdmin** or **Admin** role
 - **Request**: `multipart/form-data` with `file` (`.xlsx`)
 - **Response**: `BulkImportReport`
+
+### POST /api/books/bulk/commit-async
+
+Start async book bulk commit job.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Request**: `multipart/form-data` with `file` (`.xlsx`)
+- **Response**: `{ jobId: guid }`
+
+### GET /api/books/bulk/jobs/{jobId}
+
+Get async book bulk job status/progress.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `BulkImportJobSnapshot`
+
+### GET /api/books/bulk/jobs/{jobId}/report
+
+Download async book bulk row-result Excel report.
+
+- **Auth**: Bearer + **SuperAdmin** or **Admin** role
+- **Response**: `.xlsx` file
 
 ### PUT /api/books/{id}
 
@@ -771,15 +910,19 @@ Add stock entry for a book.
 
 ### GET /api/books/{id}/stock-entries
 
-List stock entries for a book.
+List stock entries for a book (paginated).
 
-- **Response**: `StockEntryResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StockEntryResponse>`
 
 ### GET /api/books/{id}/stock-movements
 
-List stock movements for a book.
+List stock movements for a book (paginated).
 
-- **Response**: `StockMovementResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StockMovementResponse>`
 
 ### POST /api/books/{id}/adjust-stock
 
@@ -1000,8 +1143,9 @@ All endpoints require **Bearer auth**.
 
 List return slips (paginated).
 
-- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&studentId={int}`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&studentId={int}&includeCancelled={bool}`
 - **Defaults**: pageNumber=1, pageSize=20
+- **Default behavior**: cancelled slips are excluded unless `includeCancelled=true`.
 - **Response**: `PaginatedList<ReturnSlipResponse>`
 
 ### GET /api/returns/{id}
@@ -1045,6 +1189,14 @@ Create a return slip.
 Cancel a return slip (reverses stock).
 
 - **Response**: `string` message
+- **Rule**: finalized slips cannot be cancelled.
+
+### POST /api/returns/{id}/finalize
+
+Finalize a return slip.
+
+- **Response**: `string` message
+- **Rule**: cancelled slips cannot be finalized.
 
 ### GET /api/returns/{id}/print
 
@@ -1074,6 +1226,11 @@ Download PDF for a return slip.
 | receivedByName | string |
 | receivedByDesignation | string? |
 | receivedAt | DateTime |
+| lifecycleStatus | SlipLifecycleStatus (int) |
+| finalizedById | int? |
+| finalizedAt | DateTime? |
+| cancelledById | int? |
+| cancelledAt | DateTime? |
 | notes | string? |
 | pdfFilePath | string? |
 | items | ReturnSlipItemResponse[] |
@@ -1257,6 +1414,11 @@ Download PDF for the latest teacher return slip created for the teacher issue.
 | receivedByName | string |
 | receivedByDesignation | string? |
 | receivedAt | DateTime |
+| lifecycleStatus | SlipLifecycleStatus (int) |
+| finalizedById | int? |
+| finalizedAt | DateTime? |
+| cancelledById | int? |
+| cancelledAt | DateTime? |
 | notes | string? |
 | pdfFilePath | string? |
 | items | TeacherReturnSlipItemResponse[] |
@@ -1273,6 +1435,55 @@ Download PDF for the latest teacher return slip created for the teacher issue.
 
 ---
 
+## 13A. Teacher Return Slips
+
+Base path: `/api/TeacherReturns`
+
+All endpoints require **Bearer auth**.
+
+### GET /api/TeacherReturns
+
+List teacher return slips (paginated).
+
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&teacherId={int}&teacherIssueId={int}&includeCancelled={bool}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Default behavior**: cancelled slips are excluded unless `includeCancelled=true`.
+- **Response**: `PaginatedList<TeacherReturnSlipResponse>`
+
+### GET /api/TeacherReturns/{id}
+
+Get teacher return slip by ID.
+
+- **Response**: `TeacherReturnSlipResponse`
+
+### GET /api/TeacherReturns/by-reference/{referenceNo}
+
+Get teacher return slip by reference number.
+
+- **Response**: `TeacherReturnSlipResponse`
+
+### POST /api/TeacherReturns/{id}/finalize
+
+Finalize a teacher return slip.
+
+- **Response**: `string` message
+- **Rule**: cancelled slips cannot be finalized.
+
+### DELETE /api/TeacherReturns/{id}
+
+Cancel a teacher return slip (reverses teacher-return stock movements).
+
+- **Response**: `string` message
+- **Rule**: finalized slips cannot be cancelled.
+
+### GET /api/TeacherReturns/{id}/print
+
+Download PDF for a teacher return slip.
+
+- **Response**: `application/pdf` file
+
+---
+
 ## 14. Reports
 
 Base path: `/api/reports`
@@ -1281,31 +1492,36 @@ All endpoints require **Bearer auth**.
 
 ### GET /api/reports/stock-summary
 
-Stock summary report.
+Stock summary report (paginated).
 
-- **Query**: `?subjectId={int}&grade={string}`
-- **Response**: `StockSummaryReport[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&subjectId={int}&grade={string}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StockSummaryReport>`
 
 ### GET /api/reports/distribution-summary
 
-Distribution summary report.
+Distribution summary report (paginated).
 
-- **Query**: `?academicYearId={int}&from={DateTime}&to={DateTime}`
+- **Query**: `?pageNumber={int}&pageSize={int}&academicYearId={int}&from={DateTime}&to={DateTime}`
 - `academicYearId` is **required**
-- **Response**: `DistributionSummaryReport[]`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<DistributionSummaryReport>`
 
 ### GET /api/reports/teacher-outstanding
 
-Teacher outstanding books report.
+Teacher outstanding books report (paginated).
 
-- **Query**: `?teacherId={int}`
-- **Response**: `TeacherOutstandingReport[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&teacherId={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<TeacherOutstandingReport>`
 
 ### GET /api/reports/student-history/{studentId}
 
-Student book history.
+Student book history (paginated).
 
-- **Response**: `StudentHistoryReport[]`
+- **Query**: `?pageNumber={int}&pageSize={int}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<StudentHistoryReport>`
 
 ### GET /api/reports/export/stock-summary
 
@@ -1394,9 +1610,11 @@ All endpoints require **Bearer auth** + **SuperAdmin** or **Admin** role.
 
 ### GET /api/users
 
-List all users.
+List users (paginated).
 
-- **Response**: `UserResponse[]`
+- **Query**: `?pageNumber={int}&pageSize={int}&search={string}&isActive={bool}&role={string}`
+- **Defaults**: pageNumber=1, pageSize=20
+- **Response**: `PaginatedList<UserResponse>`
 
 ### GET /api/users/{id}
 
@@ -2129,21 +2347,29 @@ Frozen routes:
 ### Frontend-Critical Reports
 
 Frozen routes:
-- `GET /api/reports/distribution-summary`
-- `GET /api/reports/student-history/{studentId}`
+- `GET /api/reports/distribution-summary?pageNumber={n}&pageSize={n}&academicYearId={id}`
+- `GET /api/reports/student-history/{studentId}?pageNumber={n}&pageSize={n}`
 
 #### GET `/api/reports/distribution-summary` Example Success (frozen)
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "slipId": 9,
-      "referenceNo": "DIS-2026-0001",
-      "studentName": "Student One",
-      "totalBooks": 3
-    }
-  ],
+  "data": {
+    "items": [
+      {
+        "slipId": 9,
+        "referenceNo": "DIS-2026-0001",
+        "studentName": "Student One",
+        "totalBooks": 3
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
   "message": null,
   "errors": null
 }
@@ -2153,15 +2379,23 @@ Frozen routes:
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "referenceNo": "DIS-2026-0001",
-      "bookTitle": "Sample Book",
-      "movementType": 2,
-      "quantity": 1,
-      "date": "2026-02-09T03:05:00Z"
-    }
-  ],
+  "data": {
+    "items": [
+      {
+        "referenceNo": "DIS-2026-0001",
+        "bookTitle": "Sample Book",
+        "movementType": 2,
+        "quantity": 1,
+        "date": "2026-02-09T03:05:00Z"
+      }
+    ],
+    "totalCount": 1,
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalPages": 1,
+    "hasPrevious": false,
+    "hasNext": false
+  },
   "message": null,
   "errors": null
 }
@@ -2177,7 +2411,82 @@ pwsh ./tools/api-contract-tester/run-backend-verification.ps1
 
 The frontend freeze is considered current only when this run passes and the scoped example payloads remain accurate.
 
-## 20. Enums
+## 20. Import Templates
+
+Base path: `/api/import-templates`
+
+All endpoints require **Bearer auth** with **SuperAdmin** or **Admin** role.
+
+Templates are generated at API startup, cached on disk, and served as static `.xlsx` files.
+All templates are header-only (no sample rows), with auto-sized columns.
+
+### GET /api/import-templates/books
+
+- **Response**: `books-import-template.xlsx`
+
+### GET /api/import-templates/students
+
+- **Response**: `students-import-template.xlsx`
+
+### GET /api/import-templates/teachers
+
+- **Response**: `teachers-import-template.xlsx`
+
+### GET /api/import-templates/parents
+
+- **Response**: `parents-import-template.xlsx`
+
+## 21. Bulk Import Models
+
+### BulkImportReport
+
+| Field | Type |
+|-------|------|
+| entity | string |
+| totalRows | int |
+| validRows | int |
+| invalidRows | int |
+| insertedRows | int |
+| updatedRows | int |
+| failedRows | int |
+| canCommit | bool |
+| rows | BulkImportRowResult[] |
+| issues | BulkImportRowIssue[] |
+
+### BulkImportRowResult
+
+| Field | Type |
+|-------|------|
+| rowNumber | int |
+| key | string |
+| success | bool |
+| status | string (`Valid`/`Inserted`/`Updated`/`Failed`) |
+| note | string? |
+
+### BulkImportRowIssue
+
+| Field | Type |
+|-------|------|
+| rowNumber | int |
+| field | string |
+| code | string |
+| message | string |
+
+### BulkImportJobSnapshot
+
+| Field | Type |
+|-------|------|
+| id | guid |
+| entity | string (`book`/`student`/`teacher`/`parent`) |
+| status | string (`Queued`/`Running`/`Completed`/`Failed`) |
+| error | string? |
+| totalRows | int |
+| processedRows | int |
+| startedAtUtc | datetime |
+| completedAtUtc | datetime? |
+| reportReady | bool |
+
+## 22. Enums
 
 ### Term
 | Value | Name |

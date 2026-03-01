@@ -89,7 +89,11 @@ public class SlipTemplateSettingServiceTests
     {
         var entity = new SlipTemplateSetting
         {
-            Id = 1, Category = "Common", Key = "SchoolName", Value = "Test School", SortOrder = 0
+            Id = 1,
+            Category = "Common",
+            Key = "SchoolName",
+            Value = "Test School",
+            SortOrder = 0
         };
         _repository.GetByIdAsync(1).Returns(entity);
 
@@ -116,7 +120,11 @@ public class SlipTemplateSettingServiceTests
     {
         var entity = new SlipTemplateSetting
         {
-            Id = 1, Category = "Common", Key = "SchoolName", Value = "Old", SortOrder = 0
+            Id = 1,
+            Category = "Common",
+            Key = "SchoolName",
+            Value = "Old",
+            SortOrder = 0
         };
         _repository.GetByIdAsync(1).Returns(entity);
 

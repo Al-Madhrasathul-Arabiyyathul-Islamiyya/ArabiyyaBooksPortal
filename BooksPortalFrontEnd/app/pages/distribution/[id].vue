@@ -6,10 +6,20 @@
       :reference-no="slip?.referenceNo"
       :academic-year-name="slip?.academicYearName"
       :date="slip?.issuedAt"
-      :notes="slip?.notes"
+      :notes="detailNotes"
       :items="slip?.items ?? []"
       :loading="isLoading"
     >
+      <template #header-meta>
+        <span
+          v-if="slip && lifecycleLabel"
+          class="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-semibold"
+          :class="lifecycleBadgeClass"
+        >
+          <i :class="lifecycleIcon" />
+          {{ lifecycleLabel }}
+        </span>
+      </template>
       <template #actions>
         <Button
           label="Done"
@@ -19,6 +29,14 @@
           @click="navigateTo('/distribution')"
         />
         <Button
+          v-if="canFinalize"
+          label="Edit"
+          icon="pi pi-pencil"
+          severity="secondary"
+          outlined
+          @click="navigateTo(`/distribution/create?reviseId=${slipId}`)"
+        />
+        <Button
           label="Print"
           icon="pi pi-print"
           outlined
@@ -26,10 +44,20 @@
           @click="printSlip"
         />
         <Button
+          v-if="canFinalize"
+          label="Finalize"
+          icon="pi pi-check-circle"
+          severity="success"
+          outlined
+          :loading="isFinalizeLoading"
+          @click="finalizeSlip"
+        />
+        <Button
           label="Cancel Slip"
           icon="pi pi-times-circle"
           severity="danger"
           outlined
+          :disabled="!canCancel"
           :loading="isCancelLoading"
           @click="cancelSlip"
         />
@@ -71,13 +99,40 @@ const route = useRoute()
 const api = useApi()
 const { showError, showSuccess } = useAppToast()
 const { confirmAction } = useAppConfirm()
+const { getLifecycleLabel, getLifecycleIcon, getLifecycleBadgeClass, isProcessing } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const slip = ref<DistributionSlip | null>(null)
 const isLoading = ref(false)
 const isPrintLoading = ref(false)
 const isCancelLoading = ref(false)
+const isFinalizeLoading = ref(false)
 
 const slipId = computed(() => Number(route.params.id))
+
+const lifecycleLabel = computed(() => getLifecycleLabel(slip.value?.lifecycleStatus))
+const lifecycleIcon = computed(() => getLifecycleIcon(slip.value?.lifecycleStatus))
+const lifecycleBadgeClass = computed(() => getLifecycleBadgeClass(slip.value?.lifecycleStatus))
+const canFinalize = computed(() =>
+  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus) && !isOperationBlocked.value,
+)
+const canCancel = computed(() =>
+  Boolean(slip.value) && isProcessing(slip.value?.lifecycleStatus) && !isOperationBlocked.value,
+)
+const detailNotes = computed(() => {
+  if (!slip.value) return null
+  const parts: string[] = [`Lifecycle: ${lifecycleLabel.value}`]
+  if (slip.value.finalizedAt) {
+    parts.push(`Finalized: ${new Date(slip.value.finalizedAt).toLocaleString()}`)
+  }
+  if (slip.value.cancelledAt) {
+    parts.push(`Cancelled: ${new Date(slip.value.cancelledAt).toLocaleString()}`)
+  }
+  if (slip.value.notes) {
+    parts.push(`Notes: ${slip.value.notes}`)
+  }
+  return parts.join(' | ')
+})
 
 async function loadSlip() {
   if (!Number.isFinite(slipId.value)) {
@@ -115,8 +170,38 @@ async function printSlip() {
   }
 }
 
-function cancelSlip() {
-  if (!Number.isFinite(slipId.value)) return
+async function finalizeSlip() {
+  if (!Number.isFinite(slipId.value) || !canFinalize.value) return
+  if (!await guard('finalize this distribution slip')) return
+  confirmAction(
+    'Finalize this distribution slip? Finalized slips cannot be cancelled.',
+    async () => {
+      isFinalizeLoading.value = true
+      try {
+        const response = await api.post<string>(API.distributions.finalize(slipId.value))
+        if (response.success) {
+          showSuccess(response.message ?? 'Distribution slip finalized')
+          await loadSlip()
+          return
+        }
+        showError(response.message ?? 'Failed to finalize slip')
+      }
+      catch (error: unknown) {
+        showError(getFriendlyErrorMessage(error, 'Failed to finalize slip'))
+      }
+      finally {
+        isFinalizeLoading.value = false
+      }
+    },
+    'Finalize Distribution Slip',
+    'Finalize',
+    'Keep Editing',
+  )
+}
+
+async function cancelSlip() {
+  if (!Number.isFinite(slipId.value) || !canCancel.value) return
+  if (!await guard('cancel this distribution slip')) return
   confirmAction(
     'Cancel this distribution slip? This will reverse stock movements.',
     async () => {

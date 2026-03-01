@@ -1,0 +1,25 @@
+# 99 - Plan Index and Archive Map
+
+## Canonical Active Plans (Use These)
+1. `plans/01-frontend-core-roadmap.md`
+2. `plans/02-frontend-validation-migration.md`
+3. `plans/03-backend-pagination-enhancements.md`
+4. `plans/04-high-priority-backend-followups.md`
+5. `plans/05-post-v1-backup-and-scheduled-reports.md`
+6. `plans/07-frontend-testing-suite-rollout.md`
+7. `plans/08-post-v1-realtime-signalr-and-websockets.md`
+8. `plans/09-pre-v1-bootstrap-and-readiness-rollout.md`
+
+## Archive Policy
+- Legacy plans are preserved under `plans/archive/`.
+- Legacy root-level filenames remain as short pointer stubs for continuity.
+- Execution tracking must be updated in the canonical numbered files.
+- Historical completed numbered plans may be archived and replaced by pointer stubs.
+
+## Status Fields Standard
+- `Status legend: [ ] Todo | [~] In progress | [x] Done`
+- Every active plan should include:
+  - Purpose
+  - Current status
+  - Remaining tasks
+  - Acceptance criteria

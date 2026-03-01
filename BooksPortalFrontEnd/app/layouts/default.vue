@@ -154,6 +154,7 @@
 
       <!-- Page content -->
       <main class="flex-1 p-6">
+        <SetupReadinessBanner class="mb-4" />
         <slot />
       </main>
     </div>
@@ -166,6 +167,8 @@ const { user, isAdmin, logout } = useAuth()
 const appStore = useAppStore()
 const route = useRoute()
 const { public: { appTitle } } = useRuntimeConfig()
+
+useLayoutPageHead('client')
 
 const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
 const userMenuRef = ref()
@@ -186,7 +189,7 @@ const userMenuItems = ref([
   {
     label: 'Profile',
     icon: 'pi pi-user',
-    command: () => navigateTo(isAdmin.value ? '/admin/settings/profile' : '/distribution'),
+    command: () => navigateTo('/profile'),
   },
   { separator: true },
   {
@@ -225,9 +228,23 @@ const collapsedNavItems = computed(() => ([
 
 // Initialize auth on layout mount
 const authStore = useAuthStore()
+const setupReadinessStore = useSetupReadinessStore()
 onMounted(() => {
   authStore.initialize()
 })
+
+watch(
+  () => authStore.isAuthenticated,
+  (isAuthenticated) => {
+    if (isAuthenticated) {
+      void setupReadinessStore.fetchStatus()
+    }
+    else {
+      setupReadinessStore.clear()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

@@ -3,10 +3,10 @@
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
-          Create Teacher Issue
+          {{ isRevisionMode ? 'Edit Teacher Issue' : 'Create Teacher Issue' }}
         </h1>
         <p class="text-sm text-surface-600 dark:text-surface-400">
-          Issue books to a teacher and generate a teacher issue slip.
+          {{ isRevisionMode ? 'Revise a processing teacher issue slip.' : 'Issue books to a teacher and generate a teacher issue slip.' }}
         </p>
       </div>
       <Button
@@ -14,7 +14,7 @@
         icon="pi pi-arrow-left"
         severity="secondary"
         text
-        @click="navigateTo('/teacher-issues')"
+        @click="navigateTo(isRevisionMode ? `/teacher-issues/${reviseSlipId}` : '/teacher-issues')"
       />
     </div>
 
@@ -181,12 +181,13 @@
               label="Cancel"
               severity="secondary"
               text
-              @click="navigateTo('/teacher-issues')"
+              @click="navigateTo(isRevisionMode ? `/teacher-issues/${reviseSlipId}` : '/teacher-issues')"
             />
             <Button
               type="submit"
-              label="Create Slip"
+              :label="isRevisionMode ? 'Save Changes' : 'Create Slip'"
               :loading="isSubmitting"
+              :disabled="isOperationBlocked"
             />
           </div>
         </form>
@@ -217,7 +218,8 @@
 
 <script setup lang="ts">
 import { z } from 'zod/v4'
-import type { Lookup, Teacher } from '~/types/entities'
+import type { PaginatedList } from '~/types/api'
+import type { Book, Lookup, Teacher, TeacherIssue } from '~/types/entities'
 import { CreateTeacherIssueRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
 import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
@@ -245,8 +247,11 @@ type TeacherIssueFormState = {
 }
 
 const api = useApi()
+const route = useRoute()
 const { showError, showSuccess } = useAppToast()
 const { isAdmin } = useAuth()
+const { isProcessing } = useSlipLifecycle()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
@@ -255,6 +260,9 @@ const selectedBooks = ref<SelectedBook[]>([])
 const isSubmitting = ref(false)
 const isTeacherDialogVisible = ref(false)
 const teacherDialogMode = ref<'lookup' | 'create'>('lookup')
+const isRevisionLoading = ref(false)
+const reviseSlipId = computed(() => Number(route.query.reviseId))
+const isRevisionMode = computed(() => Number.isFinite(reviseSlipId.value) && reviseSlipId.value > 0)
 
 const FormSchema = z.object({
   academicYearId: z.number().int().min(1).nullable(),
@@ -359,6 +367,97 @@ async function loadAcademicYears() {
   }
 }
 
+function mapBookToSelected(book: Book, quantity = 1): SelectedBook {
+  return {
+    id: book.id,
+    title: book.title,
+    code: book.code,
+    available: book.available,
+    quantity,
+  }
+}
+
+async function hydrateRevisionBooks(items: TeacherIssue['items'], academicYearId: number) {
+  const resolved = await Promise.all(items.map(async (item) => {
+    try {
+      const search = await api.get<Book[] | PaginatedList<Book>>(API.books.search, {
+        q: item.bookCode,
+        academicYearId,
+        page: 1,
+        pageSize: 5,
+      })
+      if (search.success) {
+        const candidates = Array.isArray(search.data) ? search.data : search.data.items
+        const matched = candidates.find(book => book.id === item.bookId || book.code === item.bookCode)
+        if (matched) return mapBookToSelected(matched, item.quantity)
+      }
+    }
+    catch {
+      // best effort hydration only
+    }
+
+    return {
+      id: item.bookId,
+      title: item.bookTitle,
+      code: item.bookCode,
+      available: Math.max(item.quantity, 1),
+      quantity: item.quantity,
+    }
+  }))
+
+  selectedBooks.value = resolved
+}
+
+async function loadRevisionSlip() {
+  if (!isRevisionMode.value) return
+
+  isRevisionLoading.value = true
+  try {
+    const slipResponse = await api.get<TeacherIssue>(API.teacherIssues.byId(reviseSlipId.value))
+    if (!slipResponse.success) {
+      showError(slipResponse.message ?? 'Failed to load teacher issue for editing')
+      return
+    }
+
+    const current = slipResponse.data
+    if (!isProcessing(current.lifecycleStatus)) {
+      showError('Only processing teacher issue slips can be edited.')
+      void navigateTo(`/teacher-issues/${current.id}`)
+      return
+    }
+
+    form.academicYearId = current.academicYearId
+    form.teacherId = current.teacherId
+    form.expectedReturnDate = current.expectedReturnDate
+    form.notes = current.notes ?? ''
+
+    try {
+      const teacherResponse = await api.get<Teacher>(API.teachers.byId(current.teacherId))
+      if (teacherResponse.success) {
+        selectedTeacher.value = teacherResponse.data
+      }
+    }
+    catch {
+      selectedTeacher.value = {
+        id: current.teacherId,
+        fullName: current.teacherName,
+        nationalId: '',
+        email: null,
+        phone: null,
+        assignments: [],
+      }
+    }
+
+    await hydrateRevisionBooks(current.items, current.academicYearId)
+  }
+  catch (error: unknown) {
+    showError(getFriendlyErrorMessage(error, 'Failed to load teacher issue for editing'))
+  }
+  finally {
+    isRevisionLoading.value = false
+  }
+}
+
 function mapSelectedItems() {
   return selectedBooks.value.map(item => ({
     bookId: item.id,
@@ -367,6 +466,10 @@ function mapSelectedItems() {
 }
 
 async function submitForm() {
+  if (!await guard(isRevisionMode.value ? 'save teacher issue changes' : 'create a teacher issue slip')) {
+    return
+  }
+
   setGlobalError('')
   const parsed = await validateWithSchema(form)
   if (!parsed.success) return
@@ -392,17 +495,19 @@ async function submitForm() {
 
   isSubmitting.value = true
   try {
-    const response = await api.post<{ id: number }>(API.teacherIssues.base, requestValidation.data)
+    const response = isRevisionMode.value
+      ? await api.put<{ id: number }>(API.teacherIssues.byId(reviseSlipId.value), requestValidation.data)
+      : await api.post<{ id: number }>(API.teacherIssues.base, requestValidation.data)
     if (response.success) {
-      showSuccess(response.message ?? 'Teacher issue created')
-      void navigateTo(`/teacher-issues/${response.data.id}`)
+      showSuccess(response.message ?? (isRevisionMode.value ? 'Teacher issue updated' : 'Teacher issue created'))
+      void navigateTo(`/teacher-issues/${response.data.id ?? reviseSlipId.value}`)
       return
     }
-    setGlobalError(response.message ?? 'Failed to create teacher issue')
+    setGlobalError(response.message ?? (isRevisionMode.value ? 'Failed to update teacher issue' : 'Failed to create teacher issue'))
   }
   catch (error: unknown) {
     applyBackendErrors(error)
-    showError(getFriendlyErrorMessage(error, 'Failed to create teacher issue'))
+    showError(getFriendlyErrorMessage(error, isRevisionMode.value ? 'Failed to update teacher issue' : 'Failed to create teacher issue'))
   }
   finally {
     isSubmitting.value = false
@@ -411,5 +516,6 @@ async function submitForm() {
 
 onMounted(async () => {
   await loadAcademicYears()
+  await loadRevisionSlip()
 })
 </script>

@@ -17,7 +17,6 @@ public class BookBulkImportService : IBookBulkImportService
         "SubjectCode",
         "Publisher",
         "PublishedYear",
-        "AcademicYearId",
         "Quantity"
     ];
 
@@ -47,34 +46,48 @@ public class BookBulkImportService : IBookBulkImportService
         return parsed.Report;
     }
 
-    public async Task<BulkImportReport> CommitAsync(Stream stream, int userId, CancellationToken cancellationToken = default)
+    public async Task<BulkImportReport> CommitAsync(
+        Stream stream,
+        int userId,
+        IProgress<int>? processedRowsProgress = null,
+        CancellationToken cancellationToken = default)
     {
         var parsed = await ParseAsync(stream, cancellationToken);
-        if (!parsed.Report.CanCommit)
+        if (parsed.Rows.Count == 0)
             return parsed.Report;
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        var rowsByRowNumber = parsed.Report.Rows.ToDictionary(r => r.RowNumber);
+        var rowCodes = parsed.Rows.Select(r => r.Request.Code).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var existingBooksByCode = await _bookRepository.Query()
+            .Where(b => rowCodes.Contains(b.Code))
+            .ToDictionaryAsync(b => b.Code, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        var processedRows = 0;
+        foreach (var row in parsed.Rows)
         {
-            var insertedRows = new List<BulkImportRowResult>();
-
-            foreach (var row in parsed.Rows)
+            var rowResult = rowsByRowNumber[row.RowNumber];
+            try
             {
-                var entity = new Book
+                var isUpdate = existingBooksByCode.TryGetValue(row.Request.Code, out var entity);
+                if (entity is null)
                 {
-                    ISBN = string.IsNullOrWhiteSpace(row.Request.ISBN) ? null : row.Request.ISBN,
-                    Code = row.Request.Code,
-                    Title = row.Request.Title,
-                    Author = string.IsNullOrWhiteSpace(row.Request.Author) ? null : row.Request.Author,
-                    Edition = string.IsNullOrWhiteSpace(row.Request.Edition) ? null : row.Request.Edition,
-                    Publisher = row.Request.Publisher,
-                    PublishedYear = row.Request.PublishedYear,
-                    SubjectId = row.Request.SubjectId,
-                    Grade = string.IsNullOrWhiteSpace(row.Request.Grade) ? null : row.Request.Grade,
-                    TotalStock = row.Quantity
-                };
+                    entity = new Book
+                    {
+                        ISBN = string.IsNullOrWhiteSpace(row.Request.ISBN) ? null : row.Request.ISBN,
+                        Code = row.Request.Code
+                    };
+                    _bookRepository.Add(entity);
+                }
 
-                _bookRepository.Add(entity);
+                entity.Title = row.Request.Title;
+                entity.Author = string.IsNullOrWhiteSpace(row.Request.Author) ? null : row.Request.Author;
+                entity.Edition = string.IsNullOrWhiteSpace(row.Request.Edition) ? null : row.Request.Edition;
+                entity.Publisher = row.Request.Publisher;
+                entity.PublishedYear = row.Request.PublishedYear;
+                entity.SubjectId = row.Request.SubjectId;
+                entity.Grade = string.IsNullOrWhiteSpace(row.Request.Grade) ? null : row.Request.Grade;
+                entity.TotalStock = row.Quantity;
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _stockEntryRepository.Add(new StockEntry
@@ -87,36 +100,43 @@ public class BookBulkImportService : IBookBulkImportService
                     EnteredById = userId,
                     EnteredAt = DateTime.UtcNow
                 });
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                insertedRows.Add(new BulkImportRowResult
+                rowResult.Success = true;
+                rowResult.Status = isUpdate ? "Updated" : "Inserted";
+                rowResult.Note = isUpdate ? "Updated existing book." : "Inserted new book.";
+
+                if (isUpdate)
+                    parsed.Report.UpdatedRows++;
+                else
+                    parsed.Report.InsertedRows++;
+
+                existingBooksByCode[row.Request.Code] = entity;
+            }
+            catch (Exception ex)
+            {
+                rowResult.Success = false;
+                rowResult.Status = "Failed";
+                rowResult.Note = ex.Message;
+                parsed.Report.FailedRows++;
+                parsed.Report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = row.RowNumber,
-                    Key = row.Request.Code,
-                    Success = true,
-                    Note = "Inserted"
+                    Field = "Commit",
+                    Code = "CommitFailed",
+                    Message = ex.Message
                 });
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            return new BulkImportReport
+            finally
             {
-                Entity = "Book",
-                TotalRows = parsed.Rows.Count,
-                ValidRows = parsed.Rows.Count,
-                InvalidRows = 0,
-                InsertedRows = parsed.Rows.Count,
-                FailedRows = 0,
-                CanCommit = true,
-                Rows = insertedRows
-            };
+                processedRows++;
+                processedRowsProgress?.Report(processedRows);
+            }
         }
-        catch
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
+
+        parsed.Report.CanCommit = parsed.Report.Rows.Any(r => r.Success);
+        parsed.Report.ValidRows = parsed.Report.Rows.Count(r => r.Success);
+        return parsed.Report;
     }
 
     private async Task<(List<BookImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
@@ -136,6 +156,17 @@ public class BookBulkImportService : IBookBulkImportService
                 Field = header,
                 Code = "MissingHeader",
                 Message = $"Required header '{header}' is missing."
+            });
+        }
+
+        if (!headers.ContainsKey("AcademicYearId") && !headers.ContainsKey("AcademicYear"))
+        {
+            report.Issues.Add(new BulkImportRowIssue
+            {
+                RowNumber = 1,
+                Field = "AcademicYear",
+                Code = "MissingHeader",
+                Message = "Required header 'AcademicYear' (or legacy 'AcademicYearId') is missing."
             });
         }
 
@@ -161,7 +192,9 @@ public class BookBulkImportService : IBookBulkImportService
             var publisher = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Publisher");
             var publishedYearRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "PublishedYear");
             var grade = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Grade");
-            var academicYearIdRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "AcademicYearId");
+            var academicYearRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "AcademicYearId");
+            if (string.IsNullOrWhiteSpace(academicYearRaw))
+                academicYearRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "AcademicYear");
             var quantityRaw = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Quantity");
             var source = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Source");
             var notes = BulkImportWorksheetReader.Cell(worksheet, rowNumber, headers, "Notes");
@@ -173,7 +206,6 @@ public class BookBulkImportService : IBookBulkImportService
                 continue;
 
             var publishedYear = int.TryParse(publishedYearRaw, out var parsedPublishedYear) ? parsedPublishedYear : 0;
-            var academicYearId = int.TryParse(academicYearIdRaw, out var parsedAcademicYearId) ? parsedAcademicYearId : 0;
             var quantity = int.TryParse(quantityRaw, out var parsedQuantity) ? parsedQuantity : 0;
 
             var request = new CreateBookRequest
@@ -200,7 +232,7 @@ public class BookBulkImportService : IBookBulkImportService
                 });
             }
 
-            rows.Add(new BookImportRow(rowNumber, request, subjectCode, academicYearId, quantity, source, notes));
+            rows.Add(new BookImportRow(rowNumber, request, subjectCode, academicYearRaw, quantity, source, notes));
         }
 
         report.TotalRows = rows.Count;
@@ -211,23 +243,27 @@ public class BookBulkImportService : IBookBulkImportService
                 .Where(s => subjectCodes.Contains(s.Code))
                 .ToDictionaryAsync(s => s.Code, s => s.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
-        var academicYearIds = rows.Select(r => r.AcademicYearId).Where(id => id > 0).Distinct().ToList();
-        var existingAcademicYearIds = academicYearIds.Count == 0
-            ? new List<int>()
-            : await _academicYearRepository.Query()
-                .Where(a => academicYearIds.Contains(a.Id))
-                .Select(a => a.Id)
-                .ToListAsync(cancellationToken);
-        var academicYearSet = existingAcademicYearIds.ToHashSet();
+        var academicYearTokens = rows
+            .Select(r => r.AcademicYearRaw.Trim())
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
-        var codes = rows.Select(r => r.Request.Code).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        var existingCodes = codes.Count == 0
-            ? new List<string>()
-            : await _bookRepository.Query()
-                .Where(b => codes.Contains(b.Code))
-                .Select(b => b.Code)
+        var numericAcademicYearTokens = academicYearTokens
+            .Where(token => int.TryParse(token, out _))
+            .Select(int.Parse)
+            .Distinct()
+            .ToList();
+
+        var academicYearRows = academicYearTokens.Count == 0
+            ? new List<AcademicYearLookup>()
+            : await _academicYearRepository.Query()
+                .Where(a =>
+                    numericAcademicYearTokens.Contains(a.Id) ||
+                    numericAcademicYearTokens.Contains(a.Year) ||
+                    academicYearTokens.Contains(a.Name))
+                .Select(a => new AcademicYearLookup(a.Id, a.Year, a.Name))
                 .ToListAsync(cancellationToken);
-        var existingCodeSet = existingCodes.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         foreach (var row in rows)
         {
@@ -246,14 +282,15 @@ public class BookBulkImportService : IBookBulkImportService
                 row.Request.SubjectId = subjectId;
             }
 
-            if (row.AcademicYearId <= 0 || !academicYearSet.Contains(row.AcademicYearId))
+            row.AcademicYearId = ResolveAcademicYearId(row.AcademicYearRaw, academicYearRows);
+            if (row.AcademicYearId <= 0)
             {
                 report.Issues.Add(new BulkImportRowIssue
                 {
                     RowNumber = row.RowNumber,
-                    Field = "AcademicYearId",
+                    Field = "AcademicYear",
                     Code = "NotFound",
-                    Message = $"Academic year '{row.AcademicYearId}' was not found."
+                    Message = $"Academic year '{row.AcademicYearRaw}' was not found."
                 });
             }
 
@@ -265,17 +302,6 @@ public class BookBulkImportService : IBookBulkImportService
                     Field = "Quantity",
                     Code = "Validation",
                     Message = "Quantity must be a positive integer."
-                });
-            }
-
-            if (existingCodeSet.Contains(row.Request.Code))
-            {
-                report.Issues.Add(new BulkImportRowIssue
-                {
-                    RowNumber = row.RowNumber,
-                    Field = nameof(CreateBookRequest.Code),
-                    Code = "Conflict",
-                    Message = $"Book with code '{row.Request.Code}' already exists."
                 });
             }
 
@@ -300,16 +326,36 @@ public class BookBulkImportService : IBookBulkImportService
         report.InvalidRows = rowIssueSet.Count;
         report.ValidRows = Math.Max(0, report.TotalRows - report.InvalidRows);
         report.FailedRows = report.InvalidRows;
-        report.CanCommit = report.Issues.Count == 0 && report.TotalRows > 0;
+        report.CanCommit = report.ValidRows > 0;
         report.Rows = rows.Select(r => new BulkImportRowResult
         {
             RowNumber = r.RowNumber,
             Key = r.Request.Code,
             Success = !rowIssueSet.Contains(r.RowNumber),
+            Status = rowIssueSet.Contains(r.RowNumber) ? "Failed" : "Valid",
             Note = rowIssueSet.Contains(r.RowNumber) ? "Validation failed" : "Valid"
         }).ToList();
 
         return (rows.Where(r => !rowIssueSet.Contains(r.RowNumber)).ToList(), report);
+    }
+
+    private static int ResolveAcademicYearId(string rawValue, IReadOnlyCollection<AcademicYearLookup> candidates)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+            return 0;
+
+        if (int.TryParse(rawValue, out var parsed))
+        {
+            var byId = candidates.FirstOrDefault(c => c.Id == parsed);
+            if (byId is not null)
+                return byId.Id;
+
+            var byYear = candidates.FirstOrDefault(c => c.Year == parsed);
+            return byYear?.Id ?? 0;
+        }
+
+        var byName = candidates.FirstOrDefault(c => string.Equals(c.Name, rawValue, StringComparison.OrdinalIgnoreCase));
+        return byName?.Id ?? 0;
     }
 
     private sealed class BookImportRow
@@ -318,7 +364,7 @@ public class BookBulkImportService : IBookBulkImportService
             int rowNumber,
             CreateBookRequest request,
             string subjectCode,
-            int academicYearId,
+            string academicYearRaw,
             int quantity,
             string source,
             string notes)
@@ -326,7 +372,7 @@ public class BookBulkImportService : IBookBulkImportService
             RowNumber = rowNumber;
             Request = request;
             SubjectCode = subjectCode;
-            AcademicYearId = academicYearId;
+            AcademicYearRaw = academicYearRaw;
             Quantity = quantity;
             Source = source;
             Notes = notes;
@@ -335,9 +381,12 @@ public class BookBulkImportService : IBookBulkImportService
         public int RowNumber { get; }
         public CreateBookRequest Request { get; }
         public string SubjectCode { get; }
-        public int AcademicYearId { get; }
+        public string AcademicYearRaw { get; }
+        public int AcademicYearId { get; set; }
         public int Quantity { get; }
         public string Source { get; }
         public string Notes { get; }
     }
+
+    private sealed record AcademicYearLookup(int Id, int Year, string Name);
 }

@@ -1,5 +1,6 @@
 using BooksPortal.Application.Common.Interfaces;
 using BooksPortal.Application.Features.Users.DTOs;
+using BooksPortal.Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,9 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace BooksPortal.API.Controllers;
 
 [Route("api/users")]
-[Authorize(Roles = "SuperAdmin,Admin")]
+[Authorize(Roles = $"{UserRole.SuperAdmin},{UserRole.Admin}")]
 public class UsersController : ApiControllerBase
 {
+    private const int MaxPageSize = 100;
     private readonly IUserService _userService;
     private readonly IValidator<CreateUserRequest> _createValidator;
     private readonly IValidator<UpdateUserRequest> _updateValidator;
@@ -25,9 +27,14 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? search = null,
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? role = null)
     {
-        var result = await _userService.GetAllUsersAsync();
+        var result = await _userService.GetPagedUsersAsync(NormalizePageNumber(pageNumber), NormalizePageSize(pageSize), search, isActive, role);
         return OkResponse(result);
     }
 
@@ -39,6 +46,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
     {
         var validation = await _createValidator.ValidateAsync(request);
@@ -50,6 +58,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request)
     {
         var validation = await _updateValidator.ValidateAsync(request);
@@ -61,6 +70,7 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPost("{id:int}/toggle-active")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> ToggleActive(int id)
     {
         await _userService.ToggleUserActiveAsync(id);
@@ -68,9 +78,16 @@ public class UsersController : ApiControllerBase
     }
 
     [HttpPut("{id:int}/roles")]
+    [Authorize(Roles = UserRole.SuperAdmin)]
     public async Task<IActionResult> AssignRoles(int id, [FromBody] List<string> roles)
     {
         await _userService.AssignRolesAsync(id, roles);
         return OkResponse(true, "Roles assigned successfully.");
     }
+
+    private static int NormalizePageSize(int pageSize)
+        => pageSize <= 0 ? 20 : Math.Min(pageSize, MaxPageSize);
+
+    private static int NormalizePageNumber(int pageNumber)
+        => pageNumber <= 0 ? 1 : pageNumber;
 }

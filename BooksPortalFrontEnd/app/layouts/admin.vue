@@ -42,6 +42,7 @@
           {{ appTitle }}
         </h1>
         <div class="flex items-center gap-3">
+          <AdminBulkImportJobNotifier />
           <Button
             :icon="colorMode.value === 'dark' ? 'pi pi-sun' : 'pi pi-moon'"
             text
@@ -64,7 +65,8 @@
         </div>
       </header>
 
-      <main class="flex-1 p-6">
+      <main class="admin-layout-main flex min-h-0 flex-1 flex-col p-6">
+        <SetupReadinessBanner class="mb-4" />
         <slot />
       </main>
     </div>
@@ -75,11 +77,15 @@
 import type { MenuItem } from 'primevue/menuitem'
 
 const colorMode = useColorMode()
-const { user, logout } = useAuth()
+const { user, isSuperAdmin, logout } = useAuth()
 const route = useRoute()
 const { public: { appTitle } } = useRuntimeConfig()
 const userMenuRef = ref()
 const expandedKeys = ref<Record<string, boolean>>({})
+const authStore = useAuthStore()
+const setupReadinessStore = useSetupReadinessStore()
+
+useLayoutPageHead('admin')
 
 function toggleColorMode() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
@@ -93,7 +99,7 @@ const userMenuItems = ref([
   {
     label: 'Profile',
     icon: 'pi pi-user',
-    command: () => navigateTo('/admin/settings/profile'),
+    command: () => navigateTo('/profile'),
   },
   { separator: true },
   {
@@ -143,6 +149,12 @@ const menuItems = computed<MenuItem[]>(() => ([
         label: 'Classes',
         command: () => navigateTo('/admin/master-data/class-sections'),
         class: isActive('/admin/master-data/class-sections') ? 'app-menu-item-active' : undefined,
+      },
+      {
+        key: 'master-data-grades',
+        label: 'Grades',
+        command: () => navigateTo('/admin/master-data/grades'),
+        class: isActive('/admin/master-data/grades') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'master-data-students',
@@ -207,11 +219,19 @@ const menuItems = computed<MenuItem[]>(() => ([
     label: 'Settings',
     icon: 'pi pi-cog',
     items: [
+      ...(isSuperAdmin.value
+        ? [{
+            key: 'settings-users',
+            label: 'Users',
+            command: () => navigateTo('/admin/settings/users'),
+            class: isActive('/admin/settings/users') ? 'app-menu-item-active' : undefined,
+          }]
+        : []),
       {
-        key: 'settings-users',
-        label: 'Users',
-        command: () => navigateTo('/admin/settings/users'),
-        class: isActive('/admin/settings/users') ? 'app-menu-item-active' : undefined,
+        key: 'settings-setup',
+        label: 'Setup Center',
+        command: () => navigateTo('/admin/settings/setup'),
+        class: isActive('/admin/settings/setup') ? 'app-menu-item-active' : undefined,
       },
       {
         key: 'settings-reference-formats',
@@ -225,12 +245,14 @@ const menuItems = computed<MenuItem[]>(() => ([
         command: () => navigateTo('/admin/settings/slip-templates'),
         class: isActive('/admin/settings/slip-templates') ? 'app-menu-item-active' : undefined,
       },
-      {
-        key: 'settings-profile',
-        label: 'Profile',
-        command: () => navigateTo('/admin/settings/profile'),
-        class: isActive('/admin/settings/profile') ? 'app-menu-item-active' : undefined,
-      },
+      ...(isSuperAdmin.value
+        ? [{
+            key: 'settings-master-data-hierarchy',
+            label: 'Master Data Bulk Upload',
+            command: () => navigateTo('/admin/settings/master-data-hierarchy-bulk'),
+            class: isActive('/admin/settings/master-data-hierarchy-bulk') ? 'app-menu-item-active' : undefined,
+          }]
+        : []),
     ],
   },
   {
@@ -251,6 +273,19 @@ function syncExpandedKeys(path: string) {
 }
 
 watch(() => route.path, syncExpandedKeys, { immediate: true })
+
+watch(
+  () => authStore.isAuthenticated,
+  (isAuthenticated) => {
+    if (isAuthenticated) {
+      void setupReadinessStore.fetchStatus()
+    }
+    else {
+      setupReadinessStore.clear()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped>

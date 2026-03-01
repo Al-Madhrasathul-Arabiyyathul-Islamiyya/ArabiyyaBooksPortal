@@ -17,6 +17,8 @@ using BooksPortal.Application.Features.MasterData.Interfaces;
 using BooksPortal.Application.Features.MasterData.Services;
 using BooksPortal.Application.Features.Settings.Interfaces;
 using BooksPortal.Application.Features.Settings.Services;
+using BooksPortal.Application.Features.Setup.Interfaces;
+using BooksPortal.Application.Features.Setup.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,17 +34,20 @@ public static class DependencyInjection
 
         services.AddScoped<IAcademicYearService, AcademicYearService>();
         services.AddScoped<IKeystageService, KeystageService>();
+        services.AddScoped<IGradeService, GradeService>();
         services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IClassSectionService, ClassSectionService>();
         services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<IParentService, ParentService>();
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<ILookupService, LookupService>();
+        services.AddScoped<IMasterDataHierarchyBulkService, MasterDataHierarchyBulkService>();
 
         services.AddScoped<IBookService, BookService>();
         services.AddScoped<IBookBulkImportService, BookBulkImportService>();
         services.AddScoped<ITeacherBulkImportService, TeacherBulkImportService>();
         services.AddScoped<IStudentBulkImportService, StudentBulkImportService>();
+        services.AddScoped<IParentBulkImportService, ParentBulkImportService>();
         services.AddScoped<IImportTemplateService, ImportTemplateService>();
         services.AddScoped<IDistributionService, DistributionService>();
         services.AddScoped<IReturnService, ReturnService>();
@@ -52,6 +57,7 @@ public static class DependencyInjection
 
         services.AddScoped<IReferenceNumberFormatService, ReferenceNumberFormatService>();
         services.AddScoped<ISlipTemplateSettingService, SlipTemplateSettingService>();
+        services.AddScoped<ISetupReadinessService, SetupReadinessService>();
 
         return services;
     }

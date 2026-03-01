@@ -20,6 +20,16 @@ export const ChangePasswordRequestSchema = z.object({
 })
 export type ChangePasswordRequest = z.infer<typeof ChangePasswordRequestSchema>
 
+export const BootstrapSuperAdminRequestSchema = z.object({
+  userName: z.string().min(1, 'Username is required').max(100),
+  email: z.email(),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  fullName: z.string().min(1, 'Full name is required').max(200),
+  nationalId: z.string().max(50).nullable().optional(),
+  designation: z.string().max(100).nullable().optional(),
+})
+export type BootstrapSuperAdminRequest = z.infer<typeof BootstrapSuperAdminRequestSchema>
+
 // --- Master Data ---
 
 export const CreateAcademicYearRequestSchema = z.object({
@@ -45,6 +55,14 @@ export const CreateSubjectRequestSchema = z.object({
   code: z.string().min(1, 'Code is required'),
 })
 export type CreateSubjectRequest = z.infer<typeof CreateSubjectRequestSchema>
+
+export const CreateGradeRequestSchema = z.object({
+  keystageId: z.number().int().min(1, 'Keystage is required'),
+  code: z.string().min(1, 'Code is required'),
+  name: z.string().min(1, 'Name is required'),
+  sortOrder: z.number().int().min(0),
+})
+export type CreateGradeRequest = z.infer<typeof CreateGradeRequestSchema>
 
 export const CreateClassSectionRequestSchema = z.object({
   academicYearId: z.number().int().min(1, 'Academic year is required'),

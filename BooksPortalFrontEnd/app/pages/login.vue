@@ -85,13 +85,31 @@
 
 <script setup lang="ts">
 import { LoginRequestSchema } from '~/types/forms'
+import { toFriendlyLoginError } from '~/utils/auth-errors'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'auth',
 })
 
 const { login } = useAuth()
+const setupStore = useSetupReadinessStore()
 const { public: { appTitle } } = useRuntimeConfig()
+const loginTitle = computed(() => `Login - ${appTitle}`)
+
+useHead(() => ({
+  title: loginTitle.value,
+}))
+
+useSeoMeta({
+  title: loginTitle,
+  ogTitle: loginTitle,
+  twitterTitle: loginTitle,
+  description: () => `Login page for ${appTitle}.`,
+  ogDescription: () => `Login page for ${appTitle}.`,
+  twitterDescription: () => `Login page for ${appTitle}.`,
+})
+
 const {
   state: form,
   errors,
@@ -109,27 +127,6 @@ const {
 
 const isLoading = ref(false)
 const savedEmailKey = 'bp.login.email'
-
-function toFriendlyLoginError(message?: string | null) {
-  if (!message) {
-    return 'Unable to sign in right now. Please try again.'
-  }
-
-  const normalized = message.toLowerCase()
-  if (
-    normalized.includes('fetch failed')
-    || normalized.includes('econnrefused')
-    || normalized.includes('failed to fetch')
-  ) {
-    return 'Unable to reach the server. Please ensure the backend is running and try again.'
-  }
-
-  if (normalized.includes('csrf')) {
-    return 'Security validation failed. Please refresh the page and try again.'
-  }
-
-  return message
-}
 
 async function handleLogin() {
   const parsed = await validateWithSchema(form)
@@ -151,8 +148,8 @@ async function handleLogin() {
     }
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string }, message?: string }
-    setGlobalError(toFriendlyLoginError(fetchError.data?.message || fetchError.message))
+    const safeMessage = getFriendlyErrorMessage(error, 'Login failed')
+    setGlobalError(toFriendlyLoginError(safeMessage))
   }
   finally {
     isLoading.value = false
@@ -160,11 +157,24 @@ async function handleLogin() {
 }
 
 onMounted(() => {
-  if (!import.meta.client) return
-  if (form.email) return
-  const savedEmail = localStorage.getItem(savedEmailKey)
-  if (savedEmail) {
-    form.email = savedEmail
-  }
+  void (async () => {
+    try {
+      await setupStore.fetchStatus(true)
+      if (setupStore.requiresBootstrap) {
+        await navigateTo('/setup/bootstrap')
+        return
+      }
+    }
+    catch {
+      // Keep login available if setup status cannot be fetched.
+    }
+
+    if (!import.meta.client) return
+    if (form.email) return
+    const savedEmail = localStorage.getItem(savedEmailKey)
+    if (savedEmail) {
+      form.email = savedEmail
+    }
+  })()
 })
 </script>

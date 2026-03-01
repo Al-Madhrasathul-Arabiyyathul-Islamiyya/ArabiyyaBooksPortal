@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -18,7 +18,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="users"
           :loading="isLoading"
           data-key="id"
@@ -94,7 +94,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -268,6 +268,7 @@
 
 <script setup lang="ts">
 import { z } from 'zod/v4'
+import type { PaginatedList } from '~/types/api'
 import type { User } from '~/types/entities'
 import { CreateUserRequestSchema, UpdateUserRequestSchema } from '~/types/forms'
 import { API, ROLES } from '~/utils/constants'
@@ -275,7 +276,8 @@ import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['admin'],
+  middleware: ['admin', 'role'],
+  roles: [ROLES.superAdmin],
   breadcrumb: {
     admin: 'Admin',
     settings: 'Settings',
@@ -386,9 +388,12 @@ function formatDateTime(value: string) {
 async function loadUsers() {
   isLoading.value = true
   try {
-    const response = await api.get<User[]>(API.users.base)
+    const response = await api.get<PaginatedList<User>>(API.users.base, {
+      pageNumber: 1,
+      pageSize: 500,
+    })
     if (response.success) {
-      users.value = response.data
+      users.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load users')

@@ -274,7 +274,8 @@ public class PdfServiceTests
 
     private static void MaybeSave(byte[] pdf, string filename)
     {
-        if (SavePdfsTo is null) return;
+        if (SavePdfsTo is null)
+            return;
         Directory.CreateDirectory(SavePdfsTo);
         File.WriteAllBytes(Path.Combine(SavePdfsTo, filename), pdf);
     }

@@ -29,52 +29,78 @@ public class TeacherBulkImportService : ITeacherBulkImportService
         return parsed.Report;
     }
 
-    public async Task<BulkImportReport> CommitAsync(Stream stream, CancellationToken cancellationToken = default)
+    public async Task<BulkImportReport> CommitAsync(
+        Stream stream,
+        IProgress<int>? processedRowsProgress = null,
+        CancellationToken cancellationToken = default)
     {
         var parsed = await ParseAsync(stream, cancellationToken);
-        if (!parsed.Report.CanCommit)
+        if (parsed.Rows.Count == 0)
             return parsed.Report;
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        var rowsByRowNumber = parsed.Report.Rows.ToDictionary(r => r.RowNumber);
+        var nationalIds = parsed.Rows.Select(r => r.Request.NationalId).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var existingByNationalId = await _teacherRepository.Query()
+            .Where(t => nationalIds.Contains(t.NationalId))
+            .ToDictionaryAsync(t => t.NationalId, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+        var processedRows = 0;
+        foreach (var row in parsed.Rows)
         {
-            foreach (var row in parsed.Rows)
+            var rowResult = rowsByRowNumber[row.RowNumber];
+            try
             {
-                _teacherRepository.Add(new Teacher
+                var isUpdate = existingByNationalId.TryGetValue(row.Request.NationalId, out var entity);
+                if (entity is null)
                 {
-                    FullName = row.Request.FullName,
-                    NationalId = row.Request.NationalId,
-                    Email = string.IsNullOrWhiteSpace(row.Request.Email) ? null : row.Request.Email,
-                    Phone = string.IsNullOrWhiteSpace(row.Request.Phone) ? null : row.Request.Phone
+                    entity = new Teacher
+                    {
+                        NationalId = row.Request.NationalId
+                    };
+                    _teacherRepository.Add(entity);
+                }
+
+                entity.FullName = row.Request.FullName;
+                entity.Email = string.IsNullOrWhiteSpace(row.Request.Email) ? null : row.Request.Email;
+                entity.Phone = string.IsNullOrWhiteSpace(row.Request.Phone) ? null : row.Request.Phone;
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                rowResult.Success = true;
+                rowResult.Status = isUpdate ? "Updated" : "Inserted";
+                rowResult.Note = isUpdate ? "Updated existing teacher." : "Inserted new teacher.";
+
+                if (isUpdate)
+                    parsed.Report.UpdatedRows++;
+                else
+                    parsed.Report.InsertedRows++;
+
+                existingByNationalId[row.Request.NationalId] = entity;
+            }
+            catch (Exception ex)
+            {
+                rowResult.Success = false;
+                rowResult.Status = "Failed";
+                rowResult.Note = ex.Message;
+                parsed.Report.FailedRows++;
+                parsed.Report.Issues.Add(new BulkImportRowIssue
+                {
+                    RowNumber = row.RowNumber,
+                    Field = "Commit",
+                    Code = "CommitFailed",
+                    Message = ex.Message
                 });
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-        }
-        catch
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
-
-        return new BulkImportReport
-        {
-            Entity = "Teacher",
-            TotalRows = parsed.Rows.Count,
-            ValidRows = parsed.Rows.Count,
-            InvalidRows = 0,
-            InsertedRows = parsed.Rows.Count,
-            FailedRows = 0,
-            CanCommit = true,
-            Rows = parsed.Rows.Select(r => new BulkImportRowResult
+            finally
             {
-                RowNumber = r.RowNumber,
-                Key = r.Request.NationalId,
-                Success = true,
-                Note = "Inserted"
-            }).ToList()
-        };
+                processedRows++;
+                processedRowsProgress?.Report(processedRows);
+            }
+        }
+
+        parsed.Report.CanCommit = parsed.Report.Rows.Any(r => r.Success);
+        parsed.Report.ValidRows = parsed.Report.Rows.Count(r => r.Success);
+        return parsed.Report;
     }
 
     private async Task<(List<TeacherImportRow> Rows, BulkImportReport Report)> ParseAsync(Stream stream, CancellationToken cancellationToken)
@@ -157,27 +183,6 @@ public class TeacherBulkImportService : ITeacherBulkImportService
 
         report.TotalRows = rows.Count;
 
-        var nationalIds = rows.Select(r => r.Request.NationalId).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        if (nationalIds.Count > 0)
-        {
-            var existingIds = await _teacherRepository.Query()
-                .Where(t => nationalIds.Contains(t.NationalId))
-                .Select(t => t.NationalId)
-                .ToListAsync(cancellationToken);
-
-            var existingSet = existingIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            foreach (var row in rows.Where(r => existingSet.Contains(r.Request.NationalId)))
-            {
-                report.Issues.Add(new BulkImportRowIssue
-                {
-                    RowNumber = row.RowNumber,
-                    Field = nameof(CreateTeacherRequest.NationalId),
-                    Code = "Conflict",
-                    Message = $"Teacher with national ID '{row.Request.NationalId}' already exists."
-                });
-            }
-        }
-
         var rowIssueSet = report.Issues
             .Where(i => i.RowNumber > 1)
             .Select(i => i.RowNumber)
@@ -186,12 +191,13 @@ public class TeacherBulkImportService : ITeacherBulkImportService
         report.InvalidRows = rowIssueSet.Count;
         report.ValidRows = Math.Max(0, report.TotalRows - report.InvalidRows);
         report.FailedRows = report.InvalidRows;
-        report.CanCommit = report.Issues.Count == 0 && report.TotalRows > 0;
+        report.CanCommit = report.ValidRows > 0;
         report.Rows = rows.Select(r => new BulkImportRowResult
         {
             RowNumber = r.RowNumber,
             Key = r.Request.NationalId,
             Success = !rowIssueSet.Contains(r.RowNumber),
+            Status = rowIssueSet.Contains(r.RowNumber) ? "Failed" : "Valid",
             Note = rowIssueSet.Contains(r.RowNumber) ? "Validation failed" : "Valid"
         }).ToList();
 

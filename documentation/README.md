@@ -21,6 +21,8 @@ Books Portal is a web-based textbook management system for Arabiyya school. It t
 | [09-versioning-and-release.md](./09-versioning-and-release.md) | Versioning policy for backend/frontend and git release tags |
 | [10-frontend-validation-architecture.md](./10-frontend-validation-architecture.md) | Frontend validation architecture (Regle + Zod + error normalization) |
 | [11-backup-and-scheduled-reports-architecture.md](./11-backup-and-scheduled-reports-architecture.md) | Post-v1 scheduler architecture for backups, report exports, and admin monitoring |
+| [12-frontend-testing-strategy.md](./12-frontend-testing-strategy.md) | Frontend testing strategy (Vitest + Playwright), modular rollout, and merge/release gates |
+| [13-bootstrap-and-readiness-architecture.md](./13-bootstrap-and-readiness-architecture.md) | Pre-v1 bootstrap/readiness architecture to enforce mandatory initial setup before operations |
 | [api-reference.md](./api-reference.md) | **Live API reference** - all endpoints, DTOs, enums |
 
 ---
@@ -64,10 +66,10 @@ Books Portal is a web-based textbook management system for Arabiyya school. It t
 
 | Component | Status | Version |
 |-----------|--------|---------|
-| Backend (Modules 1-9) | Complete | v0.9.0 |
-| Unit Tests | 88 passing | - |
-| Frontend | Scaffolded, dependencies installed | - |
-| Frontend Implementation | Not started | - |
+| Backend (core modules + follow-ups) | Active development | v0.10.x |
+| Backend Tests | Active (unit/integration/contract) | - |
+| Frontend Core (Phases 1-4) | Implemented | - |
+| Frontend Remaining | Verification debt + lifecycle/revision UX closure | - |
 
 ---
 
@@ -88,3 +90,9 @@ BookPortal/
   designs/                   # UI mockups
   plans/                     # Feature plans (kanban)
 ```
+
+## Planning Conventions
+
+- Canonical execution plans are in numbered files under `plans/` (`01-...`, `02-...`, ...).
+- Legacy plan filenames are kept as pointer stubs; full historical content is stored in `plans/archive/`.
+- Frontend active roadmap: `plans/01-frontend-core-roadmap.md`.

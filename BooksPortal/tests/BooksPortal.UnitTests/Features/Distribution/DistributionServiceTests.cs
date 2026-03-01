@@ -51,10 +51,16 @@ public class DistributionServiceTests
     {
         return new Book
         {
-            Id = id, Code = $"BK{id:D3}", Title = $"Book {id}",
-            SubjectId = 1, Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
-            TotalStock = totalStock, Distributed = distributed,
-            WithTeachers = withTeachers, Damaged = damaged, Lost = lost
+            Id = id,
+            Code = $"BK{id:D3}",
+            Title = $"Book {id}",
+            SubjectId = 1,
+            Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
+            TotalStock = totalStock,
+            Distributed = distributed,
+            WithTeachers = withTeachers,
+            Damaged = damaged,
+            Lost = lost
         };
     }
 
@@ -130,7 +136,9 @@ public class DistributionServiceTests
         // CreateAsync calls GetByIdAsync in the loop which will throw on the
         // GetByIdAsync(slip.Id) call at the end since we can't mock Query().Include()...
         // We test the stock effect up to the point it commits
-        try { await _sut.CreateAsync(request, userId: 1); } catch { }
+        try
+        { await _sut.CreateAsync(request, userId: 1); }
+        catch { }
 
         book1.Distributed.Should().Be(5);
         book2.Distributed.Should().Be(3);
@@ -144,7 +152,9 @@ public class DistributionServiceTests
         _refService.GenerateAsync(SlipType.Distribution, 1).Returns("DST2026000001");
         var request = CreateRequest((1, 5));
 
-        try { await _sut.CreateAsync(request, userId: 1); } catch { }
+        try
+        { await _sut.CreateAsync(request, userId: 1); }
+        catch { }
 
         await _unitOfWork.Received(1).BeginTransactionAsync();
         await _refService.Received(1).GenerateAsync(SlipType.Distribution, 1);

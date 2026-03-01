@@ -219,7 +219,7 @@
             {{ formError }}
           </Message>
 
-          <div class="flex justify-end gap-2">
+          <div class="sticky bottom-0 z-10 -mx-4 flex justify-end gap-2 border-t border-surface-200 bg-surface-0 px-4 py-3 dark:border-surface-700 dark:bg-surface-900">
             <Button
               type="button"
               label="Cancel"
@@ -231,6 +231,7 @@
               type="submit"
               label="Create Return"
               :loading="isSubmitting"
+              :disabled="isOperationBlocked"
             />
           </div>
         </form>
@@ -323,6 +324,7 @@ type ItemConditionState = {
 const api = useApi()
 const { showError, showSuccess } = useAppToast()
 const { isAdmin } = useAuth()
+const { guard, isOperationBlocked } = useOperationReadinessGuard()
 
 const academicYears = ref<Lookup[]>([])
 const activeAcademicYearId = ref<number | null>(null)
@@ -522,6 +524,10 @@ function buildReturnItems(): CreateReturnSlipItemRequest[] {
 }
 
 async function submitForm() {
+  if (!await guard('create a return slip')) {
+    return
+  }
+
   form.studentId = selectedStudent.value?.id ?? null
   form.returnedById = selectedParent.value?.id ?? form.returnedById
 

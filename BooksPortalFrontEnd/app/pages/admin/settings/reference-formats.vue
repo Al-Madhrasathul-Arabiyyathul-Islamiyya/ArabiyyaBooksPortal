@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -10,6 +10,7 @@
         </p>
       </div>
       <Button
+        v-if="isSuperAdmin"
         label="New Format"
         icon="pi pi-plus"
         @click="openCreateDialog"
@@ -31,11 +32,10 @@
           />
           <Select
             v-model="filters.academicYearId"
-            :options="academicYearOptions"
+            :options="academicYearFilterOptions"
             option-label="label"
             option-value="value"
             placeholder="Filter by academic year"
-            show-clear
             fluid
             @change="void loadReferenceFormats()"
           >
@@ -65,7 +65,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           :value="formats"
           :loading="isLoading"
           data-key="id"
@@ -112,6 +112,7 @@
             <template #body="{ data }">
               <div class="flex items-center gap-2">
                 <CommonIconActionButton
+                  v-if="isSuperAdmin"
                   icon="pi pi-pencil"
                   tooltip="Edit format"
                   @click="openEditDialog(data)"
@@ -126,7 +127,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -137,7 +138,7 @@
       :style="{ width: '38rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField
@@ -374,6 +375,32 @@ const academicYearOptions = computed(() =>
   })),
 )
 
+const academicYearFilterOptions = computed(() => [
+  { label: 'All Academic Years', value: null as number | null, isActive: false },
+  ...academicYearOptions.value,
+])
+
+const slipTypeNameMap: Record<string, number> = {
+  distribution: 1,
+  return: 2,
+  teacherissue: 3,
+  teacherreturn: 4,
+}
+
+function normalizeSlipType(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isInteger(value)) {
+    return value
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return null
+    const parsed = Number(trimmed)
+    if (Number.isInteger(parsed)) return parsed
+    return slipTypeNameMap[trimmed.toLowerCase()] ?? null
+  }
+  return null
+}
+
 function previewTemplate(template: string, paddingWidth: number, sequenceNo = 1) {
   const sequence = String(sequenceNo).padStart(paddingWidth ?? 6, '0')
   return template
@@ -436,7 +463,10 @@ async function loadReferenceFormats() {
       academicYearId: filters.academicYearId ?? undefined,
     })
     if (response.success) {
-      formats.value = response.data
+      formats.value = response.data.map(item => ({
+        ...item,
+        slipType: normalizeSlipType(item.slipType) ?? item.slipType,
+      }))
       return
     }
     showError(response.message ?? 'Failed to load reference formats')
@@ -459,7 +489,7 @@ function openEditDialog(item: ReferenceNumberFormat) {
   resetForm()
   isEditing.value = true
   selectedId.value = item.id
-  form.slipType = item.slipType
+  form.slipType = normalizeSlipType(item.slipType)
   form.academicYearId = item.academicYearId
   form.formatTemplate = item.formatTemplate
   form.paddingWidth = item.paddingWidth
@@ -559,9 +589,7 @@ async function resetFilters() {
 }
 
 onMounted(async () => {
-  await Promise.all([
-    loadAcademicYears(),
-    loadReferenceFormats(),
-  ])
+  await loadAcademicYears()
+  await loadReferenceFormats()
 })
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
@@ -29,7 +29,7 @@
           />
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="parents"
           :loading="isLoading"
           data-key="id"
@@ -79,7 +79,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -90,7 +90,7 @@
       :style="{ width: '34rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField
@@ -184,6 +184,7 @@ import type { PaginatedList } from '~/types/api'
 import type { Parent } from '~/types/entities'
 import { CreateParentRequestSchema } from '~/types/forms'
 import { API } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 definePageMeta({
   layout: 'admin',
@@ -257,8 +258,7 @@ async function loadParents() {
     showError(response.message ?? 'Failed to load parents')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load parents')
+    showError(getFriendlyErrorMessage(error, 'Failed to load parents'))
   }
   finally {
     isLoading.value = false
@@ -358,8 +358,7 @@ function handleDelete(item: Parent) {
         showError(response.message ?? 'Failed to delete parent')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete parent')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete parent'))
       }
     },
   )

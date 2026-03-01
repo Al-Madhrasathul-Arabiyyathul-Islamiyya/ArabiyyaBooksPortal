@@ -7,25 +7,38 @@ namespace BooksPortal.API.Controllers;
 [Authorize]
 public class ReportsController : ApiControllerBase
 {
+    private const int MaxPageSize = 100;
     private readonly IReportService _service;
 
     public ReportsController(IReportService service) => _service = service;
 
     [HttpGet("stock-summary")]
-    public async Task<IActionResult> StockSummary(int? subjectId = null, string? grade = null)
-        => OkResponse(await _service.GetStockSummaryAsync(subjectId, grade));
+    public async Task<IActionResult> StockSummary(
+        int pageNumber = 1,
+        int pageSize = 20,
+        int? subjectId = null,
+        string? grade = null)
+        => OkResponse(await _service.GetStockSummaryAsync(NormalizePageNumber(pageNumber), NormalizePageSize(pageSize), subjectId, grade));
 
     [HttpGet("distribution-summary")]
-    public async Task<IActionResult> DistributionSummary(int academicYearId, DateTime? from = null, DateTime? to = null)
-        => OkResponse(await _service.GetDistributionSummaryAsync(academicYearId, from, to));
+    public async Task<IActionResult> DistributionSummary(
+        int academicYearId,
+        int pageNumber = 1,
+        int pageSize = 20,
+        DateTime? from = null,
+        DateTime? to = null)
+        => OkResponse(await _service.GetDistributionSummaryAsync(NormalizePageNumber(pageNumber), NormalizePageSize(pageSize), academicYearId, from, to));
 
     [HttpGet("teacher-outstanding")]
-    public async Task<IActionResult> TeacherOutstanding(int? teacherId = null)
-        => OkResponse(await _service.GetTeacherOutstandingAsync(teacherId));
+    public async Task<IActionResult> TeacherOutstanding(
+        int pageNumber = 1,
+        int pageSize = 20,
+        int? teacherId = null)
+        => OkResponse(await _service.GetTeacherOutstandingAsync(NormalizePageNumber(pageNumber), NormalizePageSize(pageSize), teacherId));
 
     [HttpGet("student-history/{studentId}")]
-    public async Task<IActionResult> StudentHistory(int studentId)
-        => OkResponse(await _service.GetStudentHistoryAsync(studentId));
+    public async Task<IActionResult> StudentHistory(int studentId, int pageNumber = 1, int pageSize = 20)
+        => OkResponse(await _service.GetStudentHistoryAsync(NormalizePageNumber(pageNumber), NormalizePageSize(pageSize), studentId));
 
     [HttpGet("export/stock-summary")]
     public async Task<IActionResult> ExportStockSummary(int? subjectId = null, string? grade = null)
@@ -47,4 +60,10 @@ public class ReportsController : ApiControllerBase
         var bytes = await _service.ExportTeacherOutstandingAsync(teacherId);
         return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "teacher-outstanding.xlsx");
     }
+
+    private static int NormalizePageSize(int pageSize)
+        => pageSize <= 0 ? 20 : Math.Min(pageSize, MaxPageSize);
+
+    private static int NormalizePageNumber(int pageNumber)
+        => pageNumber <= 0 ? 1 : pageNumber;
 }

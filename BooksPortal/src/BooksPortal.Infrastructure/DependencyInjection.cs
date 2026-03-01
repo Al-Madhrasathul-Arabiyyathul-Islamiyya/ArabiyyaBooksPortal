@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BooksPortal.Infrastructure;
 
@@ -22,7 +23,19 @@ public static class DependencyInjection
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(BooksPortalDbContext).Assembly.FullName)));
 
-        services.AddDataProtection();
+        var dataProtectionBuilder = services.AddDataProtection();
+
+        var keyStoragePath = configuration["DataProtection:KeyStoragePath"];
+        if (!string.IsNullOrWhiteSpace(keyStoragePath))
+        {
+            dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(keyStoragePath));
+        }
+
+        var dataProtectionCertificate = LoadCertificateForDataProtection(configuration);
+        if (dataProtectionCertificate is not null)
+        {
+            dataProtectionBuilder.ProtectKeysWithCertificate(dataProtectionCertificate);
+        }
 
         services.AddIdentityCore<Staff>(options =>
             {
@@ -45,9 +58,47 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IStaffDirectoryService, StaffDirectoryService>();
+        services.AddScoped<ISetupIdentityService, SetupIdentityService>();
         services.AddScoped<IReferenceNumberService, ReferenceNumberService>();
         services.AddScoped<ISlipStorageService, SlipStorageService>();
 
         return services;
+    }
+
+    private static X509Certificate2? LoadCertificateForDataProtection(IConfiguration configuration)
+    {
+        var certBase64 = configuration["DataProtection:CertificateBase64"];
+        var certPath = configuration["DataProtection:CertificatePath"];
+        var certPassword = configuration["DataProtection:CertificatePassword"];
+
+        if (string.IsNullOrWhiteSpace(certBase64) && string.IsNullOrWhiteSpace(certPath))
+        {
+            return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(certBase64))
+        {
+            var certBytes = Convert.FromBase64String(certBase64);
+            return X509CertificateLoader.LoadPkcs12(
+                certBytes,
+                certPassword,
+                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
+        }
+
+        var resolvedPath = certPath!;
+        if (!Path.IsPathRooted(resolvedPath))
+        {
+            resolvedPath = Path.GetFullPath(resolvedPath);
+        }
+
+        if (!File.Exists(resolvedPath))
+        {
+            throw new InvalidOperationException($"DataProtection certificate file not found at path '{resolvedPath}'.");
+        }
+
+        return X509CertificateLoader.LoadPkcs12FromFile(
+            resolvedPath,
+            certPassword,
+            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.EphemeralKeySet);
     }
 }

@@ -39,10 +39,16 @@ public class ReturnServiceTests
     {
         return new Book
         {
-            Id = id, Code = $"BK{id:D3}", Title = $"Book {id}",
-            SubjectId = 1, Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
-            TotalStock = totalStock, Distributed = distributed,
-            WithTeachers = withTeachers, Damaged = damaged, Lost = lost
+            Id = id,
+            Code = $"BK{id:D3}",
+            Title = $"Book {id}",
+            SubjectId = 1,
+            Subject = new Subject { Id = 1, Name = "Math", Code = "MAT" },
+            TotalStock = totalStock,
+            Distributed = distributed,
+            WithTeachers = withTeachers,
+            Damaged = damaged,
+            Lost = lost
         };
     }
 
@@ -154,7 +160,9 @@ public class ReturnServiceTests
         _refService.GenerateAsync(SlipType.Return, 1).Returns("RTN2026000001");
         var request = new CreateReturnSlipRequest
         {
-            AcademicYearId = 1, StudentId = 1, ReturnedById = 1,
+            AcademicYearId = 1,
+            StudentId = 1,
+            ReturnedById = 1,
             Items = new() { new() { BookId = 999, Quantity = 1, Condition = BookCondition.Good } }
         };
 
@@ -176,7 +184,9 @@ public class ReturnServiceTests
 
         var request = new CreateReturnSlipRequest
         {
-            AcademicYearId = 1, StudentId = 1, ReturnedById = 1,
+            AcademicYearId = 1,
+            StudentId = 1,
+            ReturnedById = 1,
             Items = new()
             {
                 new() { BookId = 1, Quantity = 3, Condition = BookCondition.Damaged },
@@ -184,7 +194,9 @@ public class ReturnServiceTests
             }
         };
 
-        try { await _sut.CreateAsync(request, userId: 1); } catch { }
+        try
+        { await _sut.CreateAsync(request, userId: 1); }
+        catch { }
 
         book1.Distributed.Should().Be(17);  // 20 - 3
         book1.Damaged.Should().Be(5);       // 2 + 3

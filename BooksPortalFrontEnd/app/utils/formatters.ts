@@ -1,4 +1,11 @@
-import { TermValue, BookConditionValue, MovementTypeValue, TeacherIssueStatusValue, SlipTypeValue } from '~/types/enums'
+import {
+  TermValue,
+  BookConditionValue,
+  MovementTypeValue,
+  TeacherIssueStatusValue,
+  SlipTypeValue,
+  SlipLifecycleStatusValue,
+} from '~/types/enums'
 
 // Enum display labels
 export const termLabels: Record<number, string> = {
@@ -39,6 +46,18 @@ export const slipTypeLabels: Record<number, string> = {
   [SlipTypeValue.Return]: 'Return',
   [SlipTypeValue.TeacherIssue]: 'Teacher Issue',
   [SlipTypeValue.TeacherReturn]: 'Teacher Return',
+}
+
+export const slipLifecycleLabels: Record<number, string> = {
+  [SlipLifecycleStatusValue.Processing]: 'Processing',
+  [SlipLifecycleStatusValue.Finalized]: 'Finalized',
+  [SlipLifecycleStatusValue.Cancelled]: 'Cancelled',
+}
+
+export const slipLifecycleSeverity: Record<number, string> = {
+  [SlipLifecycleStatusValue.Processing]: 'warn',
+  [SlipLifecycleStatusValue.Finalized]: 'success',
+  [SlipLifecycleStatusValue.Cancelled]: 'danger',
 }
 
 // Condition severity colors for PrimeVue Tag/Badge

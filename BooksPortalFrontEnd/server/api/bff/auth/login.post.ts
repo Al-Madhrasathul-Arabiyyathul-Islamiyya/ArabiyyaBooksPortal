@@ -1,5 +1,5 @@
 import { createError, defineEventHandler, readBody } from 'h3'
-import { clearSessionTokens, setSessionTokens } from '../../../utils/auth-session'
+import { clearSessionTokens, setSessionTokens } from '#server/utils/auth-session'
 
 type LoginRequest = {
   email: string

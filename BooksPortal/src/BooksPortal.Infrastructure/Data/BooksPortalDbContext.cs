@@ -39,6 +39,7 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
     public DbSet<TeacherReturnSlip> TeacherReturnSlips => Set<TeacherReturnSlip>();
     public DbSet<TeacherReturnSlipItem> TeacherReturnSlipItems => Set<TeacherReturnSlipItem>();
     public DbSet<SlipTemplateSetting> SlipTemplateSettings => Set<SlipTemplateSetting>();
+    public DbSet<SystemSetupState> SystemSetupState => Set<SystemSetupState>();
 
     public BooksPortalDbContext(
         DbContextOptions<BooksPortalDbContext> options,
@@ -164,7 +165,8 @@ public class BooksPortalDbContext : IdentityDbContext<Staff, IdentityRole<int>, 
 
     private async Task OnAfterSaveChanges(List<AuditEntry> auditEntries, CancellationToken cancellationToken)
     {
-        if (auditEntries.Count == 0) return;
+        if (auditEntries.Count == 0)
+            return;
 
         foreach (var entry in auditEntries)
         {

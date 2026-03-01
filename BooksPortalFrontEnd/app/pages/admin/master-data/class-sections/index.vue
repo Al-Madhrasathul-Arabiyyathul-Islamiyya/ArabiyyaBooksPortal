@@ -18,15 +18,21 @@
 
     <Card class="flex min-h-0 flex-1 flex-col">
       <template #content>
-        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormsSearchInput
-            id="class-sections-search"
-            v-model="searchTerm"
-            name="class-sections-search"
-            persist-key="bp.search.admin.class-sections"
-            placeholder="Search by class, grade, section or keystage"
-            @search="handleSearch"
-          />
+        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[32rem_22rem]">
+          <FormsFormField
+            label="Search"
+            field-id="class-sections-search"
+          >
+            <FormsSearchInput
+              id="class-sections-search"
+              v-model="searchTerm"
+              name="class-sections-search"
+              persist-key="bp.search.admin.class-sections"
+              placeholder="Search by class, grade, section or keystage"
+              @search="handleSearch"
+            />
+          </FormsFormField>
+
           <FormsFormField
             label="Filter by Academic Year"
             field-id="yearFilter"
@@ -54,7 +60,7 @@
           </FormsFormField>
         </div>
 
-        <DataTable
+        <CommonAdminDataTable
           :value="filteredClassSections"
           :loading="isLoading"
           data-key="id"
@@ -112,7 +118,7 @@
               </div>
             </template>
           </Column>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
 
@@ -123,7 +129,7 @@
       :style="{ width: '34rem' }"
     >
       <form
-        class="flex flex-col gap-4"
+        class="flex h-full min-h-0 flex-col gap-4"
         @submit.prevent="handleSubmit"
       >
         <FormsFormField
@@ -240,6 +246,7 @@
 </template>
 
 <script setup lang="ts">
+import type { PaginatedList } from '~/types/api'
 import type {
   AcademicYear,
   ClassSection,
@@ -248,6 +255,7 @@ import type {
 } from '~/types/entities'
 import { CreateClassSectionRequestSchema } from '~/types/forms'
 import { API, PAGINATION } from '~/utils/constants'
+import { getFriendlyErrorMessage } from '~/utils/validation/backend-errors'
 
 interface SelectOption {
   label: string
@@ -406,8 +414,7 @@ async function loadLookups() {
     }
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load class section lookups')
+    showError(getFriendlyErrorMessage(error, 'Failed to load class section lookups'))
   }
 }
 
@@ -426,19 +433,19 @@ async function loadActiveAcademicYear() {
 async function loadClassSections() {
   isLoading.value = true
   try {
-    const query = selectedAcademicYearFilter.value
-      ? `?academicYearId=${selectedAcademicYearFilter.value}`
-      : ''
-    const response = await api.get<ClassSection[]>(`${API.classSections.base}${query}`)
+    const response = await api.get<PaginatedList<ClassSection>>(API.classSections.base, {
+      pageNumber: 1,
+      pageSize: 500,
+      academicYearId: selectedAcademicYearFilter.value ?? undefined,
+    })
     if (response.success) {
-      classSections.value = response.data
+      classSections.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load class sections')
   }
   catch (error: unknown) {
-    const fetchError = error as { data?: { message?: string } }
-    showError(fetchError.data?.message ?? 'Failed to load class sections')
+    showError(getFriendlyErrorMessage(error, 'Failed to load class sections'))
   }
   finally {
     isLoading.value = false
@@ -535,8 +542,7 @@ function handleDelete(item: ClassSection) {
         showError(response.message ?? 'Failed to delete class section')
       }
       catch (error: unknown) {
-        const fetchError = error as { data?: { message?: string } }
-        showError(fetchError.data?.message ?? 'Failed to delete class section')
+        showError(getFriendlyErrorMessage(error, 'Failed to delete class section'))
       }
     },
   )
@@ -570,8 +576,7 @@ watch(
       showError(response.message ?? 'Failed to load grades')
     }
     catch (error: unknown) {
-      const fetchError = error as { data?: { message?: string } }
-      showError(fetchError.data?.message ?? 'Failed to load grades')
+      showError(getFriendlyErrorMessage(error, 'Failed to load grades'))
     }
   },
 )

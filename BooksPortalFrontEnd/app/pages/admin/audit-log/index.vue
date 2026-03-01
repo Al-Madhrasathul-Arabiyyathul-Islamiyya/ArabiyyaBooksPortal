@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex h-full min-h-0 flex-col gap-4">
     <div>
       <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
         Audit Log
@@ -71,7 +71,7 @@
 
     <Card>
       <template #content>
-        <DataTable
+        <CommonAdminDataTable
           v-model:expanded-rows="expandedRows"
           :value="logs"
           :loading="isLoading"
@@ -139,7 +139,7 @@
               </div>
             </div>
           </template>
-        </DataTable>
+        </CommonAdminDataTable>
       </template>
     </Card>
   </div>
@@ -206,9 +206,12 @@ function formatJson(raw: string | null) {
 
 async function loadUsers() {
   try {
-    const response = await api.get<User[]>(API.users.base)
+    const response = await api.get<PaginatedList<User>>(API.users.base, {
+      pageNumber: 1,
+      pageSize: 500,
+    })
     if (response.success) {
-      users.value = response.data
+      users.value = response.data.items
       return
     }
     showError(response.message ?? 'Failed to load users')
